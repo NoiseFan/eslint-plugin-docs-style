@@ -1,34 +1,37 @@
 {
   "name": "eslint-plugin-vitepress",
+  "type": "module",
   "version": "0.0.0",
   "packageManager": "pnpm@10.21.0",
   "description": "My awesome typescript library",
-  "type": "module",
+  "author": "noisefan <noisefan@163.com>",
   "license": "MIT",
   "homepage": "https://github.com/NoiseFan/eslint-plugin-vitepress#readme",
-  "bugs": {
-    "url": "https://github.com/NoiseFan/eslint-plugin-vitepress/issues"
-  },
   "repository": {
     "type": "git",
     "url": "git+github.com:NoiseFan/eslint-plugin-vitepress.git"
   },
-  "author": "noisefan <noisefan@163.com>",
-  "files": [
-    "dist"
-  ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/NoiseFan/eslint-plugin-vitepress/issues"
+  },
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "scripts": {
-    "lint": "eslint --cache .",
+    "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -37,18 +40,20 @@
     "release": "bumpp",
     "prepublishOnly": "pnpm run build"
   },
-  "devDependencies": {
-    "@types/node": "^24.10.0",
-    "bumpp": "^10.3.1",
-    "eslint": "^9.39.1",
-    "prettier": "^3.6.2",
-    "tsdown": "^0.16.2",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.8",
-    "@antfu/eslint-config": "^6.2.0",
-    "eslint-plugin-format": "^1.0.2"
+  "dependencies": {
   },
-  "engines": {
-    "node": ">=20.19.0"
+  "devDependencies": {
+    "@antfu/eslint-config": "^6.2.0",
+    "@eslint/markdown": "^7.5.1",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/utils": "^8.46.4",
+    "bumpp": "^10.3.1",
+    "eslint": "9.39.1",
+    "eslint-plugin-format": "^1.0.2",
+    "eslint-vitest-rule-tester": "^3.0.0",
+    "tsdown": "^0.16.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
   }
 }

@@ -1,5 +1,13 @@
-export const foo = 'foo'
+import type { ESLint } from 'eslint'
+import markdown, { MarkdownLanguage } from '@eslint/markdown'
+import { rules } from './rules'
 
-export function fn(): void {
-  return void 0
+export const plugin: ESLint.Plugin = {
+  rules,
+  processors: markdown.processors,
+  languages: {
+    commonmark: new MarkdownLanguage({ mode: 'commonmark' }),
+    gfm: new MarkdownLanguage({ mode: 'gfm' }),
+  },
 }
+export default plugin
