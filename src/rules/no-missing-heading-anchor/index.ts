@@ -1,6 +1,6 @@
 import type { Heading } from 'mdast'
 import { createRule } from '../../utils'
-import { getHeadingNodeText, getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
+import { getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
 
 export const RULE_NAME = 'no-missing-heading-anchor'
 
