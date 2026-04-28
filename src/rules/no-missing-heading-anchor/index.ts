@@ -1,19 +1,23 @@
 import type { Heading } from 'mdast'
-import { createRule } from '../../utils'
+import { createRule, getNodePosition } from '../../utils'
 import { getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
 
 export const RULE_NAME = 'no-missing-heading-anchor'
 
-const MESSAGE_IDS = 'missingAnchor'
+const MESSAGE_IDS = {
+  missingAnchor: 'missingAnchor',
+} as const
+
+type MessageIds = typeof MESSAGE_IDS[keyof typeof MESSAGE_IDS]
 
 type Options = []
 
-export default createRule<Options, typeof MESSAGE_IDS>({
+export default createRule<Options, MessageIds>({
   name: RULE_NAME,
   meta: {
     type: 'layout',
     docs: {
-      description: 'Non-ASCII heading must have an anchor',
+      description: 'Require anchors for headings that contain Chinese characters.',
     },
     messages: {
       missingAnchor: 'Non-ASCII heading must have an anchor in the format "{#lowercase-anchor}".',
@@ -33,17 +37,19 @@ export default createRule<Options, typeof MESSAGE_IDS>({
         if (!likeAnchor) {
           context.report({
             node: node as any,
-            messageId: MESSAGE_IDS,
+            messageId: MESSAGE_IDS.missingAnchor,
           })
           return
         }
 
+        const { position, start, end } = getNodePosition(node)
+        if (!position)
+          return
+
         context.report({
           node: node as any,
-          messageId: MESSAGE_IDS,
+          messageId: MESSAGE_IDS.missingAnchor,
           fix(fixer) {
-            const start = node.position!.start.offset!
-            const end = node.position!.end.offset!
             const rawLikeAnchor = getLikeAnchor(content) ?? likeAnchor
 
             const anchor = normalizeAnchor(rawLikeAnchor)

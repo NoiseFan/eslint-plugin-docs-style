@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  platform: 'neutral',
+  platform: 'node',
   exports: true,
 })
