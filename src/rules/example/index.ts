@@ -13,7 +13,7 @@ export default createRule<Options, MessageIds>({
   meta: {
     type: 'layout',
     docs: {
-      description: 'Normalize non-ASCII heading anchor suffixes to lowercase, URL-safe anchors.',
+      description: '',
     },
     messages: {
       exampleMsgId: 'exampleMsgId',

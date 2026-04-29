@@ -27,7 +27,11 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       heading(node) {
-        const content = context.sourceCode.text
+        const { position, start, end } = getNodePosition(node)
+        if (!position)
+          return
+
+        const content = context.sourceCode.text.slice(start, end)
         if (isStrictAnchor(content) || !hasChinese(content))
           return
 
@@ -46,10 +50,6 @@ export default createRule<Options, MessageIds>({
 
         const anchor = normalizeAnchor(rawLikeAnchor)
         if (rawLikeAnchor === anchor)
-          return
-
-        const { position, start, end } = getNodePosition(node)
-        if (!position)
           return
 
         context.report({

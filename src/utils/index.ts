@@ -2,6 +2,8 @@ import type { Rule } from 'eslint'
 import type { Nodes } from 'mdast'
 import type { RuleContext, RuleListener, RuleWithMetaAndName } from '../types'
 
+export { getHeadingNodeText } from './rules/anchor'
+
 export function createRule<Options extends readonly unknown[], MessageIds extends string>({ create, meta }: Readonly<RuleWithMetaAndName<Options, MessageIds>>): Rule.RuleModule {
   return {
     create: ((

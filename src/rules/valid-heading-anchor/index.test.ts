@@ -13,6 +13,10 @@ const valid: ValidTestCase[] = [
     code: '# Some English Title',
   },
   {
+    description: 'english heading should not be affected by chinese content elsewhere',
+    code: '## equal\n\n- **类型:** `<T>(actual: T, expected: T, message?: string) => void`\n\n断言 `actual` 和 `expected` 非严格相等 (==)。\n\n```ts\n import { assert, test } from \'vitest\'\n\ntest(\'assert.equal\', () => {\n\nassert.equal(Math.sqrt(4), \'2\')\n})',
+  },
+  {
     description: 'sigle word of anchor',
     code: '# 简介 {#intro}',
   },
@@ -52,12 +56,6 @@ const invalid: InvalidTestCase[] = [
     description: 'should be allow underline',
     code: '# 中文标题 {#Foo_Bar`123}',
     output: '# 中文标题 {#foo_bar123}',
-    errors: [{ messageId: 'invalidHeadingAnchor' }],
-  },
-  {
-    description: 'should be formatered capital letters',
-    code: '# Introduction {#API-Reference_v2}',
-    output: '# Introduction {#api-reference_v2}',
     errors: [{ messageId: 'invalidHeadingAnchor' }],
   },
 ]

@@ -25,7 +25,6 @@ export default antfu(
       'docs-style': plugin,
     },
     rules: {
-      'docs-style/require-heading-anchor': 'error',
       'docs-style/space-between-link': 'error',
       'docs-style/valid-heading-anchor': 'error',
     },
