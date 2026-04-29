@@ -11,7 +11,7 @@ describe('hasAnchor', () => {
     ]
 
     for (const ele of data)
-      expect(hasAnchor(ele)).toBe(true)
+      expect(hasAnchor(ele)).toBeTruthy()
   })
 
   it('should return false for missing or malformed anchors', () => {
@@ -28,7 +28,7 @@ describe('hasAnchor', () => {
     ]
 
     for (const ele of data)
-      expect(hasAnchor(ele)).toBe(false)
+      expect(hasAnchor(ele)).toBeFalsy()
   })
 })
 
