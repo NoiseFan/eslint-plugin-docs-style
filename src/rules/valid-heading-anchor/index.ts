@@ -1,6 +1,6 @@
 import type { Heading } from 'mdast'
 import { createRule, getNodePosition } from '../../utils'
-import { getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
+import { getAnchor, hasAnchor, hasChinese, hasExplicitAnchor, normalizeAnchor } from '../../utils/rules/anchor'
 import { isFrontmatter, isHeading } from '../../utils/rules/heading'
 
 export const RULE_NAME = 'valid-heading-anchor'
@@ -19,7 +19,7 @@ export default createRule<Options, MessageIds>({
       description: 'Normalize non-ASCII heading anchor suffixes to lowercase, URL-safe anchors.',
     },
     messages: {
-      invalidHeadingAnchor: 'Heading anchors must use lowercase letters, digits, and hyphens only.',
+      invalidHeadingAnchor: 'Heading anchors must use lowercase letters, digits, hyphens, and underscores only.',
     },
     fixable: 'whitespace',
     schema: [],
@@ -37,14 +37,17 @@ export default createRule<Options, MessageIds>({
         if (isFrontmatter(content) || !isHeading(content))
           return
 
-        if (!hasChinese(content) && hasAnchor(content))
-          return
-        const rawLikeAnchor = getLikeAnchor(content)
-        if (!rawLikeAnchor)
+        if (!hasExplicitAnchor(content))
           return
 
-        const anchor = normalizeAnchor(rawLikeAnchor)
-        if (rawLikeAnchor === anchor)
+        if (!hasChinese(content) && hasAnchor(content))
+          return
+        const rawAnchor = getAnchor(content)
+        if (!rawAnchor)
+          return
+
+        const anchor = normalizeAnchor(rawAnchor)
+        if (rawAnchor === anchor)
           return
 
         context.report({

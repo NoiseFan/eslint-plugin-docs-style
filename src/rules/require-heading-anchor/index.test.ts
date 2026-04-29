@@ -7,6 +7,7 @@ const valid: ValidTestCase[] = [
   '# Some English Title',
   '# Introduction',
   '# 中文标题 {#chinese-title}',
+  '# 中文标题 {#Chinese-Title}',
   '# 简介 {#intro}',
   '# some title {#some-title-1}',
   '## Secondary title',

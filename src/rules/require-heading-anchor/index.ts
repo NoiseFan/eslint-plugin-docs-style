@@ -1,6 +1,6 @@
 import type { Heading } from 'mdast'
 import { createRule, getNodePosition } from '../../utils'
-import { getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
+import { getLikeAnchor, hasChinese, hasExplicitAnchor, normalizeAnchor } from '../../utils/rules/anchor'
 import { isFrontmatter, isHeading } from '../../utils/rules/heading'
 
 export const RULE_NAME = 'require-heading-anchor'
@@ -36,7 +36,10 @@ export default createRule<Options, MessageIds>({
         if (!position)
           return
 
-        if (isFrontmatter(content) || !isHeading(content) || !hasChinese(content) || hasAnchor(content))
+        if (isFrontmatter(content) || !isHeading(content) || !hasChinese(content))
+          return
+
+        if (hasExplicitAnchor(content))
           return
 
         const likeAnchor = getLikeAnchor(content)

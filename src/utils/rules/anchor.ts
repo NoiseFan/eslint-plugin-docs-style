@@ -8,7 +8,7 @@ export function getHeadingNodeText(node: any): string {
   return ''
 }
 export function getAnchor(str: string): string | null {
-  const match = str.match(/\{?#([^}]+)\}?/)
+  const match = str.match(/\{#([^}]+)\}$/)
   return match ? match[1] : null
 }
 
@@ -32,6 +32,10 @@ export function getLikeAnchor(str: string): string | null {
  */
 export function hasAnchor(str: string): boolean {
   return /\s\{#[a-z0-9]+(?:-[a-z0-9]+)*\}/.test(str)
+}
+
+export function hasExplicitAnchor(str: string): boolean {
+  return /\s\{#[^}]+\}$/.test(str)
 }
 
 export function hasChinese(str: string): boolean {

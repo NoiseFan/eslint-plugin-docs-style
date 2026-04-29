@@ -35,7 +35,6 @@ export function isFrontmatter(rawText: string): boolean {
  */
 export function isHeading(rawText: string): boolean {
   const lines = normalizeHeading(rawText)
-
   if (lines.length === 0)
     return false
 
