@@ -13,6 +13,8 @@ const valid: ValidTestCase[] = [
   'In the [Getting Started](/guide/) guide, ',
   'In the, [Getting Started](/guide/) guide, ',
   'In the [Getting Started](/guide/), ',
+  '## Prev paragraph\n\n[`link`](/link) paragraph content',
+  '[`link`](/link) paragraph content\n\n ## Next paragraph',
 ]
 
 const invalid: InvalidTestCase[] = [

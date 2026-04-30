@@ -61,6 +61,7 @@ describe('getLinkSpaceIssue', () => {
   it('detects each supported spacing issue', () => {
     const cases = new Map<string, string | null>([
       ['在 [入门指南](/guide/) 中，', null],
+      ['prev paragraph. \n\n[`toContain`](/api/expect#tocontain) checks that an array includes a particular item.', null],
       ['在[入门指南](/guide/) 中，', 'missingSpaceBeforeLink'],
       ['在  [入门指南](/guide/) 中，', 'multipleSpacesBeforeLink'],
       ['在。 [入门指南](/guide/) 中，', 'unexpectedSpaceBeforeLink'],
@@ -85,6 +86,7 @@ describe('validLinkSpace', () => {
       '在 [入门指南](/guide/) 中，',
       '在。[入门指南](/guide/) 中，',
       '在 [入门指南](/guide/)。',
+      '上一段。\n\n[`toContain`](/api/expect#tocontain) checks that an array includes a particular item.',
       'In the [Getting Started](/guide/) guide,',
       'In the, [Getting Started](/guide/) guide,',
       'In the [Getting Started](/guide/),',

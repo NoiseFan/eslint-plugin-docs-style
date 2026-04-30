@@ -32,11 +32,11 @@ export default createRule<Options, MessageIds>({
         if (!position)
           return
 
-        const content = context.sourceCode.text.slice(start, end)
-        if (isStrictAnchor(content) || !hasChinese(content) || isFrontmatter(content))
+        const source = context.sourceCode.text.slice(start, end)
+        if (isStrictAnchor(source) || !hasChinese(source) || isFrontmatter(source))
           return
 
-        const liked = getLikeAnchor(content)
+        const liked = getLikeAnchor(source)
         if (!liked) {
           context.report({
             node: node as any,
@@ -46,8 +46,8 @@ export default createRule<Options, MessageIds>({
         }
         const { rawLikeAnchor, isLikeAnchor } = liked
 
-        const compensate = calcAnchorPositionCompensate(content)
-        const remainingContent = content.slice(0, -rawLikeAnchor.length - compensate).trim()
+        const compensate = calcAnchorPositionCompensate(source)
+        const remainingContent = source.slice(0, -rawLikeAnchor.length - compensate).trim()
 
         const anchor = normalizeAnchor(rawLikeAnchor)
         if (rawLikeAnchor === anchor)
