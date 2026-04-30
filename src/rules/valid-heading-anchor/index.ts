@@ -1,24 +1,25 @@
-import type { Heading } from 'mdast'
 import { createRule, getNodePosition } from '../../utils'
-import { getLikeAnchor, hasAnchor, hasChinese, normalizeAnchor } from '../../utils/rules/anchor'
+import { calcAnchorPositionCompensate, getLikeAnchor, hasChinese, isStrictAnchor, normalizeAnchor } from '../../utils/rules/anchor'
+import { isFrontmatter } from '../../utils/rules/heading'
 
 export const RULE_NAME = 'valid-heading-anchor'
 const MESSAGE_IDS = {
+  missingAnchor: 'missingAnchor',
   invalidHeadingAnchor: 'invalidHeadingAnchor',
 } as const
-
-type MessageIds = typeof MESSAGE_IDS[keyof typeof MESSAGE_IDS]
 type Options = []
+type MessageIds = typeof MESSAGE_IDS[keyof typeof MESSAGE_IDS]
 
 export default createRule<Options, MessageIds>({
   name: RULE_NAME,
   meta: {
     type: 'layout',
     docs: {
-      description: 'Normalize non-ASCII heading anchor suffixes to lowercase, URL-safe anchors.',
+      description: '',
     },
     messages: {
-      invalidHeadingAnchor: 'Heading anchors must use lowercase letters, digits, and hyphens only.',
+      missingAnchor: 'Non-ASCII heading must have an anchor in the format "{#lowercase-anchor}".',
+      invalidHeadingAnchor: 'invalidHeadingAnchor',
     },
     fixable: 'whitespace',
     schema: [],
@@ -26,27 +27,37 @@ export default createRule<Options, MessageIds>({
   defaultOptions: [],
   create(context) {
     return {
-      heading(node: Heading) {
-        const content = context.sourceCode.getText()
-        if (!hasChinese(content) && hasAnchor(content))
+      heading(node) {
+        const { position, start, end } = getNodePosition(node)
+        if (!position)
           return
-        const rawLikeAnchor = getLikeAnchor(content)
-        if (!rawLikeAnchor)
+
+        const content = context.sourceCode.text.slice(start, end)
+        if (isStrictAnchor(content) || !hasChinese(content) || isFrontmatter(content))
           return
+
+        const liked = getLikeAnchor(content)
+        if (!liked) {
+          context.report({
+            node: node as any,
+            messageId: MESSAGE_IDS.missingAnchor,
+          })
+          return
+        }
+        const { rawLikeAnchor, isLikeAnchor } = liked
+
+        const compensate = calcAnchorPositionCompensate(content)
+        const remainingContent = content.slice(0, -rawLikeAnchor.length - compensate).trim()
 
         const anchor = normalizeAnchor(rawLikeAnchor)
         if (rawLikeAnchor === anchor)
           return
 
-        const { position, start, end } = getNodePosition(node)
-        if (!position)
-          return
-
         context.report({
           node: node as any,
-          messageId: MESSAGE_IDS.invalidHeadingAnchor,
+          messageId: isLikeAnchor ? MESSAGE_IDS.missingAnchor : MESSAGE_IDS.invalidHeadingAnchor,
           fix(fixer) {
-            return fixer.replaceTextRange([start, end], content.replace(/\{#[^}]+\}$/, `{#${anchor}}`))
+            return fixer.replaceTextRange([start, end], `${remainingContent} {#${anchor}}`)
           },
         })
       },

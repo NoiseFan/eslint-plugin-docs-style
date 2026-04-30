@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { getLikeAnchor, hasAnchor, normalizeAnchor } from './anchor'
+import { calcAnchorPositionCompensate, getLikeAnchor, isStrictAnchor, normalizeAnchor } from './anchor'
 
-describe('hasAnchor', () => {
+describe('isStrictAnchor', () => {
   it('should return true for lowercase anchors', () => {
     const data = [
       '中文标题 {#chinese-title}',
@@ -11,7 +11,7 @@ describe('hasAnchor', () => {
     ]
 
     for (const ele of data)
-      expect(hasAnchor(ele)).toBeTruthy()
+      expect(isStrictAnchor(ele)).toBeTruthy()
   })
 
   it('should return false for missing or malformed anchors', () => {
@@ -28,18 +28,18 @@ describe('hasAnchor', () => {
     ]
 
     for (const ele of data)
-      expect(hasAnchor(ele)).toBeFalsy()
+      expect(isStrictAnchor(ele)).toBeFalsy()
   })
 })
 
 describe('getLikeAnchor', () => {
   it('should extract the trailing like-anchor content', () => {
-    expect(getLikeAnchor('你的第一个测试 #Your First Test')).toBe('Your First Test')
-    expect(getLikeAnchor('你的第一个测试 # Your First Test')).toBe('Your First Test')
-    expect(getLikeAnchor('使用 `describe` 编组测试 #  Grouping Tests with `describe`')).toBe('Grouping Tests with `describe`')
-    expect(getLikeAnchor('兼容 #built-in slug')).toBe('built-in slug')
-    expect(getLikeAnchor('兼容 #built_in slug')).toBe('built_in slug')
-    expect(getLikeAnchor('兼容 {#built_in slug}')).toBe('built_in slug')
+    expect(getLikeAnchor('你的第一个测试 #Your First Test')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'Your First Test' })
+    expect(getLikeAnchor('你的第一个测试 # Your First Test')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'Your First Test' })
+    expect(getLikeAnchor('使用 `describe` 编组测试 #  Grouping Tests with `describe`')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'Grouping Tests with `describe`' })
+    expect(getLikeAnchor('兼容 #built-in slug')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'built-in slug' })
+    expect(getLikeAnchor('兼容 #built_in slug')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'built_in slug' })
+    expect(getLikeAnchor('兼容 {#built_in slug}')).toStrictEqual({ isLikeAnchor: true, rawLikeAnchor: 'built_in slug' })
   })
 
   it('should return null for non-like-anchor endings', () => {
@@ -72,5 +72,21 @@ describe('normalizeAnchor', () => {
     expect(normalizeAnchor('intro-2')).toBe('intro-2')
     expect(normalizeAnchor('API-Reference_v2')).toBe('api-reference_v2')
     expect(normalizeAnchor('a1-b2-c3')).toBe('a1-b2-c3')
+  })
+})
+
+describe('calcAnchorPositionCompensate', () => {
+  it('should count the wrapper characters of a trailing strict anchor', () => {
+    expect(calcAnchorPositionCompensate('中文标题 {#Chinese-Title}')).toBe(3)
+    expect(calcAnchorPositionCompensate('# 中文标题 {#Chinese-Title}')).toBe(3)
+  })
+
+  it('should count the wrapper characters of a trailing loose anchor', () => {
+    expect(calcAnchorPositionCompensate('## 使用 `describe` 编组测试 #Grouping Tests with `describe`')).toBe(1)
+    expect(calcAnchorPositionCompensate('使用 `describe` 编组测试 #  Grouping Tests with `describe`')).toBe(3)
+  })
+
+  it('should return 0 when there is no trailing like-anchor', () => {
+    expect(calcAnchorPositionCompensate('中文标题')).toBe(0)
   })
 })
