@@ -1,20 +1,20 @@
 import type { SpaceContext } from './link'
 import { describe, expect, it } from 'vitest'
 import { getParsedLinkContext } from '../markdown'
-import { getSpaceContext, getWhiteSpace, isFullwidthPunctuation, isHalfwidthPunctuation, isPunctuation } from './link'
+import { getSpaceContext, getWhiteSpace, isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation, isPunctuation } from './link'
 
 describe('isFullwidthPunctuation', () => {
   it('should return true for fullwidth punctuation', () => {
     const inputs = '（）【】「」《》“”，。！？，：；、'
     for (const input of Array.from(inputs)) {
-      expect(isFullwidthPunctuation(input)).toBeTruthy()
+      expect(isFullwidthPunctuation(input), input).toBeTruthy()
     }
   })
 
   it('should return false for halfwidth punctuation', () => {
     const inputs = '()[]{}<>"",.!?:;'
     for (const input of Array.from(inputs)) {
-      expect(isFullwidthPunctuation(input)).toBeFalsy()
+      expect(isFullwidthPunctuation(input), input).toBeFalsy()
     }
   })
 })
@@ -23,21 +23,21 @@ describe('isHalfwidthPunctuation', () => {
   it('should return true for halfwidth punctuation', () => {
     const inputs = '!"#%&\'()*,-./:;?@[]_{}'
     for (const input of Array.from(inputs)) {
-      expect(isHalfwidthPunctuation(input)).toBeTruthy()
+      expect(isHalfwidthPunctuation(input), input).toBeTruthy()
     }
   })
 
   it('should return false for fullwidth punctuation', () => {
     const inputs = '（）【】「」《》“”，。！？，：；、'
     for (const input of Array.from(inputs)) {
-      expect(isHalfwidthPunctuation(input)).toBeFalsy()
+      expect(isHalfwidthPunctuation(input), input).toBeFalsy()
     }
   })
 
   it('should return false for non-punctuation values', () => {
     const inputs = ['a', '1', ' ', '', 'ab', '+', '$', '￥', '×', '<', '>']
     for (const input of inputs) {
-      expect(isHalfwidthPunctuation(input)).toBeFalsy()
+      expect(isHalfwidthPunctuation(input), input).toBeFalsy()
     }
   })
 })
@@ -46,21 +46,37 @@ describe('isPunctuation', () => {
   it('should return true for halfwidth punctuation', () => {
     const inputs = '!"#%&\'()*,-./:;?@[]_{}'
     for (const input of Array.from(inputs)) {
-      expect(isPunctuation(input)).toBeTruthy()
+      expect(isPunctuation(input), input).toBeTruthy()
     }
   })
 
   it('should return true for fullwidth punctuation', () => {
     const inputs = '（）【】「」《》“”，。！？，：；、'
     for (const input of Array.from(inputs)) {
-      expect(isPunctuation(input)).toBeTruthy()
+      expect(isPunctuation(input), input).toBeTruthy()
     }
   })
 
   it('should return false for non-punctuation values', () => {
     const inputs = ['a', '1', ' ', '', 'ab', '+', '$', '￥', '×', '<', '>']
     for (const input of inputs) {
-      expect(isPunctuation(input)).toBeFalsy()
+      expect(isPunctuation(input), input).toBeFalsy()
+    }
+  })
+})
+
+describe('isDashPunctuation', () => {
+  it('should return true for dash-like punctuation', () => {
+    const inputs = ['-', '–', '—', '−']
+    for (const input of inputs) {
+      expect(isDashPunctuation(input), input).toBeTruthy()
+    }
+  })
+
+  it('should return false for non-dash punctuation', () => {
+    const inputs = [',', '.', '，', '。', '', '--']
+    for (const input of inputs) {
+      expect(isDashPunctuation(input), input).toBeFalsy()
     }
   })
 })
@@ -73,6 +89,7 @@ describe('getSpaceCount', () => {
 
   it('counts trailing whitespace', () => {
     expect(getWhiteSpace('this is a paragraph ', 'tail')).toStrictEqual({ count: 1, start: 19, end: 20 })
+    expect(getWhiteSpace(' ', 'tail')).toStrictEqual({ count: 1, start: 0, end: 1 })
   })
 })
 

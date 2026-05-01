@@ -22,7 +22,7 @@ type PositionOptions = 'head' | 'tail'
 export function isFullwidthPunctuation(str: string | undefined): boolean {
   if (!str || typeof str !== 'string' || str.length !== 1)
     return false
-  return /^[\u3001-\u303F\uFE10-\uFE1F\uFE30-\uFE4F\uFF01-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF40\uFF5B-\uFF65“”‘’—…]$/u.test(str)
+  return /^[\u3001-\u303F\uFE10-\uFE1F\uFE30-\uFE4F\uFF01-\uFF0F\uFF1A-\uFF20\uFF3B-\uFF40\uFF5B-\uFF65“”‘’…]$/u.test(str)
 }
 const HALFWIDTH_PUNCTUATION_RE = /^\p{P}$/u
 
