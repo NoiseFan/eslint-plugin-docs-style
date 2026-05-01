@@ -19,7 +19,7 @@ export default createRule<Options, MessageIds>({
     },
     messages: {
       missingAnchor: 'Non-ASCII heading must have an anchor in the format "{#lowercase-anchor}".',
-      invalidHeadingAnchor: 'invalidHeadingAnchor',
+      invalidHeadingAnchor: 'Anchor must use lowercase letters and valid characters only.',
     },
     fixable: 'whitespace',
     schema: [],

@@ -7,21 +7,67 @@ import rule, { RULE_NAME } from './index'
 const MESSAGE_IDS = LINK_SPACE_MESSAGE_IDS
 
 const valid: ValidTestCase[] = [
-  '在 [入门指南](/guide/) 中，',
-  '在。[入门指南](/guide/) 中，',
-  '在 [入门指南](/guide/)。',
-  '在。[入门指南](/guide/)。',
-  '[入门指南](/guide/) 中，',
-  '请参考 [入门指南](/guide/)',
-  'In the [Getting Started](/guide/) guide,',
-  'In the, [Getting Started](/guide/) guide,',
-  'In the [Getting Started](/guide/), ',
-  '## Prev paragraph\n\n[`link`](/link) paragraph content',
-  '[`link`](/link) paragraph content\n\n ## Next paragraph',
+  {
+    description: 'single space around link in chinese text',
+    code: '在 [入门指南](/guide/) 中，',
+  },
+  {
+    description: 'no space before link after chinese punctuation',
+    code: '在。[入门指南](/guide/) 中，',
+  },
+  {
+    description: 'no space after link before chinese punctuation',
+    code: '在 [入门指南](/guide/)。',
+  },
+  {
+    description: 'no spaces around link between chinese punctuations',
+    code: '在。[入门指南](/guide/)。',
+  },
+  {
+    description: 'link at the beginning of chinese sentence',
+    code: '[入门指南](/guide/) 中，',
+  },
+  {
+    description: 'link at the end of chinese sentence',
+    code: '请参考 [入门指南](/guide/)',
+  },
+  {
+    description: 'single space around link in english text',
+    code: 'In the [Getting Started](/guide/) guide,',
+  },
+  {
+    description: 'single space before link after english comma',
+    code: 'In the, [Getting Started](/guide/) guide,',
+  },
+  {
+    description: 'no space after link before english comma',
+    code: 'In the [Getting Started](/guide/), ',
+  },
+  {
+    description: 'link at the beginning of a paragraph after heading',
+    code: '## Prev paragraph\n\n[`link`](/link) paragraph content',
+  },
+  {
+    description: 'link at the beginning of a paragraph before next heading',
+    code: '[`link`](/link) paragraph content\n\n ## Next paragraph',
+  },
   // hyphen
-  'a permissive — [link](/link) node',
-  'a permissive [link](/link) - node',
-  'a permissive - [link](/link) - node',
+  {
+    description: 'single space before link after em dash',
+    code: 'a permissive — [link](/link) node',
+  },
+  {
+    description: 'single space after link before em dash',
+    code: 'a permissive [link](/link) — node',
+  },
+  {
+    description: 'single space after link before hyphen',
+    code: 'a permissive [link](/link) - node',
+  },
+  {
+    description: 'single spaces around link between hyphens',
+    code: 'a permissive - [link](/link) - node',
+  },
 ]
 
 const invalid: InvalidTestCase[] = [
@@ -104,10 +150,17 @@ const invalid: InvalidTestCase[] = [
     output: 'In the [Getting Started](/guide/) guide,',
     errors: [{ messageId: MESSAGE_IDS.multipleSpacesAfterLink }],
   },
+  // hyphen
   {
-    description: 'multiple spaces after link before english text',
-    code: 'In the [Getting Started](/guide/)   guide,',
-    output: 'In the [Getting Started](/guide/) guide,',
+    description: 'missing space after link before dash punctuation',
+    code: 'a permissive [link](/link)- node',
+    output: 'a permissive [link](/link) - node',
+    errors: [{ messageId: MESSAGE_IDS.missingSpaceAfterLink }],
+  },
+  {
+    description: 'multiple spaces after link before dash punctuation',
+    code: 'a permissive [link](/link)   - node',
+    output: 'a permissive [link](/link) - node',
     errors: [{ messageId: MESSAGE_IDS.multipleSpacesAfterLink }],
   },
   // after unexpect

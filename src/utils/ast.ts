@@ -1,26 +1,12 @@
 import type { Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, Text } from 'mdast'
+import type { NodeContextReturnType, RuleContextWithAncestors } from '../types/ast'
 
-type SiblingNode<Current extends RootContent> = Current extends PhrasingContent
-  ? PhrasingContent
-  : RootContent
-
-export interface NodeContextReturnType<
-  Current extends RootContent = RootContent,
-  Sibling extends RootContent = SiblingNode<Current>,
-> {
-  parent?: Parents
-  prev?: Sibling
-  next?: Sibling
-  current: Current
-}
-
-interface SourceCodeWithAncestors {
-  getAncestors: (node: RootContent) => unknown[]
-}
-
-export interface RuleContextWithAncestors {
-  sourceCode: SourceCodeWithAncestors
-}
+export type {
+  NodeContextReturnType,
+  RuleContextWithAncestors,
+  SiblingNode,
+  SourceCodeWithAncestors,
+} from '../types/ast'
 
 /* ==================== Internal guards ==================== */
 

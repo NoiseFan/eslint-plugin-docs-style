@@ -1,17 +1,4 @@
 /**
- * Recursively collect plain text from a heading node tree.
- */
-export function getHeadingNodeText(node: any): string {
-  if (typeof node?.value === 'string')
-    return node.value
-
-  if (Array.isArray(node?.children))
-    return node.children.map(getHeadingNodeText).join('')
-
-  return ''
-}
-
-/**
  * Extract anchor content from `#anchor` or `{#anchor}`.
  */
 export function getAnchor(str: string): string | null {

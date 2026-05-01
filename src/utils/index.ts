@@ -2,8 +2,6 @@ import type { MarkdownRuleDefinition } from '@eslint/markdown'
 import type { Nodes } from 'mdast'
 import type { RuleWithMetaAndName } from '../types'
 
-export { getHeadingNodeText } from './rules/anchor'
-
 export function createRule<Options extends unknown[], MessageIds extends string>({
   create,
   defaultOptions,

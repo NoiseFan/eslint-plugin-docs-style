@@ -1,7 +1,5 @@
 import type { MarkdownRuleDefinition, MarkdownRuleVisitor } from '@eslint/markdown'
 
-export type { LinkSpaceContext, LinkSpaceIssue } from './link'
-
 export interface RuleWithMetaAndName<Options extends unknown[], MessageIds extends string>
   extends MarkdownRuleDefinition<{
     RuleOptions: Options
