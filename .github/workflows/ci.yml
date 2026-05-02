@@ -50,4 +50,4 @@ jobs:
         run: nci
 
       - name: unit tests
-        run: nr test
+        run: nr test:cov
