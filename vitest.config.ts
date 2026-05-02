@@ -8,5 +8,8 @@ export default defineConfig({
       ...configDefaults.exclude,
       '**/*/example',
     ],
+    coverage: {
+      provider: 'v8',
+    },
   },
 })
