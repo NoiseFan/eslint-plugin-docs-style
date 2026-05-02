@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isFrontmatter, isHeading, isKeyValueLine } from './heading'
+import { isFrontmatter, isKeyValueLine } from './heading'
 
 describe('isKeyValueLine', () => {
   it('returns true for frontmatter-style key-value lines', () => {
@@ -35,23 +35,5 @@ outline: deep
   it('returns false for actual markdown headings', () => {
     expect(isFrontmatter('# Title')).toBeFalsy()
     expect(isFrontmatter('Title\n---')).toBeFalsy()
-  })
-})
-
-describe('isHeading', () => {
-  it('returns true for atx headings', () => {
-    expect(isHeading('# Title')).toBeTruthy()
-    expect(isHeading('### 中文标题 {#chinese-title}')).toBeTruthy()
-  })
-
-  it('returns true for setext headings', () => {
-    expect(isHeading('c\nTitle\n---')).toBeTruthy()
-    expect(isHeading('Title\n---')).toBeTruthy()
-    expect(isHeading('Title\n===')).toBeTruthy()
-  })
-
-  it('returns false for normal text', () => {
-    expect(isHeading('plain text')).toBeFalsy()
-    expect(isHeading('key: value')).toBeFalsy()
   })
 })

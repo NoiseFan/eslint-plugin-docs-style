@@ -1,10 +1,6 @@
 const FRONTMATTER_KEY_VALUE_LINE_RE = /^[\w-]+\s*:\s*(?:\S.*)?$/
 const FRONTMATTER_DELIMITER_RE = /^\s{0,3}---\s*$/
 
-// @see https://webcoder.info/markdown-headers.html
-const ATX_HEADING_RE = /^\s{0,3}#{1,6}.?/
-const SETEXT_HEADING_UNDERLINE_RE = /[-=]{3}$/
-
 /**
  * Check whether a line follows a simple YAML frontmatter key-value shape.
  * @example key: value
@@ -28,23 +24,6 @@ export function isFrontmatter(rawText: string): boolean {
     return false
 
   return lines.slice(0, -1).every(isKeyValueLine)
-}
-
-/**
- * Check whether a raw text block uses valid Markdown heading syntax.
- * @deprecated I haven't used it yet.
- */
-export function isHeading(rawText: string): boolean {
-  const lines = normalizeHeading(rawText)
-  if (lines.length === 0)
-    return false
-
-  if (ATX_HEADING_RE.test(lines[0]))
-    return true
-  if (lines.length < 2)
-    return false
-
-  return lines[0].trim().length > 0 && SETEXT_HEADING_UNDERLINE_RE.test(lines[lines.length - 1])
 }
 
 /**

@@ -19,7 +19,7 @@ export default createRule<Options, MessageIds>({
     },
     messages: {
       missingAnchor: 'Non-ASCII heading must have an anchor in the format "{#lowercase-anchor}".',
-      invalidHeadingAnchor: 'invalidHeadingAnchor',
+      invalidHeadingAnchor: 'Anchor must use lowercase letters and valid characters only.',
     },
     fixable: 'whitespace',
     schema: [],
@@ -32,29 +32,29 @@ export default createRule<Options, MessageIds>({
         if (!position)
           return
 
-        const content = context.sourceCode.text.slice(start, end)
-        if (isStrictAnchor(content) || !hasChinese(content) || isFrontmatter(content))
+        const source = context.sourceCode.text.slice(start, end)
+        if (isStrictAnchor(source) || !hasChinese(source) || isFrontmatter(source))
           return
 
-        const liked = getLikeAnchor(content)
+        const liked = getLikeAnchor(source)
         if (!liked) {
           context.report({
-            node: node as any,
+            node,
             messageId: MESSAGE_IDS.missingAnchor,
           })
           return
         }
         const { rawLikeAnchor, isLikeAnchor } = liked
 
-        const compensate = calcAnchorPositionCompensate(content)
-        const remainingContent = content.slice(0, -rawLikeAnchor.length - compensate).trim()
+        const compensate = calcAnchorPositionCompensate(source)
+        const remainingContent = source.slice(0, -rawLikeAnchor.length - compensate).trim()
 
         const anchor = normalizeAnchor(rawLikeAnchor)
         if (rawLikeAnchor === anchor)
           return
 
         context.report({
-          node: node as any,
+          node,
           messageId: isLikeAnchor ? MESSAGE_IDS.missingAnchor : MESSAGE_IDS.invalidHeadingAnchor,
           fix(fixer) {
             return fixer.replaceTextRange([start, end], `${remainingContent} {#${anchor}}`)

@@ -103,7 +103,6 @@ export default [
 
 | Rule | Included in `recommended` | Autofix |
 | --- | --- | --- |
-| `docs-style/require-heading-anchor` | Yes | Yes |
 | `docs-style/space-between-link` | Yes | Yes |
 | `docs-style/valid-heading-anchor` | Yes | Yes |
 

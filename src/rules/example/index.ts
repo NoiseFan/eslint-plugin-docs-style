@@ -1,6 +1,6 @@
 import { createRule, } from '../../utils'
 
-export const RULE_NAME = 'valid-heading-anchor'
+export const RULE_NAME = 'example'
 const MESSAGE_IDS = {
   exampleMsgId: 'exampleMsgId',
 } as const

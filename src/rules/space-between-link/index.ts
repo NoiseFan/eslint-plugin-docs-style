@@ -1,19 +1,19 @@
 import type { Link } from 'mdast'
 import { createRule, getNodePosition } from '../../utils'
-import { getLinkSpaceContext, getLinkSpaceIssue } from '../../utils/rules/link'
+import { getNodeContext } from '../../utils/ast'
+import { getSpaceContext, LINK_SPACE_MESSAGE_IDS as MESSAGE_IDS, validateSpace } from '../../utils/rules/link'
 
 export const RULE_NAME = 'space-between-link'
-const MESSAGE_IDS = {
-  missingSpaceBeforeLink: 'missingSpaceBeforeLink',
-  missingSpaceAfterLink: 'missingSpaceAfterLink',
-  multipleSpacesBeforeLink: 'multipleSpacesBeforeLink',
-  multipleSpacesAfterLink: 'multipleSpacesAfterLink',
-  unexpectedSpaceBeforeLink: 'unexpectedSpaceBeforeLink',
-  unexpectedSpaceAfterLink: 'unexpectedSpaceAfterLink',
-} as const
 
 type MessageIds = typeof MESSAGE_IDS[keyof typeof MESSAGE_IDS]
 type Options = []
+
+const BEFORE_LINK_MESSAGE_IDS = new Set<MessageIds>([
+  MESSAGE_IDS.missingSpaceBeforeLink,
+  MESSAGE_IDS.multipleSpacesBeforeLink,
+  MESSAGE_IDS.multipleSpacesAfterPunctuation,
+  MESSAGE_IDS.unexpectedSpaceBeforeLink,
+])
 
 export default createRule<Options, MessageIds>({
   name: RULE_NAME,
@@ -27,6 +27,7 @@ export default createRule<Options, MessageIds>({
       missingSpaceAfterLink: 'A space is required after the link.',
       multipleSpacesBeforeLink: 'Use exactly one space before the link.',
       multipleSpacesAfterLink: 'Use exactly one space after the link.',
+      multipleSpacesAfterPunctuation: 'Use one space after punctuation.',
       unexpectedSpaceBeforeLink: 'Do not add a space between punctuation and the link.',
       unexpectedSpaceAfterLink: 'Do not add a space between the link and punctuation.',
     },
@@ -35,81 +36,40 @@ export default createRule<Options, MessageIds>({
   },
   defaultOptions: [],
   create(context) {
-    const source = context.sourceCode.text
-
     return {
       link(node: Link) {
         const { position, start, end } = getNodePosition(node)
         if (!position)
           return
 
-        const issue = getLinkSpaceIssue(source, start, end)
-        if (!issue)
+        const nodeContext = getNodeContext(context, node)
+        const spaceContext = getSpaceContext(nodeContext)
+
+        const messageId = validateSpace(nodeContext)
+        if (!messageId)
           return
 
-        const ctx = getLinkSpaceContext(source, start, end)
+        if (BEFORE_LINK_MESSAGE_IDS.has(messageId) && spaceContext.prev) {
+          const { count } = spaceContext.prev.whiteSpace
+          const replaceText = messageId === MESSAGE_IDS.unexpectedSpaceBeforeLink ? '' : ' '
 
-        if (issue === MESSAGE_IDS.missingSpaceBeforeLink) {
           context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.missingSpaceBeforeLink,
+            node,
+            messageId,
             fix(fixer) {
-              return fixer.insertTextBeforeRange([start, start], ' ')
+              return fixer.replaceTextRange([start - count, start], replaceText)
             },
           })
           return
         }
-
-        if (issue === MESSAGE_IDS.multipleSpacesBeforeLink) {
+        if (spaceContext.next) {
+          const { count } = spaceContext.next.whiteSpace
+          const replaceText = messageId === MESSAGE_IDS.unexpectedSpaceAfterLink ? '' : ' '
           context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.multipleSpacesBeforeLink,
+            node,
+            messageId,
             fix(fixer) {
-              return fixer.replaceTextRange([ctx.beforeSpaceStart, ctx.beforeSpaceEnd], ' ')
-            },
-          })
-          return
-        }
-
-        if (issue === MESSAGE_IDS.unexpectedSpaceBeforeLink) {
-          context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.unexpectedSpaceBeforeLink,
-            fix(fixer) {
-              return fixer.removeRange([ctx.beforeSpaceStart, ctx.beforeSpaceEnd])
-            },
-          })
-          return
-        }
-
-        if (issue === MESSAGE_IDS.missingSpaceAfterLink) {
-          context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.missingSpaceAfterLink,
-            fix(fixer) {
-              return fixer.insertTextAfterRange([end, end], ' ')
-            },
-          })
-          return
-        }
-
-        if (issue === MESSAGE_IDS.multipleSpacesAfterLink) {
-          context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.multipleSpacesAfterLink,
-            fix(fixer) {
-              return fixer.replaceTextRange([ctx.afterSpaceStart, ctx.afterSpaceEnd], ' ')
-            },
-          })
-          return
-        }
-
-        if (issue === MESSAGE_IDS.unexpectedSpaceAfterLink) {
-          context.report({
-            node: node as any,
-            messageId: MESSAGE_IDS.unexpectedSpaceAfterLink,
-            fix(fixer) {
-              return fixer.removeRange([ctx.afterSpaceStart, ctx.afterSpaceEnd])
+              return fixer.replaceTextRange([end, end + count], replaceText)
             },
           })
         }

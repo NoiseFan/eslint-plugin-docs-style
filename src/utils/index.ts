@@ -1,15 +1,21 @@
-import type { Rule } from 'eslint'
+import type { MarkdownRuleDefinition } from '@eslint/markdown'
 import type { Nodes } from 'mdast'
-import type { RuleContext, RuleListener, RuleWithMetaAndName } from '../types'
+import type { RuleWithMetaAndName } from '../types'
 
-export { getHeadingNodeText } from './rules/anchor'
-
-export function createRule<Options extends readonly unknown[], MessageIds extends string>({ create, meta }: Readonly<RuleWithMetaAndName<Options, MessageIds>>): Rule.RuleModule {
+export function createRule<Options extends unknown[], MessageIds extends string>({
+  create,
+  defaultOptions,
+  meta,
+}: Readonly<RuleWithMetaAndName<Options, MessageIds>>): MarkdownRuleDefinition<{
+  RuleOptions: Options
+  MessageIds: MessageIds
+}> {
   return {
-    create: ((
-      context: Readonly<RuleContext<MessageIds, Options>>,
-    ): RuleListener => create(context, context.options as Options)) as any,
-    meta: meta as any,
+    create,
+    meta: {
+      defaultOptions,
+      ...meta,
+    },
   }
 }
 
