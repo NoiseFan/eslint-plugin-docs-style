@@ -32,6 +32,10 @@ const valid: ValidTestCase[] = [
     code: '请参考 [入门指南](/guide/)',
   },
   {
+    description: 'link at the end of heading before trailing anchor',
+    code: '### In the [Getting Started](/guide) {#in-the-getting-started}',
+  },
+  {
     description: 'single space around link in english text',
     code: 'In the [Getting Started](/guide/) guide,',
   },
@@ -44,12 +48,20 @@ const valid: ValidTestCase[] = [
     code: 'In the [Getting Started](/guide/), ',
   },
   {
+    description: 'no space before link after opening parenthesis',
+    code: 'In the ([Getting Started](/guide/) guide)',
+  },
+  {
     description: 'link at the beginning of a paragraph after heading',
     code: '## Prev paragraph\n\n[`link`](/link) paragraph content',
   },
   {
     description: 'link at the beginning of a paragraph before next heading',
     code: '[`link`](/link) paragraph content\n\n ## Next paragraph',
+  },
+  {
+    description: 'link inside custom container before closing marker',
+    code: '::: info\n[Getting Started](/guide/)\n:::',
   },
   // hyphen
   {
@@ -116,6 +128,12 @@ const invalid: InvalidTestCase[] = [
     description: 'unexpected space before link after chinese punctuation',
     code: '在。 [入门指南](/guide/) 中，',
     output: '在。[入门指南](/guide/) 中，',
+    errors: [{ messageId: MESSAGE_IDS.unexpectedSpaceBeforeLink }],
+  },
+  {
+    description: 'unexpected space before link after opening parenthesis',
+    code: 'In the ( [Getting Started](/guide/) guide)',
+    output: 'In the ([Getting Started](/guide/) guide)',
     errors: [{ messageId: MESSAGE_IDS.unexpectedSpaceBeforeLink }],
   },
   {

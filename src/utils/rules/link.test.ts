@@ -1,7 +1,7 @@
-import type { SpaceContext } from './link'
+import type { SpaceContext } from '../../types/link'
 import { describe, expect, it } from 'vitest'
 import { getParsedLinkContext } from '../markdown'
-import { getSpaceContext, getWhiteSpace, isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation, isPunctuation } from './link'
+import { getSpaceContext, getWhiteSpace, isCustomContainerMarker, isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation, isPunctuation } from './link'
 
 describe('isFullwidthPunctuation', () => {
   it('should return true for fullwidth punctuation', () => {
@@ -77,6 +77,22 @@ describe('isDashPunctuation', () => {
     const inputs = [',', '.', '，', '。', '', '--']
     for (const input of inputs) {
       expect(isDashPunctuation(input), input).toBeFalsy()
+    }
+  })
+})
+
+describe('isCustomContainerMarker', () => {
+  it('should return true for custom container markers on the next line', () => {
+    const inputs = ['\n:::', '\n  :::', ' \n:::  ']
+    for (const input of inputs) {
+      expect(isCustomContainerMarker(input), `-${input}`).toBeTruthy()
+    }
+  })
+
+  it('should return false for inline punctuation and non-marker values', () => {
+    const inputs = [undefined, '', ':::', ' ::: ', '\n::', '\n: text', '\n::: text', 'text\n:::']
+    for (const input of inputs) {
+      expect(isCustomContainerMarker(input), input ?? 'undefined').toBeFalsy()
     }
   })
 })

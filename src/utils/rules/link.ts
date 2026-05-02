@@ -2,6 +2,7 @@ import type { InlineCode, Link, PhrasingContent } from 'mdast'
 import type { LinkSpaceIssue, PositionOptions, SpaceContext } from '../../types/link'
 import type { NodeContextReturnType } from '../ast'
 import { isParentNode } from '../ast'
+import { getLikeAnchor } from './anchor'
 
 export const LINK_SPACE_MESSAGE_IDS = {
   missingSpaceBeforeLink: 'missingSpaceBeforeLink',
@@ -12,6 +13,9 @@ export const LINK_SPACE_MESSAGE_IDS = {
   unexpectedSpaceBeforeLink: 'unexpectedSpaceBeforeLink',
   unexpectedSpaceAfterLink: 'unexpectedSpaceAfterLink',
 } as const
+
+export const OPENING_PAIRED_PUNCTUATION = new Set(['(', '[', '{', '<', '（', '【', '《', '“', '‘'])
+export const CLOSING_PAIRED_PUNCTUATION = new Set([')', ']', '}', '>', '）', '】', '》', '”', '’'])
 
 /**
  * Checks whether the character is fullwidth punctuation.
@@ -49,6 +53,21 @@ export function isDashPunctuation(str: string | undefined): boolean {
     return false
 
   return DASH_PUNCTUATION_RE.test(str)
+}
+
+/**
+ * Checks whether adjacent text is a custom container marker on the next line.
+ *
+ * @deprecated Temporary workaround to prevent space-between-link from reporting
+ * false positives on custom containers. Remove this and handle the case in a
+ * dedicated custom container rule when one exists.
+ * @see https://vitepress.dev/guide/markdown#custom-containers
+ * @example `\n:::` -> true
+ * @example `\n::::` -> true
+ * @example `:::` -> false
+ */
+export function isCustomContainerMarker(str: string | undefined): boolean {
+  return /^[ \t]*\n[ \t]*:{3,}[ \t]*$/u.test(str || '')
 }
 
 const PUNCTUATION_RE = /^\p{P}$/u
@@ -193,6 +212,14 @@ function validateSingleRequiredSpace(
  * Validates the spacing before a link when the previous character is punctuation.
  */
 function validateSpaceBeforeLinkAfterPunctuation(context: AdjacentTextContext): LinkSpaceIssue | undefined {
+  // opening paired punctuation
+  if (OPENING_PAIRED_PUNCTUATION.has(getAdjacentChar(context.value, 'tail') || '')) {
+    if (context.whiteSpace.count > 0)
+      return LINK_SPACE_MESSAGE_IDS.unexpectedSpaceBeforeLink
+    return
+  }
+
+  // hybrid
   if (context.punctuationType === 'half') {
     return validateSingleRequiredSpace(
       context.whiteSpace.count,
@@ -230,6 +257,9 @@ function validateSpaceAfterLinkBeforePunctuation(context: AdjacentTextContext): 
       LINK_SPACE_MESSAGE_IDS.multipleSpacesAfterLink,
     )
   }
+  // ignore element
+  if (getLikeAnchor(context.value) || isCustomContainerMarker(context.value))
+    return
 
   if (context.whiteSpace.count > 0)
     return LINK_SPACE_MESSAGE_IDS.unexpectedSpaceAfterLink

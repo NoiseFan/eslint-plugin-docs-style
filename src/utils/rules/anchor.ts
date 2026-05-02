@@ -24,7 +24,9 @@ function getLikeAnchorMatch(str: string): string | null {
  * @example `# Your First Test` -> { isLike: true, rawLikeAnchor: 'Your First Test' }
  * @example `{#built-in-slug}` -> { isLike: false, rawLikeAnchor: 'built-in-slug' }
  */
-export function getLikeAnchor(str: string): { isLikeAnchor: boolean, rawLikeAnchor: string } | null {
+export function getLikeAnchor(str: string | undefined): { isLikeAnchor: boolean, rawLikeAnchor: string } | null {
+  if (str === undefined)
+    return null
   const match = getLikeAnchorMatch(str)
 
   if (!match)
