@@ -27,6 +27,12 @@ jobs:
       - name: Lint
         run: nr lint
 
+      - name: Typecheck
+        run: nr typecheck
+
+      - name: Build
+        run: nr build
+
   test:
     runs-on: ubuntu-latest
 

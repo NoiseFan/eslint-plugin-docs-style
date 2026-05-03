@@ -18,17 +18,13 @@ describe('isFrontmatter', () => {
   it('returns true for yaml frontmatter content misparsed as heading', () => {
     // The AST heading node does not include the opening `---` from the frontmatter block.
     const inputs = [
-      `navbar: false
----`,
-      `pageClass: custom-page-class
----`,
-      `title: restoreMocks | 配置
-outline: deep
----`,
+      `navbar: false\n---`,
+      `pageClass: custom-page-class\n---`,
+      `title: restoreMocks | 配置\noutline: deep\n---`,
     ]
 
     for (const input of inputs) {
-      expect(isFrontmatter(input)).toBeTruthy()
+      expect(isFrontmatter(input), input).toBeTruthy()
     }
   })
 

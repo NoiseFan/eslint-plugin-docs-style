@@ -5,8 +5,10 @@ ESLint plugin for enforcing style rules in Markdown-based documentation.
 ## Install
 
 ```bash
-pnpm add -D eslint eslint-plugin-docs-style
+pnpm add -D eslint @eslint/markdown eslint-plugin-docs-style
 ```
+
+`@eslint/markdown` is required because this plugin registers Markdown processors and languages on top of it.
 
 ## Usage
 
@@ -44,7 +46,7 @@ export default antfu(
   {
     files: ['**/*.md'],
     rules: {
-      'docs-style/require-heading-anchor': 'off',
+      'docs-style/valid-heading-anchor': 'off',
     },
   },
 )

@@ -85,7 +85,7 @@ describe('isCustomContainerMarker', () => {
   it('should return true for custom container markers on the next line', () => {
     const inputs = ['\n:::', '\n  :::', ' \n:::  ']
     for (const input of inputs) {
-      expect(isCustomContainerMarker(input), `-${input}`).toBeTruthy()
+      expect(isCustomContainerMarker(input), input).toBeTruthy()
     }
   })
 
