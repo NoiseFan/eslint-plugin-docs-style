@@ -16,14 +16,11 @@ export function isKeyValueLine(line: string): boolean {
 export function isFrontmatter(rawText: string): boolean {
   const lines = normalizeHeading(rawText)
 
-  if (lines.length < 2)
-    return false
-
   const lastLine = lines.at(-1) ?? ''
-  if (!FRONTMATTER_DELIMITER_RE.test(lastLine))
-    return false
+  if (FRONTMATTER_DELIMITER_RE.test(lastLine))
+    return lines.slice(0, -1).every(isKeyValueLine)
 
-  return lines.slice(0, -1).every(isKeyValueLine)
+  return lines.every(isKeyValueLine)
 }
 
 /**

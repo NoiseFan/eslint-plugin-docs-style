@@ -21,6 +21,7 @@ describe('isFrontmatter', () => {
       `navbar: false\n---`,
       `pageClass: custom-page-class\n---`,
       `title: restoreMocks | 配置\noutline: deep\n---`,
+      `title: 快速起步 | 指南\nnext:\ntext: Writing Tests\nlink: /guide/learn/writing-tests`,
     ]
 
     for (const input of inputs) {

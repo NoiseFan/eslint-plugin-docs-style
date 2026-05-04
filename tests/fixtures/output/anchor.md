@@ -5,6 +5,10 @@ next:
   link: /guide/learn/writing-tests
 ---
 
+---
+title: 使用插件 | 指南
+---
+
 # Getting Started
 
 ## Overview

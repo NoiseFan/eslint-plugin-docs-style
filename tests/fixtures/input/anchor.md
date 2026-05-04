@@ -6,13 +6,6 @@ next:
 ---
 
 ---
-title: 快速起步 | 指南
-next:
-  text: Writing Tests
-  link: /guide/learn/writing-tests
----
-
----
 title: 使用插件 | 指南
 ---
 
