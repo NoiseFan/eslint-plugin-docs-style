@@ -14,7 +14,7 @@ const valid: ValidTestCase[] = [
   },
   {
     description: 'english heading should not be affected by chinese content elsewhere',
-    code: '## equal\n\n- **类型:** `<T>(actual: T, expected: T, message?: string) => void`\n\n断言 `actual` 和 `expected` 非严格相等 (==)。\n\n```ts\n import { assert, test } from \'vitest\'\n\ntest(\'assert.equal\', () => {\n\nassert.equal(Math.sqrt(4), \'2\')\n})',
+    code: '## equal\n\n- **类型:** `<T>(actual: T, expected: T, message?: string) => void`\n\n断言 `actual` 和 `expected` 非严格相等 (==)。\n\n```ts\n import { assert, test } from \'vitest\'\n\ntest(\'assert.equal\', () => {\n\nassert.equal(Math.sqrt(4), \'2\')\n})```',
   },
   {
     description: 'sigle word of anchor',

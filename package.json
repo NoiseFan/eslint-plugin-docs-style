@@ -46,6 +46,9 @@
     "@eslint/markdown": "^7.5.1",
     "eslint": "^9.0.0 || ^10.0.0"
   },
+  "dependencies": {
+    "tinyglobby": "^0.2.16"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^6.2.0",
     "@eslint/markdown": "^7.5.1",

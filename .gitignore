@@ -1,9 +1,10 @@
 node_modules
 dist
+coverage
+_fixtures
 
 *.log
 .DS_Store
 .eslintcache
 .local
 .idea
-coverage

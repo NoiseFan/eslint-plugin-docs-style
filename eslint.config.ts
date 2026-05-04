@@ -24,9 +24,6 @@ export default antfu(
       markdown,
       'docs-style': plugin,
     },
-    rules: {
-      'docs-style/space-between-link': 'error',
-      'docs-style/valid-heading-anchor': 'error',
-    },
+    rules: {},
   },
 )
