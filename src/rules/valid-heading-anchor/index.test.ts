@@ -28,16 +28,24 @@ const valid: ValidTestCase[] = [
 
 const invalid: InvalidTestCase[] = [
   {
-    description: 'chinese heading of missing anchor',
+    description: 'chinese heading should require an anchor',
     code: '# 中文标题',
     errors: [{ messageId: 'missingAnchor' }],
   },
   {
+    description: 'chinese with english should require an anchor',
     code: '# 你的第一个测试 Your First Test',
     errors: [{ messageId: 'missingAnchor' }],
   },
   {
+    description: 'english with chinese should require an anchor',
     code: '## API 介绍 API Introduction',
+    errors: [{ messageId: 'missingAnchor' }],
+  },
+  {
+    description: 'generated anchor should replace dots with dashes',
+    code: '# Vitest 3.2 发布了！ # Vitest 3.2 is out!',
+    output: '# Vitest 3.2 发布了！ {#vitest-3-2-is-out}',
     errors: [{ messageId: 'missingAnchor' }],
   },
   {

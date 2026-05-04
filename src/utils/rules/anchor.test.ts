@@ -58,6 +58,7 @@ describe('getLikeAnchor', () => {
 
 describe('normalizeAnchor', () => {
   it('should convert uppercase letters to lowercase', () => {
+    expect(normalizeAnchor('3.2!')).toBe('3-2')
     expect(normalizeAnchor('Chinese-Title')).toBe('chinese-title')
     expect(normalizeAnchor('API-Reference')).toBe('api-reference')
   })

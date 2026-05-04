@@ -21,6 +21,8 @@ title: 使用插件 | 指南
 
 ## 使用 `describe` 编组测试 {#grouping-tests-with-describe}
 
+## Vitest 5.0 发布了！ {#vitest-5-0-is-out}
+
 ## equal
 
 - **类型:** `<T>(actual: T, expected: T, message?: string) => void`
