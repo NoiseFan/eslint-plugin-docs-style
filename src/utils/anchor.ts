@@ -49,7 +49,7 @@ export function isStrictAnchor(str: string): boolean {
  * Check whether the string contains CJK Han characters.
  */
 export function hasChinese(str: string): boolean {
-  return /[\u4E00-\u9FA5]/.test(str)
+  return /\p{Script=Han}/u.test(str)
 }
 
 /**
