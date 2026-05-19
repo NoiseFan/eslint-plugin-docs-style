@@ -32,6 +32,9 @@ export const configs: PluginConfigMap = {
       'md-style': plugin,
     },
     language: 'md-style/gfm',
+    languageOptions: {
+      frontmatter: 'yaml',
+    },
     rules: recommendedRules,
   },
   all: {
@@ -41,6 +44,9 @@ export const configs: PluginConfigMap = {
       'md-style': plugin,
     },
     language: 'md-style/gfm',
+    languageOptions: {
+      frontmatter: 'yaml',
+    },
     rules: allRules,
   },
 }

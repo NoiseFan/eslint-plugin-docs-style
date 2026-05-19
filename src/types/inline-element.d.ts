@@ -1,6 +1,6 @@
 import type { Emphasis, Image, InlineCode, Link, Strong } from 'mdast'
 import type { ValueOf } from '@/types/index'
-import type { INLINE_SPACE_MESSAGE_IDS } from '@/types/inline-element'
+import type { INLINE_SPACE_MESSAGE_IDS } from '@/utils/inline-element'
 
 /**
  * The Markdown inline element node types selected by space-around-inline-element.

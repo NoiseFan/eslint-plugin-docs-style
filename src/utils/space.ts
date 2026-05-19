@@ -1,7 +1,7 @@
 import type { PhrasingContent } from 'mdast'
 import type { NodeContextReturnType } from '@/types/ast'
 import type { PositionOptions } from '@/types/inline-element'
-import type { SpaceContext, whiteSpaceReturn } from '@/types/space'
+import type { SpaceContext, WhiteSpaceReturn } from '@/types/space'
 import { getAdjacentChar, getNodeValue } from './ast'
 import { hasPunctuation, isFullwidthPunctuation } from './punctuation'
 
@@ -13,7 +13,7 @@ import { hasPunctuation, isFullwidthPunctuation } from './punctuation'
 export function getWhiteSpace(
   str: string | undefined,
   position: PositionOptions = 'head',
-): whiteSpaceReturn {
+): WhiteSpaceReturn {
   const defaultVal = { count: 0, start: 0, end: 0 }
   if (!str || str.length === 0)
     return defaultVal

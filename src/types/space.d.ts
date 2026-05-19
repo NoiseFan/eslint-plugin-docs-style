@@ -14,7 +14,7 @@ export interface SpaceContext {
   next?: AdjacentTextContext
 }
 
-export interface whiteSpaceReturn {
+export interface WhiteSpaceReturn {
   count: number
   start: number
   end: number

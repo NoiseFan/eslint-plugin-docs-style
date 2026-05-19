@@ -98,13 +98,8 @@ export function getNodeValue(
     return
   if ('value' in node)
     return node.value
-  if (hasChildren(node)) {
-    const value = node.children
-      .map(getNodeValue)
-      .join('')
-
-    return value || undefined
-  }
+  if (hasChildren(node))
+    return node.children.map(getNodeValue).join('')
 }
 
 /**
