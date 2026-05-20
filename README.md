@@ -121,6 +121,8 @@ export default antfu(
 | Rule | Included in `recommended` | Autofix |
 | --- | --- | --- |
 | `md-style/space-around-inline-element` | ✅ | 🔧 |
+| `md-style/space-around-number` |  | 🔧 |
+| `md-style/space-around-word` |  | 🔧 |
 | `md-style/valid-heading-anchor` | ✅ | 🔧 |
 
 ## Why `@eslint/markdown` Is Required
