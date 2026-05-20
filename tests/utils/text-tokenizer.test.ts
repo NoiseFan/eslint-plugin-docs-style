@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import { describe, expect, it } from 'vitest'
-import { buildTextNodeAst, getTextType, tokenizeText } from '@/utils/text-tokenizer'
+import { buildTextNodeAst, getTextType, tokenizeText } from '@/utils/text'
 
 describe('getTextType', () => {
   it('classifies core character groups', () => {

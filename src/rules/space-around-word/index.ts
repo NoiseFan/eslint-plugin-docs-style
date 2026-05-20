@@ -1,9 +1,8 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
+import type { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
 import { createRule } from '@/utils'
-import { getNodeContextByParent } from '@/utils/ast'
-import { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
-import { buildTextNodeAst, isLatinWordType, TEXT_TYPE } from '@/utils/text-tokenizer'
+import { fixBoundarySpace, getBoundarySpaceMessageId, isLatinWordType } from '@/utils/text'
 
 export const RULE_NAME = 'space-around-word'
 
@@ -26,21 +25,21 @@ export default createRule<Options, MessageIds>({
       unexpectedSpaceAfter: 'Remove the unexpected space after the word.',
       unexpectedSpaceAround: 'Remove the unexpected spaces around the word.',
     },
-    fixable: 'code',
+    fixable: 'whitespace',
     schema: [],
   },
   defaultOptions: [],
   create(context) {
     return {
       text(node: Text) {
-        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node)
+        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, isLatinWordType)
 
         if (fixed === node.value)
           return
 
         context.report({
           node,
-          messageId: getMessageId({ missingBefore, missingAfter, unexpectedBefore, unexpectedAfter }),
+          messageId: getBoundarySpaceMessageId({ missingBefore, missingAfter, unexpectedBefore, unexpectedAfter }),
           fix(fixer) {
             return fixer.replaceText(node, fixed)
           },
@@ -49,130 +48,3 @@ export default createRule<Options, MessageIds>({
     }
   },
 })
-
-interface FixBoundarySpaceResult {
-  fixed: string
-  missingBefore: boolean
-  missingAfter: boolean
-  unexpectedBefore: boolean
-  unexpectedAfter: boolean
-}
-
-type TextToken = ReturnType<typeof buildTextNodeAst>['children'][number]
-type TokenContext = ReturnType<typeof getNodeContextByParent<TextToken>>
-
-/**
- * Normalizes an existing space token according to the token types on both
- * sides, and records which side contains redundant spacing when collapsing
- * multiple spaces to a single space.
- */
-function processSpaceToken(ctx: TokenContext, result: FixBoundarySpaceResult): void {
-  const { prev, current, next } = ctx
-  /* v8 ignore if -- @preserve */
-  if (!current)
-    return
-
-  const CJK2Latin = prev?.type === TEXT_TYPE.cjk && isLatinWordType(next?.type)
-  const latin2CJK = isLatinWordType(prev?.type) && next?.type === TEXT_TYPE.cjk
-  const latins = isLatinWordType(prev?.type) && isLatinWordType(next?.type)
-  const hasUnexpectedSpaces = current.value.length !== 1
-
-  if (hasUnexpectedSpaces) {
-    if (CJK2Latin || latins)
-      result.unexpectedBefore = true
-
-    if (latin2CJK || latins)
-      result.unexpectedAfter = true
-  }
-
-  if (CJK2Latin || latin2CJK || hasUnexpectedSpaces) {
-    result.fixed += ' '
-  }
-  else {
-    result.fixed += current.value
-  }
-}
-
-/**
- * Inserts missing boundary spaces around a Latin word when it is
- * adjacent to CJK text, while keeping track of the missing side(s) for
- * reporting.
- */
-function processLatinWordToken(ctx: TokenContext, result: FixBoundarySpaceResult): void {
-  const { prev, current, next } = ctx
-  /* v8 ignore if -- @preserve */
-  if (!current)
-    return
-
-  if (prev?.type === TEXT_TYPE.cjk) {
-    result.fixed += ' '
-    result.missingBefore = true
-  }
-
-  result.fixed += current.value
-
-  if (next?.type === TEXT_TYPE.cjk) {
-    result.fixed += ' '
-    result.missingAfter = true
-  }
-}
-
-/**
- * Selects the most specific lint message for the combination of missing or
- * unexpected boundary spaces found in the text node.
- */
-function getMessageId(boundary: {
-  missingBefore: boolean
-  missingAfter: boolean
-  unexpectedBefore: boolean
-  unexpectedAfter: boolean
-}): MessageIds {
-  if (boundary.missingBefore && boundary.missingAfter)
-    return MESSAGE_IDS.missingSpacesAround
-
-  if (boundary.unexpectedBefore && boundary.unexpectedAfter)
-    return MESSAGE_IDS.unexpectedSpaceAround
-
-  if (boundary.missingBefore)
-    return MESSAGE_IDS.missingSpaceBefore
-
-  if (boundary.missingAfter)
-    return MESSAGE_IDS.missingSpaceAfter
-
-  if (boundary.unexpectedBefore)
-    return MESSAGE_IDS.unexpectedSpaceBefore
-
-  return MESSAGE_IDS.unexpectedSpaceAfter
-}
-
-/**
- * Rebuilds a text node with normalized spacing between CJK and Latin-word
- * tokens, and returns both the fixed text and the boundary issues detected
- * during the pass.
- */
-function fixBoundarySpace(node: Text): FixBoundarySpaceResult {
-  const { children } = buildTextNodeAst(node)
-  const result: FixBoundarySpaceResult = {
-    fixed: '',
-    missingBefore: false,
-    missingAfter: false,
-    unexpectedBefore: false,
-    unexpectedAfter: false,
-  }
-
-  for (let i = 0; i < children.length; i += 1) {
-    const ctx = getNodeContextByParent(children, i)
-    /* v8 ignore if -- @preserve */
-    if (!ctx.current)
-      continue
-
-    if (ctx.current.type === TEXT_TYPE.space)
-      processSpaceToken(ctx, result)
-    else if (isLatinWordType(ctx.current.type))
-      processLatinWordToken(ctx, result)
-    else
-      result.fixed += ctx.current.value
-  }
-
-  return result
-}

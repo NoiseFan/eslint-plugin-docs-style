@@ -1,7 +1,7 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text-tokenizer'
-import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from './punctuation'
+import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text/tokenizer'
+import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../punctuation'
 
 export const TEXT_TYPE = {
   'cjk': 'cjk',

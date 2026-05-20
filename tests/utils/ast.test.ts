@@ -9,7 +9,7 @@ import {
   isTextNode,
 } from '@/utils/ast'
 import { parseMarkdown } from '@/utils/markdown'
-import { buildTextNodeAst } from '@/utils/text-tokenizer'
+import { buildTextNodeAst } from '@/utils/text'
 
 describe('isParentNode', () => {
   it('returns true for nodes with children', () => {
