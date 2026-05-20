@@ -1,7 +1,7 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text-tokenizer'
-import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from './punctuation'
+import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text/tokenizer'
+import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../punctuation'
 
 export const TEXT_TYPE = {
   'cjk': 'cjk',
@@ -56,25 +56,33 @@ function isInvisible(char: string): boolean {
   )
 }
 
-export function isLatinWord(type: string | undefined): boolean {
+export function isLatinWordType(type: string | undefined): boolean {
   return type === TEXT_TYPE.latin
+}
+
+export function isNumberType(type: string | undefined): boolean {
+  return type === TEXT_TYPE.number
+}
+
+function isNumber(char: string, prev: TextToken | undefined): boolean {
+  return NUMBER_RE.test(char) || (prev?.type === TEXT_TYPE.number && (char === '.' || char === '%'))
 }
 
 const TEXT_TYPE_MATCHERS = [
   { type: TEXT_TYPE.newline, test: (char: string) => NEWLINE_RE.test(char) },
   { type: TEXT_TYPE.space, test: (char: string) => SPACE_RE.test(char) },
-  { type: TEXT_TYPE.invisible, test: isInvisible },
+  { type: TEXT_TYPE.invisible, test: (char: string) => isInvisible(char) },
   { type: TEXT_TYPE.cjk, test: (char: string) => CJK_RE.test(char) },
   { type: TEXT_TYPE.latin, test: (char: string) => LATIN_RE.test(char) },
-  { type: TEXT_TYPE.number, test: (char: string) => NUMBER_RE.test(char) },
-  { type: TEXT_TYPE.dash, test: isDashPunctuation },
-  { type: TEXT_TYPE['fullwidth-punctuation'], test: isFullwidthPunctuation },
-  { type: TEXT_TYPE['halfwidth-punctuation'], test: isHalfwidthPunctuation },
+  { type: TEXT_TYPE.number, test: isNumber },
+  { type: TEXT_TYPE.dash, test: (char: string) => isDashPunctuation(char) },
+  { type: TEXT_TYPE['fullwidth-punctuation'], test: (char: string) => isFullwidthPunctuation(char) },
+  { type: TEXT_TYPE['halfwidth-punctuation'], test: (char: string) => isHalfwidthPunctuation(char) },
   { type: TEXT_TYPE.emoji, test: (char: string) => EMOJI_RE.test(char) },
   { type: TEXT_TYPE.symbol, test: (char: string) => SYMBOL_RE.test(char) },
 ] as const satisfies readonly {
   type: TextType
-  test: (char: string) => boolean
+  test: (char: string, prev: TextToken | undefined) => boolean
 }[]
 
 const DEFAULT_START_POINT = {
@@ -102,9 +110,9 @@ function advancePoint(point: TextPoint, char: string): TextPoint {
 /**
  * Classifies a single Unicode code point for Markdown text style rules.
  */
-export function getTextType(char: string): TextType {
+export function getTextType(char: string, prev?: TextToken): TextType {
   for (const matcher of TEXT_TYPE_MATCHERS) {
-    if (matcher.test(char))
+    if (matcher.test(char, prev))
       return matcher.type
   }
 
@@ -117,26 +125,27 @@ export function getTextType(char: string): TextType {
 export function tokenizeText(value: string, start: TextPoint = DEFAULT_START_POINT): TextToken[] {
   const tokens: TextToken[] = []
   let point = start
+  let prevToken: undefined | TextToken
 
   for (const char of value) {
-    const type = getTextType(char)
+    const type = getTextType(char, prevToken)
     const tokenStart = point
     const tokenEnd = advancePoint(point, char)
-    const prev = tokens.at(-1)
 
-    if (prev?.type === type) {
-      prev.value += char
-      prev.position.end = tokenEnd
+    if (prevToken?.type === type) {
+      prevToken.value += char
+      prevToken.position.end = tokenEnd
     }
     else {
-      tokens.push({
+      prevToken = {
         type,
         value: char,
         position: {
           start: tokenStart,
           end: tokenEnd,
         },
-      })
+      }
+      tokens.push(prevToken)
     }
 
     point = tokenEnd

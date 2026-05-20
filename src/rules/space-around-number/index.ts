@@ -2,12 +2,11 @@ import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
 import type { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
 import { createRule } from '@/utils'
-import { fixBoundarySpace, getBoundarySpaceMessageId, isLatinWordType } from '@/utils/text'
+import { fixBoundarySpace, getBoundarySpaceMessageId, isNumberType } from '@/utils/text'
 
-export const RULE_NAME = 'space-around-word'
+export const RULE_NAME = 'space-around-number'
 
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
-
 type Options = []
 
 export default createRule<Options, MessageIds>({
@@ -15,15 +14,15 @@ export default createRule<Options, MessageIds>({
   meta: {
     type: 'layout',
     docs: {
-      description: 'Enforce a single space between CJK characters and Latin words.',
+      description: 'Enforce a single space between CJK characters and numbers.',
     },
     messages: {
-      missingSpaceBefore: 'Add a space before the word.',
-      missingSpaceAfter: 'Add a space after the word.',
-      missingSpacesAround: 'Add spaces before and after the word.',
-      unexpectedSpaceBefore: 'Remove the unexpected space before the word.',
-      unexpectedSpaceAfter: 'Remove the unexpected space after the word.',
-      unexpectedSpaceAround: 'Remove the unexpected spaces around the word.',
+      missingSpaceBefore: 'Add a space before the number.',
+      missingSpaceAfter: 'Add a space after the number.',
+      missingSpacesAround: 'Add spaces before and after the number.',
+      unexpectedSpaceBefore: 'Remove the unexpected space before the number.',
+      unexpectedSpaceAfter: 'Remove the unexpected space after the number.',
+      unexpectedSpaceAround: 'Remove the unexpected spaces around the number.',
     },
     fixable: 'whitespace',
     schema: [],
@@ -32,7 +31,7 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       text(node: Text) {
-        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, isLatinWordType)
+        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, isNumberType)
 
         if (fixed === node.value)
           return

@@ -5,6 +5,15 @@ import type { SpaceContext, WhiteSpaceReturn } from '@/types/space'
 import { getAdjacentChar, getNodeValue } from './ast'
 import { hasPunctuation, isFullwidthPunctuation } from './punctuation'
 
+export const SPACE_MESSAGE_IDS = {
+  missingSpaceBefore: 'missingSpaceBefore',
+  missingSpaceAfter: 'missingSpaceAfter',
+  missingSpacesAround: 'missingSpacesAround',
+  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
+  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
+  unexpectedSpaceAround: 'unexpectedSpaceAround',
+} as const
+
 /**
  * Gets the count and range of consecutive whitespace at the start or end of a string.
  * @example `  text`, `head` -> { count: 2, start: 0, end: 2 }

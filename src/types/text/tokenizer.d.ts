@@ -1,5 +1,5 @@
 import type { Text } from 'mdast'
-import type { TextType } from '@/utils/text-tokenizer'
+import type { TextType } from '@/utils/text'
 
 /**
  * Source location point compatible with mdast position points

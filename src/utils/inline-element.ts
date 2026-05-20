@@ -1,19 +1,10 @@
 import type { NodeContextReturnType } from '@/types/ast'
 import type { AdjacentTextContext, InlineElement, InlineElementSpaceIssue } from '@/types/inline-element'
+import { MESSAGE_IDS as INLINE_SPACE_MESSAGE_IDS } from '@/rules/space-around-inline-element'
 import { getLikeAnchor } from './anchor'
 import { getAdjacentChar, isInlineElement, isTableCell } from './ast'
 import { CLOSING_PAIRED_PUNCTUATION, isDashPunctuation, isSlashPunctuation, OPENING_PAIRED_PUNCTUATION } from './punctuation'
 import { getSpaceContext } from './space'
-
-export const INLINE_SPACE_MESSAGE_IDS = {
-  missingSpaceBefore: 'missingSpaceBefore',
-  missingSpaceAfter: 'missingSpaceAfter',
-  multipleSpacesBefore: 'multipleSpacesBefore',
-  multipleSpacesAfter: 'multipleSpacesAfter',
-  multipleSpacesAfterPunctuation: 'multipleSpacesAfterPunctuation',
-  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
-  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
-} as const
 
 /**
  * Checks whether adjacent text is a custom container marker on the next line.

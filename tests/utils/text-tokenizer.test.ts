@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import { describe, expect, it } from 'vitest'
-import { buildTextNodeAst, getTextType, tokenizeText } from '@/utils/text-tokenizer'
+import { buildTextNodeAst, getTextType, tokenizeText } from '@/utils/text'
 
 describe('getTextType', () => {
   it('classifies core character groups', () => {
@@ -23,6 +23,10 @@ describe('getTextType', () => {
 describe('tokenizeText', () => {
   it('groups same-type chars', async () => {
     await expect(JSON.stringify(tokenizeText('中文 Vitest 4.1，OK'), null, 2)).toMatchFileSnapshot('__snapshots__/tokenizeText-groups-same-type-chars.json')
+  })
+
+  it('keeps decimal and percent suffixes in the same number token', async () => {
+    await expect(JSON.stringify(tokenizeText('中文 4.0% 增长'), null, 2)).toMatchFileSnapshot('__snapshots__/tokenizeText-groups-number-fragments.json')
   })
 
   it('keeps code unit offsets', async () => {

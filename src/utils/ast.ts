@@ -1,6 +1,7 @@
 import type { InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
 import type { InlineElement, PositionOptions } from '@/types/inline-element'
+import type { TextToken } from '@/types/text/tokenizer'
 
 /* ==================== Node type guards ==================== */
 
@@ -163,6 +164,8 @@ export function getNodeContextByParent<Current>(
     next: childrenNodes[currentIndex + 1],
   }
 }
+
+export type TokenContext = ReturnType<typeof getNodeContextByParent<TextToken>>
 
 /**
  * Gets the first or last visible character of a string after trimming
