@@ -56,77 +56,39 @@ export function parseType(params: string): string {
 /**
  * Parse an opening tag into its raw text, type, and optional title ranges.
  */
-export function parseOpeningTag(
-  raw: string,
-  opts: {
-    params: string
-    marker: string
-    tagStart: number
-    type: string
-  },
-): CustomContainerOpeningTag {
+export function parseOpeningTag(raw: string, opts: { params: string, marker: string, tagStart: number, type: string }): CustomContainerOpeningTag {
   const { params, marker, tagStart, type } = opts
   const typeStart = tagStart + raw.indexOf(type, marker.length)
   return {
     raw,
-    position: {
-      start: tagStart,
-      end: tagStart + raw.length,
-    },
-    type: {
-      value: type,
-      start: typeStart,
-      end: typeStart + type.length,
-    },
-    title: parseTitle(raw, {
-      params,
-      type,
-      tagStart,
-      typeStart,
-    }),
+    position: { start: tagStart, end: tagStart + raw.length },
+    type: { value: type, start: typeStart, end: typeStart + type.length },
+    title: parseTitle(raw, { params, type, tagStart, typeStart }),
   }
 }
 
 /**
  * Parse the optional title from an opening tag and calculate its source range.
  */
-export function parseTitle(raw: string, opts: {
-  params: string
-  type: string
-  typeStart: number
-  tagStart: number
-}): CustomContainerTagValue | null {
+export function parseTitle(raw: string, opts: { params: string, type: string, typeStart: number, tagStart: number }): CustomContainerTagValue | null {
   const { params, type, tagStart, typeStart } = opts
   const value = params.slice(type.length).trim()
   if (!value)
     return null
 
   const start = tagStart + raw.indexOf(value, typeStart - tagStart + type.length)
-  return {
-    value,
-    start,
-    end: start + value.length,
-  }
+  return { value, start, end: start + value.length }
 }
 
 /**
  * Create the pending state used while collecting a container's content.
  */
-export function createContainer(value: string, opts: {
-  tagStart: number
-  raw: string
-  marker: string
-  type: string
-  openingTag: CustomContainerOpeningTag
-}): PendingCustomContainer {
+export function createContainer(value: string, opts: { tagStart: number, raw: string, marker: string, type: string, openingTag: CustomContainerOpeningTag }): PendingCustomContainer {
   const { tagStart, raw, marker, type, openingTag } = opts
   return {
     type,
     content: '',
-    tag: {
-      open: openingTag,
-      close: null,
-    },
+    tag: { open: openingTag, close: null },
     markerLength: marker.length,
     contentStart: getNextLineStart(value, tagStart + raw.length),
   }

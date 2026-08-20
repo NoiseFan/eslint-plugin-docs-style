@@ -1,13 +1,13 @@
 /**
- * A half-open source range relative to the parsed Markdown value.
+ * A ahalf-open source range relative to the parsed Markdown value.
  */
 export interface CustomContainerRange {
   /**
-   * Inclusive start offset in JavaScript string code units.
+   * Start offset
    */
   start: number
   /**
-   * Exclusive end offset in JavaScript string code units.
+   * End offset
    */
   end: number
 }
@@ -23,7 +23,7 @@ export interface CustomContainerTagValue extends CustomContainerRange {
 }
 
 /**
- * The opening tag of a VitePress custom container.
+ * The opening tag of a custom container.
  */
 export interface CustomContainerOpeningTag {
   /**
@@ -45,7 +45,7 @@ export interface CustomContainerOpeningTag {
 }
 
 /**
- * The closing tag of a VitePress custom container.
+ * The closing tag of a custom container.
  */
 export interface CustomContainerClosingTag extends CustomContainerRange {
   /**
@@ -69,7 +69,7 @@ export interface CustomContainerTag {
 }
 
 /**
- * A parsed VitePress custom container.
+ * A parsed custom container.
  */
 export interface CustomContainerNode {
   /**
