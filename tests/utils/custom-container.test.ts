@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createContainer,
   CUSTOM_CONTAINER_TYPES,
+  getNextLineStart,
   isCustomContainerType,
   parseCustomContainers,
   parseOpeningTag,
@@ -64,6 +65,12 @@ describe('custom-container parsers', () => {
       contentStart: 11,
       tag: { open: openingTag, close: null },
     })
+  })
+
+  it('gets the content start after the opening tag line ending', () => {
+    expect(getNextLineStart('::: info\r\ncontent', 8)).toBe(10)
+    expect(getNextLineStart('::: info\ncontent', 8)).toBe(9)
+    expect(getNextLineStart('::: info', 8)).toBe(8)
   })
 })
 

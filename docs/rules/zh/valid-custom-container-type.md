@@ -4,7 +4,7 @@
 
 ## 规则详情
 
-自定义容器的起始标记必须使用以下类型之一：`info`、`tip`、`warning`、`danger`、`details`、`raw`。
+自定义容器的起始标记必须使用以下类型之一：`info`、`tip`、`warning`、`danger`、`details`、`raw`、`code-group`、`v-pre`、`tabs`。其中，`tabs` 类型由 [`vitepress-plugin-tabs`](https://github.com/sapphi-red/vitepress-plugins/tree/main/packages/vitepress-plugin-tabs) 提供。
 
 类型严格区分大小写。对于仅大小写不正确的类型，规则会单独报告大小写错误并自动转换为小写；其他未知类型会报告类型错误，但不会自动修改。
 
@@ -22,9 +22,17 @@
 ::: details 点击查看详情
 详细内容。
 :::
+
+::: tabs
+== 标签页 A
+标签页 A 的内容。
+
+== 标签页 B
+标签页 B 的内容。
+:::
 ```
 
-该规则的**错误**示例：
+该规则的 **错误** 示例：
 
 ```md
 ::: note

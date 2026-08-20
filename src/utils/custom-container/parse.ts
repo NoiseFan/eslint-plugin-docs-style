@@ -11,7 +11,6 @@ export function parseCustomContainers(value: string): CustomContainerNode[] {
   const stack: PendingCustomContainer[] = []
 
   for (const match of value.matchAll(CUSTOM_CONTAINER_TAG_RE)) {
-    /* v8 ignore if -- @preserve */
     const tagStart = match.index ?? 0
     const raw = match[0].replace(/\r$/, '')
     const marker = match[1]
@@ -19,6 +18,7 @@ export function parseCustomContainers(value: string): CustomContainerNode[] {
 
     if (!params) {
       const current = stack.at(-1)
+      /* v8 ignore if -- @preserve */
       if (!current || marker.length < current.markerLength)
         continue
 
@@ -136,7 +136,7 @@ export function createContainer(value: string, opts: {
  * Returns the offset immediately after the line break following an opening
  * tag, or the tag end when it is the last line.
  */
-function getNextLineStart(value: string, tagEnd: number): number {
+export function getNextLineStart(value: string, tagEnd: number): number {
   if (value.startsWith('\r\n', tagEnd))
     return tagEnd + 2
   if (value[tagEnd] === '\n')
