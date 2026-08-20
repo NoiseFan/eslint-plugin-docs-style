@@ -1,5 +1,7 @@
 import type { CustomContainerNode, CustomContainerOpeningTag, CustomContainerTagValue, PendingCustomContainer } from '@/types/custom-container'
 
+interface ContainerTypeOpts { params: string, tagStart: number, type: string }
+
 const CUSTOM_CONTAINER_TAG_RE = /^ {0,3}(:{3,})(?:[\t ]([^\r\n]*))?\r?$/gm
 
 /**
@@ -33,8 +35,8 @@ export function parseCustomContainers(value: string): CustomContainerNode[] {
     }
 
     const type = parseType(params)
-    const openingTag = parseOpeningTag(raw, { params, marker, tagStart, type })
-    const container = createContainer(value, { tagStart, raw, marker, type, openingTag })
+    const openingTag = parseOpeningTag(raw, marker, { params, tagStart, type })
+    const container = createContainer(raw, value, { tagStart, marker, type, openingTag })
 
     containers.push(container)
     stack.push(container)
@@ -56,22 +58,22 @@ export function parseType(params: string): string {
 /**
  * Parse an opening tag into its raw text, type, and optional title ranges.
  */
-export function parseOpeningTag(raw: string, opts: { params: string, marker: string, tagStart: number, type: string }): CustomContainerOpeningTag {
-  const { params, marker, tagStart, type } = opts
+export function parseOpeningTag(raw: string, marker: string, opts: ContainerTypeOpts): CustomContainerOpeningTag {
+  const { params, tagStart, type } = opts
   const typeStart = tagStart + raw.indexOf(type, marker.length)
   return {
     raw,
     position: { start: tagStart, end: tagStart + raw.length },
     type: { value: type, start: typeStart, end: typeStart + type.length },
-    title: parseTitle(raw, { params, type, tagStart, typeStart }),
+    title: parseTitle(raw, typeStart, { params, tagStart, type }),
   }
 }
 
 /**
  * Parse the optional title from an opening tag and calculate its source range.
  */
-export function parseTitle(raw: string, opts: { params: string, type: string, typeStart: number, tagStart: number }): CustomContainerTagValue | null {
-  const { params, type, tagStart, typeStart } = opts
+export function parseTitle(raw: string, typeStart: number, opts: ContainerTypeOpts): CustomContainerTagValue | null {
+  const { params, type, tagStart } = opts
   const value = params.slice(type.length).trim()
   if (!value)
     return null
@@ -83,8 +85,12 @@ export function parseTitle(raw: string, opts: { params: string, type: string, ty
 /**
  * Create the pending state used while collecting a container's content.
  */
-export function createContainer(value: string, opts: { tagStart: number, raw: string, marker: string, type: string, openingTag: CustomContainerOpeningTag }): PendingCustomContainer {
-  const { tagStart, raw, marker, type, openingTag } = opts
+export function createContainer(
+  raw: string,
+  value: string,
+  opts: Omit<ContainerTypeOpts, 'params'> & { marker: string, openingTag: CustomContainerOpeningTag },
+): PendingCustomContainer {
+  const { tagStart, marker, type, openingTag } = opts
   return {
     type,
     content: '',

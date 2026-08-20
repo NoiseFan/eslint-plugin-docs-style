@@ -17,28 +17,21 @@ describe('custom-container parsers', () => {
   })
 
   it('parses an optional title and its source range', () => {
-    expect(parseTitle('::: info Optional title', {
+    expect(parseTitle('::: info Optional title', 14, {
       params: 'info Optional title',
       type: 'info',
       tagStart: 10,
-      typeStart: 14,
     })).toStrictEqual({
       value: 'Optional title',
       start: 19,
       end: 33,
     })
-    expect(parseTitle('::: info', {
-      params: 'info',
-      type: 'info',
-      tagStart: 0,
-      typeStart: 4,
-    })).toBeNull()
+    expect(parseTitle('::: info', 4, { params: 'info', type: 'info', tagStart: 0 })).toBeNull()
   })
 
   it('parses an opening tag with type and title ranges', () => {
-    expect(parseOpeningTag('::: info Optional title', {
+    expect(parseOpeningTag('::: info Optional title', ':::', {
       params: 'info Optional title',
-      marker: ':::',
       tagStart: 0,
       type: 'info',
     })).toStrictEqual({
@@ -50,11 +43,10 @@ describe('custom-container parsers', () => {
   })
 
   it('creates pending container state from an opening tag', () => {
-    const openingTag = parseOpeningTag('::: danger', { params: 'danger', marker: ':::', tagStart: 0, type: 'danger' })
+    const openingTag = parseOpeningTag('::: danger', ':::', { params: 'danger', tagStart: 0, type: 'danger' })
 
-    expect(createContainer('::: danger\ncontent', {
+    expect(createContainer('::: danger', '::: danger\ncontent', {
       tagStart: 0,
-      raw: '::: danger',
       marker: ':::',
       type: 'danger',
       openingTag,
