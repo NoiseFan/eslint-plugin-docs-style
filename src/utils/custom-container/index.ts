@@ -7,6 +7,9 @@ export const CUSTOM_CONTAINER_TYPES = [
   'danger',
   'details',
   'raw',
+  'code-group',
+  'v-pre',
+  'tabs', // support `vitepress-plugin-tabs`
 ] as const
 
 export type CustomContainerType = typeof CUSTOM_CONTAINER_TYPES[number]
