@@ -33,6 +33,13 @@ const invalid: InvalidTestCase[] = [
     output: ':::: info\n::: tip\ncontent\n:::\n::::',
     errors: [{ messageId: MESSAGE_IDS.invalidTypeCase, data: { type: 'TIP' } }],
   },
+  // uppercase to lowercase
+  {
+    description: 'normalizes an uppercase type',
+    code: '::: INFO \n content\n:::',
+    output: '::: info \n content\n:::',
+    errors: [{ messageId: MESSAGE_IDS.invalidTypeCase, data: { type: 'INFO' } }],
+  },
 ]
 
 run({
