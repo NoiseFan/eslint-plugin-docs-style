@@ -1,0 +1,26 @@
+[
+  {
+    "type": "error",
+    "content": "content",
+    "tag": {
+      "open": {
+        "raw": "::: error ",
+        "position": {
+          "start": 0,
+          "end": 10
+        },
+        "type": {
+          "value": "error",
+          "start": 4,
+          "end": 9
+        },
+        "title": null
+      },
+      "close": {
+        "raw": ":::",
+        "start": 19,
+        "end": 22
+      }
+    }
+  }
+]

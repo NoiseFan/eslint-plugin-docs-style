@@ -123,6 +123,7 @@ export default antfu(
 | `md-style/space-around-inline-element` | ✅ | 🔧 |
 | `md-style/space-around-number` |  | 🔧 |
 | `md-style/space-around-word` |  | 🔧 |
+| `md-style/valid-custom-container-type` |  | 🔧 |
 | `md-style/valid-heading-anchor` | ✅ | 🔧 |
 
 ## Why `@eslint/markdown` Is Required
