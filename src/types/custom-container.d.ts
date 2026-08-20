@@ -29,7 +29,7 @@ export interface CustomContainerOpeningTag {
   /**
    * The complete opening tag text.
    */
-  raw: string
+  content: string
   /**
    * The source range of the complete opening tag.
    */
@@ -37,7 +37,7 @@ export interface CustomContainerOpeningTag {
   /**
    * The container type and its source range.
    */
-  type: CustomContainerTagValue
+  type: string
   /**
    * The optional title and its source range.
    */
@@ -69,11 +69,12 @@ export interface CustomContainerTag {
 }
 
 /**
- * A parsed custom container.
+ * Parsed custom container AST
  */
 export interface CustomContainerNode {
   /**
-   * The container type, such as `info` or `warning`.
+   * Container type
+   * @example `info`, `warning`
    */
   type: string
   /**
@@ -81,10 +82,28 @@ export interface CustomContainerNode {
    */
   content: string
   /**
+   * Child containers and normalized blank-line nodes.
+   */
+  children?: CustomContainerChild[]
+  /**
+   * Nesting depth
+   * @default 1
+   */
+  depth?: number
+  /**
    * The source tags that delimit the container.
    */
   tag: CustomContainerTag
 }
+
+export interface CustomContainerBlankLineNode {
+  type: 'blank-line'
+  value: string
+  length: number
+  position?: CustomContainerRange
+}
+
+export type CustomContainerChild = CustomContainerNode | CustomContainerBlankLineNode
 
 /**
  * Internal container state retained while parsing nested containers.
@@ -98,4 +117,32 @@ export interface PendingCustomContainer extends CustomContainerNode {
    * The offset where the container content begins.
    */
   contentStart: number
+  containerType: string
+  parent?: PendingCustomContainer
+}
+
+export type CustomContainerPaddingIssueKind
+  = | 'missing'
+    | 'unexpected'
+
+/**
+ * A source edit needed to normalize whitespace next to a container marker.
+ */
+export interface CustomContainerPaddingIssue {
+  /**
+   * The violated container boundary.
+   */
+  kind: CustomContainerPaddingIssueKind
+  /**
+   * The whitespace range to replace.
+   */
+  range: CustomContainerRange
+  /**
+   * The normalized line breaks for the whitespace range.
+   */
+  replacement: string
+  /**
+   * The container marker range used when reporting the issue.
+   */
+  tag: CustomContainerRange
 }

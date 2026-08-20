@@ -36,7 +36,8 @@ export default createRule<Options, MessageIds>({
           return
 
         for (const container of parseCustomContainers(node.value)) {
-          const issue = getTypeIssue(container.type)
+          const containerType = container.tag.open.type.value
+          const issue = getTypeIssue(containerType)
           if (!issue)
             continue
 
@@ -45,7 +46,7 @@ export default createRule<Options, MessageIds>({
           context.report({
             node,
             messageId: issue.messageId,
-            data: { type: container.type },
+            data: { type: containerType },
             loc: {
               start: context.sourceCode.getLocFromIndex(start + typeStart),
               end: context.sourceCode.getLocFromIndex(start + typeEnd),

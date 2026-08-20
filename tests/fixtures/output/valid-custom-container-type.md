@@ -20,7 +20,6 @@ Information.
 ::: danger
 danger content.
 :::
-
 :::
 
 <!-- unsupport type -->

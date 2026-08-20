@@ -1,0 +1,30 @@
+{
+  "type": "custom-container",
+  "content": "inner content",
+  "tag": {
+    "open": {
+      "raw": "::: tip Inner",
+      "position": {
+        "start": 28,
+        "end": 41
+      },
+      "type": {
+        "value": "tip",
+        "start": 32,
+        "end": 35
+      },
+      "title": {
+        "value": "Inner",
+        "start": 36,
+        "end": 41
+      }
+    },
+    "close": {
+      "raw": ":::",
+      "start": 56,
+      "end": 59
+    }
+  },
+  "children": [],
+  "depth": 2
+}

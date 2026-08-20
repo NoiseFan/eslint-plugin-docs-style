@@ -1,6 +1,6 @@
 [
   {
-    "type": "info",
+    "type": "custom-container",
     "content": "content",
     "tag": {
       "open": {
@@ -25,6 +25,8 @@
         "start": 32,
         "end": 35
       }
-    }
+    },
+    "children": [],
+    "depth": 1
   }
 ]
