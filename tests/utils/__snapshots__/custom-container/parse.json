@@ -1,0 +1,30 @@
+[
+  {
+    "type": "info",
+    "content": "content",
+    "tag": {
+      "open": {
+        "raw": "::: info Optional title",
+        "position": {
+          "start": 0,
+          "end": 23
+        },
+        "type": {
+          "value": "info",
+          "start": 4,
+          "end": 8
+        },
+        "title": {
+          "value": "Optional title",
+          "start": 9,
+          "end": 23
+        }
+      },
+      "close": {
+        "raw": ":::",
+        "start": 32,
+        "end": 35
+      }
+    }
+  }
+]

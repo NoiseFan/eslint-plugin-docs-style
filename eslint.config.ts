@@ -13,6 +13,8 @@ export default antfu(
         'test/padding-around-before-each-blocks': 'error',
         'test/padding-around-describe-blocks': 'error',
         'test/padding-around-test-blocks': 'error',
+        'test/prefer-to-be-truthy': 'error',
+        'test/prefer-to-be-falsy': 'error',
       },
     },
     ignores: [
