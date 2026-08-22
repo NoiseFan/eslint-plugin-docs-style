@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text/tokenizer'
+import type { Position, TextAst, TextPosition, TextToken } from '@/types/text/tokenizer'
 import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../punctuation'
 
 export const TEXT_TYPE = {
@@ -89,9 +89,9 @@ const DEFAULT_START_POINT = {
   line: 1,
   column: 1,
   offset: 0,
-} as const satisfies TextPoint
+} as const satisfies Position
 
-function advancePoint(point: TextPoint, char: string): TextPoint {
+function advancePoint(point: Position, char: string): Position {
   if (NEWLINE_RE.test(char)) {
     return {
       line: point.line + 1,
@@ -122,7 +122,7 @@ export function getTextType(char: string, prev?: TextToken): TextType {
 /**
  * Tokenizes text into consecutive typed runs while preserving source positions.
  */
-export function tokenizeText(value: string, start: TextPoint = DEFAULT_START_POINT): TextToken[] {
+export function tokenizeText(value: string, start: Position = DEFAULT_START_POINT): TextToken[] {
   const tokens: TextToken[] = []
   let point = start
   let prevToken: undefined | TextToken

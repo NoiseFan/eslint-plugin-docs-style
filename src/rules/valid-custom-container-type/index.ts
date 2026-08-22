@@ -1,5 +1,6 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
+import type { CustomContainerAST, TagNode } from '@/types/custom-container'
 import { createRule } from '@/utils'
 import { getNodePosition } from '@/utils/ast'
 import { isCustomContainerType, parseCustomContainers } from '@/utils/custom-container'
@@ -35,18 +36,25 @@ export default createRule<Options, MessageIds>({
         if (!position)
           return
 
-        for (const container of parseCustomContainers(node.value)) {
-          const containerType = container.tag.open.type.value
-          const issue = getTypeIssue(containerType)
+        let searchStart = 0
+        for (const tag of getOpeningTags(parseCustomContainers(node.value))) {
+          const tagStart = node.value.indexOf(tag.raw, searchStart)
+          /* v8 ignore if -- @preserve */
+          if (tagStart < 0)
+            continue
+
+          searchStart = tagStart + tag.raw.length
+          const typeStart = tagStart + tag.raw.indexOf(tag.value)
+          const typeEnd = typeStart + tag.value.length
+          const issue = getTypeIssue(tag.value)
           if (!issue)
             continue
 
-          const { start: typeStart, end: typeEnd } = container.tag.open.type
           const normalizedType = 'normalizedType' in issue ? issue.normalizedType : undefined
           context.report({
             node,
             messageId: issue.messageId,
-            data: { type: containerType },
+            data: { type: tag.value },
             loc: {
               start: context.sourceCode.getLocFromIndex(start + typeStart),
               end: context.sourceCode.getLocFromIndex(start + typeEnd),
@@ -60,6 +68,15 @@ export default createRule<Options, MessageIds>({
     }
   },
 })
+
+function* getOpeningTags(container: CustomContainerAST): Generator<TagNode> {
+  for (const child of container.children) {
+    if (child.type === 'cumstom-container')
+      yield* getOpeningTags(child)
+    else if (child.type === 'open')
+      yield child
+  }
+}
 
 function getTypeIssue(type: string): { messageId: MessageIds, normalizedType?: string } | null {
   if (isCustomContainerType(type))

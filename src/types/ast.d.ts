@@ -1,6 +1,41 @@
 import type { Parents, PhrasingContent, RootContent } from 'mdast'
 
 /**
+ * Source location range for a token or auxiliary text AST node
+ */
+export interface Position {
+  /**
+   * Inclusive start point
+   */
+  start: PositionParam
+  /**
+   * Exclusive end point
+   */
+  end: PositionParam
+}
+
+/**
+ * Source location point compatible with mdast position points
+ */
+export interface PositionParam {
+  /**
+   * Line number
+   * @default 1
+   */
+  line: number
+  /**
+   * column number
+   * @default 1
+   */
+  column: number
+  /**
+   * offset in JavaScript string code units
+   * @default 0
+   */
+  offset: number
+}
+
+/**
  * The resolved source position of a node.
  */
 export interface NodePositionReturnType {

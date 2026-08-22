@@ -1,38 +1,6 @@
 import type { Text } from 'mdast'
+import type { Position } from '../ast'
 import type { TextType } from '@/utils/text'
-
-/**
- * Source location point compatible with mdast position points
- */
-export interface TextPoint {
-  /**
-   * Line number
-   * @default 1
-   */
-  line: number
-  /**
-   * 1-based column number
-   */
-  column: number
-  /**
-   * 0-based offset in JavaScript string code units
-   */
-  offset: number
-}
-
-/**
- * Source location range for a token or auxiliary text AST node
- */
-export interface TextPosition {
-  /**
-   * Inclusive start point
-   */
-  start: TextPoint
-  /**
-   * Exclusive end point
-   */
-  end: TextPoint
-}
 
 export interface TextToken {
   /**
@@ -46,7 +14,7 @@ export interface TextToken {
   /**
    * Token position in the source text
    */
-  position: TextPosition
+  position: Position
 }
 
 export interface TextAst {
@@ -65,7 +33,7 @@ export interface TextAst {
   /**
    * Node position in the source text
    */
-  position: TextPosition
+  position: Position
   /**
    * Tokenized children derived from the text content
    */
