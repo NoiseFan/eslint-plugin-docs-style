@@ -1,42 +1,43 @@
 {
   "type": "cumstom-container",
-  "depth": 2,
+  "depth": 1,
   "children": [
     {
       "type": "open",
-      "raw": "::: tip",
+      "raw": "::: info Title content",
       "value": {
-        "content": "tip",
-        "start": 19,
-        "end": 22
+        "content": "info",
+        "start": 4,
+        "end": 8
       },
+      "title": "Title content",
       "position": {
-        "start": 15,
+        "start": 0,
         "end": 22
       }
     },
     {
       "type": "blank",
-      "value": "\n",
+      "value": "\r\n",
       "position": {
         "start": 22,
-        "end": 23
+        "end": 24
       }
     },
     {
       "type": "text",
-      "value": "nested",
+      "value": "content",
       "position": {
-        "start": 23,
-        "end": 29
+        "start": 24,
+        "end": 31
       }
     },
     {
       "type": "blank",
-      "value": "\n",
+      "value": "\r\n",
       "position": {
-        "start": 29,
-        "end": 30
+        "start": 31,
+        "end": 33
       }
     },
     {
@@ -44,17 +45,17 @@
       "raw": ":::",
       "value": {
         "content": ":::",
-        "start": 30,
-        "end": 33
+        "start": 33,
+        "end": 36
       },
       "position": {
-        "start": 30,
-        "end": 33
+        "start": 33,
+        "end": 36
       }
     }
   ],
   "position": {
-    "start": 15,
-    "end": 38
+    "start": 0,
+    "end": 36
   }
 }

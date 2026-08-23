@@ -23,8 +23,8 @@ export function isCustomContainerType(value: string): value is CustomContainerTy
   return CUSTOM_CONTAINER_TYPE_SET.has(value)
 }
 
-export const CUSTOM_CONTAINER_OPEN_MARKER_RE = /^:{3,}([\s\w]+)/
-export const CUSTOM_CONTAINER_CLOSE_MARKER_RE = /^\n:{3,}$/
+export const CUSTOM_CONTAINER_OPEN_MARKER_RE = /^ {0,3}:{3,}[ \t]+([\w-]+)(?=$|[ \t]|\r?\n)/
+export const CUSTOM_CONTAINER_CLOSE_MARKER_RE = /^\r?\n {0,3}:{3,}[ \t]*$/
 
 /**
  * Checks whether adjacent text is a custom container marker on the next line.

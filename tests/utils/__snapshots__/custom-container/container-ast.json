@@ -4,31 +4,15 @@
   "children": [
     {
       "type": "open",
-      "raw": "::: info Title",
+      "raw": "::: info Title content",
       "value": {
         "content": "info",
         "start": 4,
         "end": 8
       },
-      "title": "Title",
+      "title": "Title content",
       "position": {
         "start": 0,
-        "end": 14
-      }
-    },
-    {
-      "type": "blank",
-      "value": "\n",
-      "position": {
-        "start": 14,
-        "end": 15
-      }
-    },
-    {
-      "type": "text",
-      "value": "content",
-      "position": {
-        "start": 15,
         "end": 22
       }
     },
@@ -41,21 +25,37 @@
       }
     },
     {
+      "type": "text",
+      "value": "content",
+      "position": {
+        "start": 23,
+        "end": 30
+      }
+    },
+    {
+      "type": "blank",
+      "value": "\n",
+      "position": {
+        "start": 30,
+        "end": 31
+      }
+    },
+    {
       "type": "close",
       "raw": ":::",
       "value": {
         "content": ":::",
-        "start": 23,
-        "end": 26
+        "start": 31,
+        "end": 34
       },
       "position": {
-        "start": 23,
-        "end": 26
+        "start": 31,
+        "end": 34
       }
     }
   ],
   "position": {
     "start": 0,
-    "end": 26
+    "end": 34
   }
 }
