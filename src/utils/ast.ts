@@ -117,7 +117,7 @@ export function getNodeContext(
     return { prev: undefined, next: undefined, current: node }
 
   const currentIndex = parent.children.findIndex(child => child === node)
-  /* v8 ignore if -- @preserve */
+
   if (currentIndex === -1)
     return { parent, prev: undefined, next: undefined, current: node }
 
