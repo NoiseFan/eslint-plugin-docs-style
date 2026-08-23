@@ -19,6 +19,7 @@ export function parseCustomContainers(
   while (splits.length) {
     const item = splits.shift()
     const prevNode: ChildrenNode | undefined = children.at(-1) || parentNode
+    /* v8 ignore if -- @preserve */
     if (item === undefined)
       break
     if (item === '\n' || item === '\r\n') {
