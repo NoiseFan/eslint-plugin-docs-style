@@ -51,25 +51,25 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.0.0",
-    "@eslint/markdown": "^8.0.1",
+    "@antfu/eslint-config": "^9.3.0",
+    "@eslint/markdown": "^8.0.3",
     "@types/mdast": "^4.0.4",
-    "@types/node": "^25.7.0",
+    "@types/node": "^26.2.0",
     "@types/unist": "^3.0.3",
-    "@typescript-eslint/utils": "^8.59.3",
-    "@vitest/coverage-v8": "^4.1.6",
-    "bumpp": "^11.1.0",
-    "eslint": "10.3.0",
+    "@typescript-eslint/utils": "^8.67.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "bumpp": "^12.2.1",
+    "eslint": "10.8.1",
     "eslint-factory": "^0.1.2",
     "eslint-plugin-format": "^2.0.1",
-    "eslint-plugin-md-style": "^0.1.0",
+    "eslint-plugin-md-style": "^0.2.0",
     "eslint-vitest-rule-tester": "^3.1.0",
-    "lint-staged": "^17.0.4",
+    "lint-staged": "^17.3.0",
     "simple-git-hooks": "^2.13.1",
-    "tinyglobby": "^0.2.16",
-    "tsdown": "^0.22.0",
+    "tinyglobby": "^0.2.17",
+    "tsdown": "^0.22.14",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.11"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpx lint-staged"
