@@ -21,8 +21,6 @@ export function parseCustomContainers(
     const prevNode: ChildrenNode | undefined = children.at(-1) || parentNode
     if (item === undefined)
       break
-    if (item === '')
-      continue
     if (item === '\n' || item === '\r\n') {
       parseBlankNode(children, { newline: item, prevNode })
       continue
