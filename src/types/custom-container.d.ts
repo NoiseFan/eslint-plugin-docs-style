@@ -1,7 +1,61 @@
 /**
- * A ahalf-open source range relative to the parsed Markdown value.
+ * AST node representing a custom Markdown container and its nested content.
  */
-export interface CustomContainerRange {
+export interface CustomContainerAST {
+  /**
+   * Node discriminator for custom containers
+   */
+  type: 'cumstom-container'
+  /**
+   *  Source range covering the complete container
+   */
+  position: OffsetRange
+  /**
+   * Nesting depth within custom containers
+   * @default 1
+   */
+  depth?: number
+  /**
+   * Nodes contained by this custom container
+   */
+  children: Array<ChildrenNode>
+}
+
+/**
+ * A node that can occur inside a custom container.
+ */
+export type ChildrenNode = CustomContainerAST | TagNode | BlankNode | TextNode
+
+/**
+ * AST node for an opening or closing custom-container tag.
+ */
+export interface TagNode {
+  /**
+   * Whether the tag opens or closes the container
+   */
+  type: 'open' | 'close'
+  /**
+   * Original tag text as it appeared in the source
+   */
+  raw: string
+  /**
+   *  Tag content and its source range
+   */
+  value: { content: string } & OffsetRange
+  /**
+   * Optional title associated with an opening tag
+   */
+  title?: string
+  /**
+   * Source range covering the tag
+   */
+  position: OffsetRange
+}
+
+/**
+ * Half-open character offset range in the source document.
+ */
+export interface OffsetRange {
   /**
    * Start offset
    */
@@ -13,89 +67,37 @@ export interface CustomContainerRange {
 }
 
 /**
- * A parsed value together with its source range.
+ *  AST node representing a blank line inside a custom container.
  */
-export interface CustomContainerTagValue extends CustomContainerRange {
+export interface BlankNode {
   /**
-   * The parsed value.
+   *  Node discriminator for blank lines
+   */
+  type: 'blank'
+  /**
+   * Original blank-line text
    */
   value: string
+  /**
+   * Source range covering the blank line
+   */
+  position: OffsetRange
 }
 
 /**
- * The opening tag of a custom container.
+ * AST node representing plain text inside a custom container.
  */
-export interface CustomContainerOpeningTag {
+export interface TextNode {
   /**
-   * The complete opening tag text.
+   *  Node discriminator for text nodes
    */
-  raw: string
+  type: 'text'
   /**
-   * The source range of the complete opening tag.
+   * Original text content
    */
-  position: CustomContainerRange
+  value: string
   /**
-   * The container type and its source range.
+   * Source range covering the text
    */
-  type: CustomContainerTagValue
-  /**
-   * The optional title and its source range.
-   */
-  title: CustomContainerTagValue | null
-}
-
-/**
- * The closing tag of a custom container.
- */
-export interface CustomContainerClosingTag extends CustomContainerRange {
-  /**
-   * The complete closing tag text.
-   */
-  raw: string
-}
-
-/**
- * The opening and closing tags that delimit a custom container.
- */
-export interface CustomContainerTag {
-  /**
-   * The opening tag.
-   */
-  open: CustomContainerOpeningTag
-  /**
-   * The closing tag, or `null` when the container is unclosed.
-   */
-  close: CustomContainerClosingTag | null
-}
-
-/**
- * A parsed custom container.
- */
-export interface CustomContainerNode {
-  /**
-   * The container type, such as `info` or `warning`.
-   */
-  type: string
-  /**
-   * The container content without its boundary line break.
-   */
-  content: string
-  /**
-   * The source tags that delimit the container.
-   */
-  tag: CustomContainerTag
-}
-
-/**
- * Internal container state retained while parsing nested containers.
- */
-export interface PendingCustomContainer extends CustomContainerNode {
-  /**
-   * The number of marker characters in the opening tag.
-   */
-  markerLength: number
-  /**
-   * The offset where the container content begins.
-   */
-  contentStart: number
+  position: OffsetRange
 }

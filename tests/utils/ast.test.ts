@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   findNode,
   getAdjacentChar,
+  getNodeContext,
   getNodeContextByParent,
   hasChildren,
   isLinkNode,
@@ -78,6 +79,34 @@ describe('getNodeContextByParent', () => {
       prev: undefined,
       current: children[0],
       next: children[1],
+    })
+  })
+})
+
+describe('getNodeContext', () => {
+  it('returns no siblings when the ancestor list has no parent node', () => {
+    const { ast } = parseMarkdown('Plain text.')
+    const paragraph = findNode(ast, isParagraphNode)
+
+    expect(paragraph).toBeDefined()
+    expect(getNodeContext({ sourceCode: { getAncestors: () => [] } }, paragraph!)).toStrictEqual({
+      prev: undefined,
+      next: undefined,
+      current: paragraph,
+    })
+  })
+
+  it('returns no siblings when the current node is absent from its parent', () => {
+    const { ast } = parseMarkdown('Plain text.')
+    const paragraph = findNode(ast, isParagraphNode)
+    const parent = { type: 'root', children: [] }
+
+    expect(paragraph).toBeDefined()
+    expect(getNodeContext({ sourceCode: { getAncestors: () => [parent] } }, paragraph!)).toStrictEqual({
+      parent,
+      prev: undefined,
+      next: undefined,
+      current: paragraph,
     })
   })
 })

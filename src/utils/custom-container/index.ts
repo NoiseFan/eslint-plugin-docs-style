@@ -22,3 +22,20 @@ const CUSTOM_CONTAINER_TYPE_SET = new Set<string>(CUSTOM_CONTAINER_TYPES)
 export function isCustomContainerType(value: string): value is CustomContainerType {
   return CUSTOM_CONTAINER_TYPE_SET.has(value)
 }
+
+export const CUSTOM_CONTAINER_OPEN_MARKER_RE = /^ {0,3}:{3,}[ \t]+([\w-]+)(?=$|[ \t]|\r?\n)/
+export const CUSTOM_CONTAINER_CLOSE_MARKER_RE = /^\r?\n {0,3}:{3,}[ \t]*$/
+
+/**
+ * Checks whether adjacent text is a custom container marker on the next line.
+ *
+ * @see https://vitepress.dev/guide/markdown#custom-containers
+ * @example `::: info` -> true
+ * @example `:::: tip` -> true
+ * @example `:::` -> false
+ */
+export function isCustomContainerMarker(str: string | undefined): boolean {
+  if (!str)
+    return false
+  return CUSTOM_CONTAINER_CLOSE_MARKER_RE.test(str) || CUSTOM_CONTAINER_OPEN_MARKER_RE.test(str)
+}

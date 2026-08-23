@@ -1,6 +1,6 @@
 import type { InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
-import type { InlineElement, PositionOptions } from '@/types/inline-element'
+import type { PositionOptions } from '@/types/inline-element'
 import type { TextToken } from '@/types/text/tokenizer'
 
 /* ==================== Node type guards ==================== */
@@ -42,23 +42,6 @@ export function isInlineCodeNode(node: Nodes): node is InlineCode {
 
 export function isTableCell(node: Nodes): node is TableCell {
   return node.type === 'tableCell'
-}
-
-const INLINE_ELEMENT_TYPES = new Set(['link', 'image', 'inlineCode', 'emphasis', 'strong'])
-
-/**
- * Checks whether a phrasing node is one of the selected inline element targets.
- */
-export function isInlineElement(node: PhrasingContent | Parents | undefined): node is InlineElement {
-  return !!node && INLINE_ELEMENT_TYPES.has(node.type)
-}
-
-/**
- * Checks whether the current inline element is nested inside another selected inline element.
- */
-export function isNestedInlineElement(nodeContext: NodeContextReturnType<InlineElement>): boolean {
-  const { parent } = nodeContext
-  return isInlineElement(parent)
 }
 
 /* ==================== Tree traversal ==================== */
@@ -134,7 +117,7 @@ export function getNodeContext(
     return { prev: undefined, next: undefined, current: node }
 
   const currentIndex = parent.children.findIndex(child => child === node)
-  /* v8 ignore if -- @preserve */
+
   if (currentIndex === -1)
     return { parent, prev: undefined, next: undefined, current: node }
 

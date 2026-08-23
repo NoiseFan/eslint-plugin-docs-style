@@ -1,5 +1,6 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
+import type { CustomContainerAST, TagNode } from '@/types/custom-container'
 import { createRule } from '@/utils'
 import { getNodePosition } from '@/utils/ast'
 import { isCustomContainerType, parseCustomContainers } from '@/utils/custom-container'
@@ -17,10 +18,10 @@ export default createRule<Options, MessageIds>({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Require VitePress custom containers to use a supported type.',
+      description: 'Require custom containers to use a supported type.',
     },
     messages: {
-      invalidType: 'Invalid custom container type "{{type}}". Use info, tip, warning, danger, details, or raw.',
+      invalidType: 'Invalid custom container type "{{type}}". Use info, tip, warning, danger, details, raw, code-group, v-pre, or tabs.',
       invalidTypeCase: 'Custom container type "{{type}}" must be lowercase.',
     },
     fixable: 'code',
@@ -30,28 +31,31 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       text(node: Text) {
-        const { position, start } = getNodePosition(node)
+        const { position, start: startPoint } = getNodePosition(node)
         /* v8 ignore if -- @preserve */
         if (!position)
           return
 
-        for (const container of parseCustomContainers(node.value)) {
-          const issue = getTypeIssue(container.type)
+        for (const tag of getOpeningTags(parseCustomContainers(node.value))) {
+          const issue = getTypeIssue(tag.value.content)
           if (!issue)
             continue
 
-          const { start: typeStart, end: typeEnd } = container.tag.open.type
           const normalizedType = 'normalizedType' in issue ? issue.normalizedType : undefined
+
+          const start = startPoint + tag.value.start
+          const end = startPoint + tag.value.end
+
           context.report({
             node,
             messageId: issue.messageId,
-            data: { type: container.type },
+            data: { type: tag.value.content },
             loc: {
-              start: context.sourceCode.getLocFromIndex(start + typeStart),
-              end: context.sourceCode.getLocFromIndex(start + typeEnd),
+              start: context.sourceCode.getLocFromIndex(start),
+              end: context.sourceCode.getLocFromIndex(end),
             },
             fix: normalizedType
-              ? fixer => fixer.replaceTextRange([start + typeStart, start + typeEnd], normalizedType)
+              ? fixer => fixer.replaceTextRange([start, end], normalizedType)
               : undefined,
           })
         }
@@ -59,6 +63,15 @@ export default createRule<Options, MessageIds>({
     }
   },
 })
+
+function* getOpeningTags(container: CustomContainerAST): Generator<TagNode> {
+  for (const child of container.children) {
+    if (child.type === 'cumstom-container')
+      yield* getOpeningTags(child)
+    else if (child.type === 'open')
+      yield child
+  }
+}
 
 function getTypeIssue(type: string): { messageId: MessageIds, normalizedType?: string } | null {
   if (isCustomContainerType(type))

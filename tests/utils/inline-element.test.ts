@@ -1,27 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { isInlineCodeNode } from '@/utils/ast'
 import {
-  isCustomContainerMarker,
   validateSpace,
   validateSpaceAfterPunctuation,
 } from '@/utils/inline-element'
 import { getParsedNodeContext } from '@/utils/markdown'
-
-describe('isCustomContainerMarker', () => {
-  it('should return true for custom container markers on the next line', () => {
-    const inputs = ['\n:::', '\n  :::', ' \n:::  ']
-    for (const input of inputs) {
-      expect(isCustomContainerMarker(input), input).toBeTruthy()
-    }
-  })
-
-  it('should return false for inline punctuation and non-marker values', () => {
-    const inputs = [undefined, '', ':::', ' ::: ', '\n::', '\n: text', '\n::: text', 'text\n:::']
-    for (const input of inputs) {
-      expect(isCustomContainerMarker(input), input ?? 'undefined').toBeFalsy()
-    }
-  })
-})
 
 describe('validateSpace', () => {
   it('allows spaced adjacent inline elements in table cells', () => {

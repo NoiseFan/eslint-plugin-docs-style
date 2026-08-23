@@ -1,6 +1,8 @@
 import type { Text } from 'mdast'
+import type { Point, Position } from 'unist'
 import type { ValueOf } from '@/types'
-import type { TextAst, TextPoint, TextPosition, TextToken } from '@/types/text/tokenizer'
+import type { TextAst, TextToken } from '@/types/text/tokenizer'
+
 import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../punctuation'
 
 export const TEXT_TYPE = {
@@ -89,21 +91,22 @@ const DEFAULT_START_POINT = {
   line: 1,
   column: 1,
   offset: 0,
-} as const satisfies TextPoint
+} as const satisfies Point
 
-function advancePoint(point: TextPoint, char: string): TextPoint {
+function advancePoint(point: Point, char: string): Point {
+  const { line, column, offset = 0 } = point
   if (NEWLINE_RE.test(char)) {
     return {
-      line: point.line + 1,
+      line: line + 1,
       column: 1,
-      offset: point.offset + char.length,
+      offset: offset + char.length,
     }
   }
 
   return {
-    line: point.line,
-    column: point.column + char.length,
-    offset: point.offset + char.length,
+    line,
+    column: column + char.length,
+    offset: offset + char.length,
   }
 }
 
@@ -122,7 +125,7 @@ export function getTextType(char: string, prev?: TextToken): TextType {
 /**
  * Tokenizes text into consecutive typed runs while preserving source positions.
  */
-export function tokenizeText(value: string, start: TextPoint = DEFAULT_START_POINT): TextToken[] {
+export function tokenizeText(value: string, start: Point = DEFAULT_START_POINT): TextToken[] {
   const tokens: TextToken[] = []
   let point = start
   let prevToken: undefined | TextToken
@@ -160,7 +163,7 @@ export function tokenizeText(value: string, start: TextPoint = DEFAULT_START_POI
 export function buildTextNodeAst(node: Text): TextAst {
   const start = node.position?.start
   const end = node.position?.end
-  const position: TextPosition = {
+  const position: Position = {
     start: {
       line: start?.line ?? DEFAULT_START_POINT.line,
       column: start?.column ?? DEFAULT_START_POINT.column,

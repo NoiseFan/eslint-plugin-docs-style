@@ -55,6 +55,7 @@
     "@eslint/markdown": "^8.0.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^26.2.0",
+    "@types/unist": "^3.0.3",
     "@typescript-eslint/utils": "^8.67.0",
     "@vitest/coverage-v8": "^4.1.11",
     "bumpp": "^12.2.1",

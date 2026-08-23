@@ -12,7 +12,21 @@ Warning content.
 danger content.
 :::
 
+::: tip
+[Getting Started](/guide/)
+:::
+
 <!-- nested containers -->
+
+:::: info Outer container
+This box contains another container.
+
+::: details Inner container
+```js
+console.log('Hello, VitePress!')
+```
+:::
+::::
 
 ::: info
 Information.
@@ -21,6 +35,23 @@ Information.
 danger content.
 :::
 
+:::
+
+::: info
+Information.
+
+::: DANGER
+danger content.
+:::
+Information.
+:::
+
+<!-- additional attributes -->
+
+::: details Click me to toggle the code {open}
+```js
+console.log('Hello, VitePress!')
+```
 :::
 
 <!-- unsupport type -->
