@@ -30,8 +30,8 @@ export const CUSTOM_CONTAINER_CLOSE_MARKER_RE = /^\r?\n {0,3}:{3,}[ \t]*$/
  * Checks whether adjacent text is a custom container marker on the next line.
  *
  * @see https://vitepress.dev/guide/markdown#custom-containers
- * @example `\n:::` -> true
- * @example `\n::::` -> true
+ * @example `::: info` -> true
+ * @example `:::: tip` -> true
  * @example `:::` -> false
  */
 export function isCustomContainerMarker(str: string | undefined): boolean {
