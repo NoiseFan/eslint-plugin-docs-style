@@ -1,25 +1,17 @@
+import type { Parents, PhrasingContent } from 'mdast'
 import type { NodeContextReturnType } from '@/types/ast'
 import type { AdjacentTextContext, InlineElement, InlineElementSpaceIssue } from '@/types/inline-element'
 import { MESSAGE_IDS as INLINE_SPACE_MESSAGE_IDS } from '@/rules/space-around-inline-element'
+import { isCustomContainerMarker } from '@/utils/custom-container'
 import { getLikeAnchor } from './anchor'
-import { getAdjacentChar, isInlineElement, isTableCell } from './ast'
-import { CLOSING_PAIRED_PUNCTUATION, isDashPunctuation, isSlashPunctuation, OPENING_PAIRED_PUNCTUATION } from './punctuation'
+import { getAdjacentChar, isTableCell } from './ast'
+import {
+  CLOSING_PAIRED_PUNCTUATION,
+  isDashPunctuation,
+  isSlashPunctuation,
+  OPENING_PAIRED_PUNCTUATION,
+} from './punctuation'
 import { getSpaceContext } from './space'
-
-/**
- * Checks whether adjacent text is a custom container marker on the next line.
- *
- * @deprecated Temporary workaround to prevent space-between-link from reporting
- * false positives on custom containers. Remove this and handle the case in a
- * dedicated custom container rule when one exists.
- * @see https://vitepress.dev/guide/markdown#custom-containers
- * @example `\n:::` -> true
- * @example `\n::::` -> true
- * @example `:::` -> false
- */
-export function isCustomContainerMarker(str: string | undefined): boolean {
-  return /^[ \t]*\n[ \t]*:{3,}[ \t]*$/u.test(str || '')
-}
 
 /**
  * Validates whether a spacing run contains exactly one required space.
@@ -120,6 +112,23 @@ export function validateSpaceAfterNode(context: AdjacentTextContext): InlineElem
     INLINE_SPACE_MESSAGE_IDS.missingSpaceAfter,
     INLINE_SPACE_MESSAGE_IDS.multipleSpacesAfter,
   )
+}
+
+const INLINE_ELEMENT_TYPES = new Set(['link', 'image', 'inlineCode', 'emphasis', 'strong'])
+
+/**
+ * Checks whether a phrasing node is one of the selected inline element targets.
+ */
+export function isInlineElement(node: PhrasingContent | Parents | undefined): node is InlineElement {
+  return !!node && INLINE_ELEMENT_TYPES.has(node.type)
+}
+
+/**
+ * Checks whether the current inline element is nested inside another selected inline element.
+ */
+export function isNestedInlineElement(nodeContext: NodeContextReturnType<InlineElement>): boolean {
+  const { parent } = nodeContext
+  return isInlineElement(parent)
 }
 
 /**

@@ -12,6 +12,10 @@ Warning content.
 danger content.
 :::
 
+::: tip
+[Getting Started](/guide/)
+:::
+
 <!-- nested containers -->
 
 ::: info
@@ -20,6 +24,16 @@ Information.
 ::: danger
 danger content.
 :::
+
+:::
+
+::: info
+Information.
+
+::: danger
+danger content.
+:::
+Information.
 :::
 
 <!-- unsupport type -->

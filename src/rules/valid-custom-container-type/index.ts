@@ -18,10 +18,10 @@ export default createRule<Options, MessageIds>({
   meta: {
     type: 'problem',
     docs: {
-      description: 'Require VitePress custom containers to use a supported type.',
+      description: 'Require custom containers to use a supported type.',
     },
     messages: {
-      invalidType: 'Invalid custom container type "{{type}}". Use info, tip, warning, danger, details, or raw.',
+      invalidType: 'Invalid custom container type "{{type}}". Use info, tip, warning, danger, details, raw, code-group, v-pre, or tabs.',
       invalidTypeCase: 'Custom container type "{{type}}" must be lowercase.',
     },
     fixable: 'code',
@@ -31,36 +31,31 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       text(node: Text) {
-        const { position, start } = getNodePosition(node)
+        const { position, start: startPoint } = getNodePosition(node)
         /* v8 ignore if -- @preserve */
         if (!position)
           return
 
-        let searchStart = 0
         for (const tag of getOpeningTags(parseCustomContainers(node.value))) {
-          const tagStart = node.value.indexOf(tag.raw, searchStart)
-          /* v8 ignore if -- @preserve */
-          if (tagStart < 0)
-            continue
-
-          searchStart = tagStart + tag.raw.length
-          const typeStart = tagStart + tag.raw.indexOf(tag.value)
-          const typeEnd = typeStart + tag.value.length
-          const issue = getTypeIssue(tag.value)
+          const issue = getTypeIssue(tag.value.content)
           if (!issue)
             continue
 
           const normalizedType = 'normalizedType' in issue ? issue.normalizedType : undefined
+
+          const start = startPoint + tag.value.start
+          const end = startPoint + tag.value.end
+
           context.report({
             node,
             messageId: issue.messageId,
-            data: { type: tag.value },
+            data: { type: tag.value.content },
             loc: {
-              start: context.sourceCode.getLocFromIndex(start + typeStart),
-              end: context.sourceCode.getLocFromIndex(start + typeEnd),
+              start: context.sourceCode.getLocFromIndex(start),
+              end: context.sourceCode.getLocFromIndex(end),
             },
             fix: normalizedType
-              ? fixer => fixer.replaceTextRange([start + typeStart, start + typeEnd], normalizedType)
+              ? fixer => fixer.replaceTextRange([start, end], normalizedType)
               : undefined,
           })
         }
