@@ -4,7 +4,7 @@ import {
   validateSpace,
   validateSpaceAfterPunctuation,
 } from '@/utils/inline-element'
-import { getParsedNodeContext } from '@/utils/markdown'
+import { getParsedNodeContext } from '../helpers/markdown'
 
 describe('validateSpace', () => {
   it('allows spaced adjacent inline elements in table cells', () => {
