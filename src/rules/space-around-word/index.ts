@@ -2,6 +2,7 @@ import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
 import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/boundary-spacing/analyze'
 import { createRule } from '@/utils'
+import { isLatinWordType } from '@/utils/text'
 
 export const RULE_NAME = 'space-around-word'
 export const MESSAGE_IDS = {
@@ -39,7 +40,7 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       text(node: Text) {
-        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, type => type === 'latin')
+        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, isLatinWordType)
 
         if (fixed === node.value)
           return

@@ -59,6 +59,12 @@ function isNumber(char: string, prev: TextToken | undefined): boolean {
   return NUMBER_RE.test(char) || (prev?.type === TEXT_TYPE.number && (char === '.' || char === '%'))
 }
 
+export function isLatinWordType(type: string | undefined): boolean {
+  if (!type)
+    return false
+  return type === 'latin'
+}
+
 const TEXT_TYPE_MATCHERS = [
   { type: TEXT_TYPE.newline, test: (char: string) => NEWLINE_RE.test(char) },
   { type: TEXT_TYPE.space, test: (char: string) => SPACE_RE.test(char) },
