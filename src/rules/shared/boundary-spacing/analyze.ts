@@ -4,13 +4,13 @@ import type { BoundarySpaceResult } from '@/types/text/boundary-space'
 import { getNodeContextByParent } from '@/parser/ast'
 import { buildTextNodeAst, TEXT_TYPE } from '@/utils/text/tokenizer'
 
-export type BoundarySpaceIssue
-  = 'missing-space-before'
-    | 'missing-space-after'
-    | 'missing-spaces-around'
-    | 'unexpected-space-before'
-    | 'unexpected-space-after'
-    | 'unexpected-spaces-around'
+export type BoundarySpaceMessageId
+  = 'missingSpaceBefore'
+    | 'missingSpaceAfter'
+    | 'missingSpacesAround'
+    | 'unexpectedSpaceBefore'
+    | 'unexpectedSpaceAfter'
+    | 'unexpectedSpaceAround'
 
 /**
  * Normalizes an existing space token around the target token type.
@@ -73,31 +73,31 @@ function processTargetToken(
 }
 
 /**
- * Chooses the most specific shared boundary-space issue from the
+ * Chooses the most specific shared boundary-space message id from the
  * collected missing or redundant space flags.
  */
-export function getBoundarySpaceIssue(boundary: {
+export function getBoundarySpaceMessageId(boundary: {
   missingBefore: boolean
   missingAfter: boolean
   unexpectedBefore: boolean
   unexpectedAfter: boolean
-}): BoundarySpaceIssue {
+}): BoundarySpaceMessageId {
   if (boundary.missingBefore && boundary.missingAfter)
-    return 'missing-spaces-around'
+    return 'missingSpacesAround'
 
   if (boundary.unexpectedBefore && boundary.unexpectedAfter)
-    return 'unexpected-spaces-around'
+    return 'unexpectedSpaceAround'
 
   if (boundary.missingBefore)
-    return 'missing-space-before'
+    return 'missingSpaceBefore'
 
   if (boundary.missingAfter)
-    return 'missing-space-after'
+    return 'missingSpaceAfter'
 
   if (boundary.unexpectedBefore)
-    return 'unexpected-space-before'
+    return 'unexpectedSpaceBefore'
 
-  return 'unexpected-space-after'
+  return 'unexpectedSpaceAfter'
 }
 
 /**
