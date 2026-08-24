@@ -1,10 +1,18 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
+import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/boundary-spacing/analyze'
 import { createRule } from '@/utils'
-import { fixBoundarySpace, getBoundarySpaceMessageId, isLatinWordType } from '@/utils/text'
+import { isLatinWordType } from '@/utils/text'
 
 export const RULE_NAME = 'space-around-word'
+export const MESSAGE_IDS = {
+  missingSpaceBefore: 'missingSpaceBefore',
+  missingSpaceAfter: 'missingSpaceAfter',
+  missingSpacesAround: 'missingSpacesAround',
+  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
+  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
+  unexpectedSpaceAround: 'unexpectedSpaceAround',
+} as const
 
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
 

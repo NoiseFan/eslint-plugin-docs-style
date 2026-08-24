@@ -1,6 +1,6 @@
 import type { RootContent } from 'mdast'
 import { describe, expect, it } from 'vitest'
-import { hasFrontmatter } from '@/utils/heading'
+import { hasFrontmatter } from '@/rules/valid-heading-anchor/frontmatter'
 
 describe('hasFrontmatter', () => {
   it('returns true for yaml frontmatter at the document start', () => {

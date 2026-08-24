@@ -1,26 +1,10 @@
+import { getParsedNodeContext } from '@tests/helpers/markdown'
 import { describe, expect, it } from 'vitest'
-import { isInlineCodeNode } from '@/utils/ast'
+import { isInlineCodeNode } from '@/parser/ast'
 import {
   validateSpace,
   validateSpaceAfterPunctuation,
-} from '@/utils/inline-element'
-import { getParsedNodeContext } from '@/utils/markdown'
-
-describe('validateSpace', () => {
-  it('allows spaced adjacent inline elements in table cells', () => {
-    const markdown = '| Setting | Value|\n| --- | --- |\n| Working directory | `/path` `/to/your-project-root`|'
-    const inlineCodeContext = getParsedNodeContext(markdown, isInlineCodeNode)
-
-    expect(validateSpace(inlineCodeContext)).toBeUndefined()
-  })
-
-  it('skips standalone inline elements in table cells without adjacent text', () => {
-    const markdown = '| Setting | Value|\n| --- | --- |\n| Working directory | `/path/to/your-project-root`|'
-    const inlineCodeContext = getParsedNodeContext(markdown, isInlineCodeNode)
-
-    expect(validateSpace(inlineCodeContext)).toBeUndefined()
-  })
-})
+} from '@/rules/space-around-inline-element/analyze'
 
 describe('validateSpaceAfterPunctuation', () => {
   describe('closing paired punctuation', () => {
@@ -39,7 +23,7 @@ describe('validateSpaceAfterPunctuation', () => {
         whiteSpace: { count: 1, start: 0, end: 1 },
         hasPunctuation: true,
         punctuationType: 'half',
-      })).toBe('unexpectedSpaceAfter')
+      })).toBe('unexpected-space-after')
     })
 
     it('reports multiple unexpected spaces before closing punctuation', () => {
@@ -48,7 +32,7 @@ describe('validateSpaceAfterPunctuation', () => {
         whiteSpace: { count: 2, start: 0, end: 2 },
         hasPunctuation: true,
         punctuationType: 'half',
-      })).toBe('unexpectedSpaceAfter')
+      })).toBe('unexpected-space-after')
     })
   })
 
@@ -59,7 +43,7 @@ describe('validateSpaceAfterPunctuation', () => {
         whiteSpace: { count: 0, start: 0, end: 0 },
         hasPunctuation: true,
         punctuationType: 'half',
-      })).toBe('missingSpaceAfter')
+      })).toBe('missing-space-after')
     })
 
     it('allows a single space before opening punctuation', () => {
@@ -77,7 +61,19 @@ describe('validateSpaceAfterPunctuation', () => {
         whiteSpace: { count: 2, start: 0, end: 2 },
         hasPunctuation: true,
         punctuationType: 'half',
-      })).toBe('multipleSpacesAfter')
+      })).toBe('multiple-spaces-after')
     })
+  })
+})
+
+describe('validateSpace', () => {
+  it('allows spaced adjacent inline elements in table cells', () => {
+    const markdown = '| Setting | Value|\n| --- | --- |\n| Working directory | `/path` `/to/your-project-root`|'
+    expect(validateSpace(getParsedNodeContext(markdown, isInlineCodeNode))).toBeUndefined()
+  })
+
+  it('skips standalone inline elements in table cells without adjacent text', () => {
+    const markdown = '| Setting | Value|\n| --- | --- |\n| Working directory | `/path/to/your-project-root`|'
+    expect(validateSpace(getParsedNodeContext(markdown, isInlineCodeNode))).toBeUndefined()
   })
 })

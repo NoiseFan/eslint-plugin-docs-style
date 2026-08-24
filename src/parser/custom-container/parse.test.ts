@@ -1,47 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
-  CUSTOM_CONTAINER_TYPES,
-  isCustomContainerMarker,
-  isCustomContainerType,
   parseBlankNode,
   parseCloseTag,
   parseCustomContainers,
   parseOpenTag,
   splitLines,
-} from '@/utils/custom-container'
-
-describe('isCustomContainerMarker', () => {
-  it('should return true for custom container markers on the next line', () => {
-    const inputs = ['::: info', '::: tip', ':::: warning']
-    for (const input of inputs) {
-      expect(isCustomContainerMarker(input)).toBeTruthy()
-    }
-  })
-
-  it('should return false for inline punctuation and non-marker values', () => {
-    const inputs = [undefined, '', ':::', ' ::: ', '\n::', '\n: text', '\n::: text', 'text\n:::']
-    for (const input of inputs) {
-      expect(isCustomContainerMarker(input)).toBeFalsy()
-    }
-  })
-})
-
-describe('isCustomContainerType', () => {
-  it.each(CUSTOM_CONTAINER_TYPES)('accepts %s', (type) => {
-    expect(isCustomContainerType(type)).toBeTruthy()
-  })
-
-  it.each(['note', 'INFO', '', 'warning!'])('rejects %s', (type) => {
-    expect(isCustomContainerType(type)).toBeFalsy()
-  })
-})
+} from '@/parser/custom-container'
 
 describe('parseCustomContainers', () => {
   it('parses opening, text, and closing nodes', async () => {
     const container = parseCustomContainers('::: info Title content\ncontent\n:::')
 
     await expect(JSON.stringify(container, null, 2))
-      .toMatchFileSnapshot('__snapshots__/custom-container/container-ast.json')
+      .toMatchFileSnapshot('__snapshots__/container-ast.json')
   })
 
   it('includes a blank node for an empty line', () => {
@@ -59,13 +30,13 @@ describe('parseCustomContainers', () => {
     const nested = container.children.find(child => child.type === 'cumstom-container')
 
     await expect(JSON.stringify(nested, null, 2))
-      .toMatchFileSnapshot('__snapshots__/custom-container/nested-container-ast.json')
+      .toMatchFileSnapshot('__snapshots__/nested-container-ast.json')
   })
 
   it('parses a details container with the open attribute', async () => {
     const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')
     await expect(JSON.stringify(container, null, 2))
-      .toMatchFileSnapshot(`__snapshots__/custom-container/multi-attrs.json`)
+      .toMatchFileSnapshot(`__snapshots__/multi-attrs.json`)
   })
 
   it('keeps text that is not part of a container', () => {
@@ -114,7 +85,7 @@ describe('parseCustomContainers', () => {
     const container = parseCustomContainers('::: info Title content\r\ncontent\r\n:::')
 
     await expect(JSON.stringify(container, null, 2))
-      .toMatchFileSnapshot('__snapshots__/custom-container/CRLF-container.json')
+      .toMatchFileSnapshot('__snapshots__/CRLF-container.json')
   })
 })
 

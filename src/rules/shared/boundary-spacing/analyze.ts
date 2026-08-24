@@ -1,12 +1,16 @@
 import type { Text } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { TokenContext } from '@/parser/ast'
 import type { BoundarySpaceResult } from '@/types/text/boundary-space'
-import type { TokenContext } from '@/utils/ast'
-import { getNodeContextByParent } from '@/utils/ast'
-import { SPACE_MESSAGE_IDS } from '@/utils/space'
-import { buildTextNodeAst, TEXT_TYPE } from './tokenizer'
+import { getNodeContextByParent } from '@/parser/ast'
+import { buildTextNodeAst, TEXT_TYPE } from '@/utils/text/tokenizer'
 
-type BoundarySpaceMessageId = ValueOf<typeof SPACE_MESSAGE_IDS>
+export type BoundarySpaceMessageId
+  = 'missingSpaceBefore'
+    | 'missingSpaceAfter'
+    | 'missingSpacesAround'
+    | 'unexpectedSpaceBefore'
+    | 'unexpectedSpaceAfter'
+    | 'unexpectedSpaceAround'
 
 /**
  * Normalizes an existing space token around the target token type.
@@ -79,21 +83,21 @@ export function getBoundarySpaceMessageId(boundary: {
   unexpectedAfter: boolean
 }): BoundarySpaceMessageId {
   if (boundary.missingBefore && boundary.missingAfter)
-    return SPACE_MESSAGE_IDS.missingSpacesAround
+    return 'missingSpacesAround'
 
   if (boundary.unexpectedBefore && boundary.unexpectedAfter)
-    return SPACE_MESSAGE_IDS.unexpectedSpaceAround
+    return 'unexpectedSpaceAround'
 
   if (boundary.missingBefore)
-    return SPACE_MESSAGE_IDS.missingSpaceBefore
+    return 'missingSpaceBefore'
 
   if (boundary.missingAfter)
-    return SPACE_MESSAGE_IDS.missingSpaceAfter
+    return 'missingSpaceAfter'
 
   if (boundary.unexpectedBefore)
-    return SPACE_MESSAGE_IDS.unexpectedSpaceBefore
+    return 'unexpectedSpaceBefore'
 
-  return SPACE_MESSAGE_IDS.unexpectedSpaceAfter
+  return 'unexpectedSpaceAfter'
 }
 
 /**

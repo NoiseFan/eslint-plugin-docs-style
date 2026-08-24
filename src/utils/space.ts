@@ -1,18 +1,4 @@
-import type { PhrasingContent } from 'mdast'
-import type { NodeContextReturnType } from '@/types/ast'
-import type { PositionOptions } from '@/types/inline-element'
-import type { SpaceContext, WhiteSpaceReturn } from '@/types/space'
-import { getAdjacentChar, getNodeValue } from './ast'
-import { hasPunctuation, isFullwidthPunctuation } from './punctuation'
-
-export const SPACE_MESSAGE_IDS = {
-  missingSpaceBefore: 'missingSpaceBefore',
-  missingSpaceAfter: 'missingSpaceAfter',
-  missingSpacesAround: 'missingSpacesAround',
-  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
-  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
-  unexpectedSpaceAround: 'unexpectedSpaceAround',
-} as const
+import type { PositionOptions, WhiteSpaceReturn } from '@/types'
 
 /**
  * Gets the count and range of consecutive whitespace at the start or end of a string.
@@ -45,31 +31,5 @@ export function getWhiteSpace(
       start: match.index,
       end: str.length,
     }
-  }
-}
-
-/**
- * Gets whitespace and punctuation information for text adjacent to a link or inline code node.
- */
-export function getSpaceContext(
-  nodeContext: NodeContextReturnType<PhrasingContent>,
-): SpaceContext {
-  const { prev, next } = nodeContext
-  const prevValue = getNodeValue(prev)
-  const nextValue = getNodeValue(next)
-
-  return {
-    prev: {
-      value: prevValue,
-      whiteSpace: getWhiteSpace(prevValue, 'tail'),
-      hasPunctuation: hasPunctuation(prevValue, 'tail'),
-      punctuationType: isFullwidthPunctuation(getAdjacentChar(prevValue, 'tail')) ? 'full' : 'half',
-    },
-    next: {
-      value: nextValue,
-      whiteSpace: getWhiteSpace(nextValue),
-      hasPunctuation: hasPunctuation(nextValue),
-      punctuationType: isFullwidthPunctuation(getAdjacentChar(nextValue, 'head')) ? 'full' : 'half',
-    },
   }
 }

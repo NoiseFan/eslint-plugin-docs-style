@@ -1,6 +1,6 @@
 import type { InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
+import type { PositionOptions } from '@/types'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
-import type { PositionOptions } from '@/types/inline-element'
 import type { TextToken } from '@/types/text/tokenizer'
 
 /* ==================== Node type guards ==================== */

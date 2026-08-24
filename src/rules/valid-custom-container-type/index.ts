@@ -1,9 +1,9 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
 import type { CustomContainerAST, TagNode } from '@/types/custom-container'
+import { getNodePosition } from '@/parser/ast'
+import { isCustomContainerType, parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'
-import { getNodePosition } from '@/utils/ast'
-import { isCustomContainerType, parseCustomContainers } from '@/utils/custom-container'
 
 export const RULE_NAME = 'valid-custom-container-type'
 export const MESSAGE_IDS = {

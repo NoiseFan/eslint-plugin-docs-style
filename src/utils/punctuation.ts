@@ -1,4 +1,4 @@
-import type { PositionOptions } from '@/types/inline-element'
+import type { PositionOptions } from '@/types'
 
 export const OPENING_PAIRED_PUNCTUATION = new Set(['(', '[', '{', '<', '（', '【', '《', '“', '‘'])
 export const CLOSING_PAIRED_PUNCTUATION = new Set([')', ']', '}', '>', '）', '】', '》', '”', '’'])

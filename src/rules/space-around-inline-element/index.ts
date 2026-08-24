@@ -1,10 +1,9 @@
 import type { Emphasis, Image, InlineCode, Link, Strong } from 'mdast'
+import type { InlineElement, InlineElementSpaceIssue } from './types'
 import type { RuleContext, ValueOf } from '@/types'
-import type { InlineElement } from '@/types/inline-element'
+import { getNodeContext, getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
-import { getNodeContext, getNodePosition } from '@/utils/ast'
-import { isNestedInlineElement, validateSpace } from '@/utils/inline-element'
-import { getSpaceContext } from '@/utils/space'
+import { getSpaceContext, isNestedInlineElement, validateSpace } from './analyze'
 
 export const RULE_NAME = 'space-around-inline-element'
 export const MESSAGE_IDS = {
@@ -18,6 +17,16 @@ export const MESSAGE_IDS = {
 } as const
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
 type Options = []
+
+const ISSUE_TO_MESSAGE_ID: Record<InlineElementSpaceIssue, MessageIds> = {
+  'missing-space-before': MESSAGE_IDS.missingSpaceBefore,
+  'missing-space-after': MESSAGE_IDS.missingSpaceAfter,
+  'multiple-spaces-before': MESSAGE_IDS.multipleSpacesBefore,
+  'multiple-spaces-after': MESSAGE_IDS.multipleSpacesAfter,
+  'multiple-spaces-after-punctuation': MESSAGE_IDS.multipleSpacesAfterPunctuation,
+  'unexpected-space-before': MESSAGE_IDS.unexpectedSpaceBefore,
+  'unexpected-space-after': MESSAGE_IDS.unexpectedSpaceAfter,
+}
 
 const BEFORE_INLINE_ELEMENT_MESSAGE_IDS = new Set<MessageIds>([
   MESSAGE_IDS.missingSpaceBefore,
@@ -81,9 +90,11 @@ function checkInlineElement(context: RuleContext<MessageIds, Options>, node: Inl
     return
 
   const spaceContext = getSpaceContext(nodeContext)
-  const messageId = validateSpace(nodeContext)
-  if (!messageId)
+  const issue = validateSpace(nodeContext)
+  if (!issue)
     return
+
+  const messageId = ISSUE_TO_MESSAGE_ID[issue]
 
   if (BEFORE_INLINE_ELEMENT_MESSAGE_IDS.has(messageId) && spaceContext.prev) {
     const { count } = spaceContext.prev.whiteSpace

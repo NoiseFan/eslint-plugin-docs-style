@@ -1,8 +1,7 @@
 import type { InvalidTestCase, ValidTestCase } from 'eslint-vitest-rule-tester'
 import markdown from '@eslint/markdown'
 import { run } from 'eslint-vitest-rule-tester'
-import { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
-import rule, { RULE_NAME } from './index'
+import rule, { MESSAGE_IDS, RULE_NAME } from './index'
 
 const valid: ValidTestCase[] = [
   {

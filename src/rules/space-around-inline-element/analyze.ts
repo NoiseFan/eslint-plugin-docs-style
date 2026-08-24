@@ -1,17 +1,19 @@
 import type { Parents, PhrasingContent } from 'mdast'
+import type { SpaceContext } from './space-types'
+import type { AdjacentTextContext, InlineElement, InlineElementSpaceIssue } from './types'
 import type { NodeContextReturnType } from '@/types/ast'
-import type { AdjacentTextContext, InlineElement, InlineElementSpaceIssue } from '@/types/inline-element'
-import { MESSAGE_IDS as INLINE_SPACE_MESSAGE_IDS } from '@/rules/space-around-inline-element'
-import { isCustomContainerMarker } from '@/utils/custom-container'
-import { getLikeAnchor } from './anchor'
-import { getAdjacentChar, isTableCell } from './ast'
+import { getAdjacentChar, getNodeValue, isTableCell } from '@/parser/ast'
+import { isCustomContainerMarker } from '@/parser/custom-container'
+import { getLikeAnchor } from '@/utils/anchor'
 import {
   CLOSING_PAIRED_PUNCTUATION,
+  hasPunctuation,
   isDashPunctuation,
+  isFullwidthPunctuation,
   isSlashPunctuation,
   OPENING_PAIRED_PUNCTUATION,
-} from './punctuation'
-import { getSpaceContext } from './space'
+} from '@/utils/punctuation'
+import { getWhiteSpace } from '@/utils/space'
 
 /**
  * Validates whether a spacing run contains exactly one required space.
@@ -36,7 +38,7 @@ export function validateBeforePunctuation(
   const adjacentChar = getAdjacentChar(context.value, 'tail')
   if (OPENING_PAIRED_PUNCTUATION.has(adjacentChar || '') || isSlashPunctuation(adjacentChar)) {
     if (context.whiteSpace.count > 0)
-      return INLINE_SPACE_MESSAGE_IDS.unexpectedSpaceBefore
+      return 'unexpected-space-before'
     return
   }
 
@@ -44,13 +46,13 @@ export function validateBeforePunctuation(
   if (context.punctuationType === 'half') {
     return validateSingleRequiredSpace(
       context.whiteSpace.count,
-      INLINE_SPACE_MESSAGE_IDS.missingSpaceBefore,
-      INLINE_SPACE_MESSAGE_IDS.multipleSpacesAfterPunctuation,
+      'missing-space-before',
+      'multiple-spaces-after-punctuation',
     )
   }
 
   if (context.whiteSpace.count > 0)
-    return INLINE_SPACE_MESSAGE_IDS.unexpectedSpaceBefore
+    return 'unexpected-space-before'
 }
 
 /**
@@ -64,8 +66,8 @@ export function validateSpaceBeforeNode(
 
   return validateSingleRequiredSpace(
     context.whiteSpace.count,
-    INLINE_SPACE_MESSAGE_IDS.missingSpaceBefore,
-    INLINE_SPACE_MESSAGE_IDS.multipleSpacesBefore,
+    'missing-space-before',
+    'multiple-spaces-before',
   )
 }
 
@@ -82,7 +84,7 @@ export function validateSpaceAfterPunctuation(context: AdjacentTextContext): Inl
     CLOSING_PAIRED_PUNCTUATION.has(adjacentChar || '')
     && context.whiteSpace.count > 0
   ) {
-    return INLINE_SPACE_MESSAGE_IDS.unexpectedSpaceAfter
+    return 'unexpected-space-after'
   }
 
   if (
@@ -91,13 +93,13 @@ export function validateSpaceAfterPunctuation(context: AdjacentTextContext): Inl
   ) {
     return validateSingleRequiredSpace(
       context.whiteSpace.count,
-      INLINE_SPACE_MESSAGE_IDS.missingSpaceAfter,
-      INLINE_SPACE_MESSAGE_IDS.multipleSpacesAfter,
+      'missing-space-after',
+      'multiple-spaces-after',
     )
   }
 
   if (context.whiteSpace.count > 0)
-    return INLINE_SPACE_MESSAGE_IDS.unexpectedSpaceAfter
+    return 'unexpected-space-after'
 }
 
 /**
@@ -109,8 +111,8 @@ export function validateSpaceAfterNode(context: AdjacentTextContext): InlineElem
 
   return validateSingleRequiredSpace(
     context.whiteSpace.count,
-    INLINE_SPACE_MESSAGE_IDS.missingSpaceAfter,
-    INLINE_SPACE_MESSAGE_IDS.multipleSpacesAfter,
+    'missing-space-after',
+    'multiple-spaces-after',
   )
 }
 
@@ -129,6 +131,29 @@ export function isInlineElement(node: PhrasingContent | Parents | undefined): no
 export function isNestedInlineElement(nodeContext: NodeContextReturnType<InlineElement>): boolean {
   const { parent } = nodeContext
   return isInlineElement(parent)
+}
+
+export function getSpaceContext(
+  nodeContext: NodeContextReturnType<PhrasingContent>,
+): SpaceContext {
+  const { prev, next } = nodeContext
+  const prevValue = getNodeValue(prev)
+  const nextValue = getNodeValue(next)
+
+  return {
+    prev: {
+      value: prevValue,
+      whiteSpace: getWhiteSpace(prevValue, 'tail'),
+      hasPunctuation: hasPunctuation(prevValue, 'tail'),
+      punctuationType: isFullwidthPunctuation(getAdjacentChar(prevValue, 'tail')) ? 'full' : 'half',
+    },
+    next: {
+      value: nextValue,
+      whiteSpace: getWhiteSpace(nextValue),
+      hasPunctuation: hasPunctuation(nextValue),
+      punctuationType: isFullwidthPunctuation(getAdjacentChar(nextValue, 'head')) ? 'full' : 'half',
+    },
+  }
 }
 
 /**

@@ -1,21 +1,19 @@
 import type { Emphasis, Image, InlineCode, Link, Strong } from 'mdast'
-import type { ValueOf } from '@/types/index'
-import type { INLINE_SPACE_MESSAGE_IDS } from '@/utils/inline-element'
+import type { WhiteSpaceReturn } from '@/types'
 
 /**
  * The Markdown inline element node types selected by space-around-inline-element.
  */
 export type InlineElement = Link | Image | InlineCode | Emphasis | Strong
 
-/**
- * The allowed issue ids for inline element spacing rules.
- */
-export type InlineElementSpaceIssue = ValueOf<typeof INLINE_SPACE_MESSAGE_IDS>
-
-/**
- * The relative position to check for spacing.
- */
-export type PositionOptions = 'head' | 'tail'
+export type InlineElementSpaceIssue
+  = | 'missing-space-before'
+    | 'missing-space-after'
+    | 'multiple-spaces-before'
+    | 'multiple-spaces-after'
+    | 'multiple-spaces-after-punctuation'
+    | 'unexpected-space-before'
+    | 'unexpected-space-after'
 
 /**
  * The text context adjacent to a link.
@@ -28,7 +26,7 @@ export interface AdjacentTextContext {
   /**
    * The neighboring whitespace node.
    */
-  whiteSpace: whiteSpaceReturn
+  whiteSpace: WhiteSpaceReturn
   /**
    * Whether the adjacent text contains punctuation.
    */

@@ -1,7 +1,6 @@
 import type { Text } from 'mdast'
 import type { Point, Position } from 'unist'
-import type { ValueOf } from '@/types'
-import type { TextAst, TextToken } from '@/types/text/tokenizer'
+import type { TextAst, TextToken, TextType } from '@/types/text/tokenizer'
 
 import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../punctuation'
 
@@ -19,8 +18,6 @@ export const TEXT_TYPE = {
   'invisible': 'invisible',
   'other': 'other',
 } as const
-
-export type TextType = ValueOf<typeof TEXT_TYPE>
 
 const CJK_RE = /^\p{Script=Han}$|^\p{Script=Hiragana}$|^\p{Script=Katakana}$|^\p{Script=Hangul}$/u
 const LATIN_RE = /^\p{Script=Latin}$/u
@@ -58,16 +55,14 @@ function isInvisible(char: string): boolean {
   )
 }
 
-export function isLatinWordType(type: string | undefined): boolean {
-  return type === TEXT_TYPE.latin
-}
-
-export function isNumberType(type: string | undefined): boolean {
-  return type === TEXT_TYPE.number
-}
-
 function isNumber(char: string, prev: TextToken | undefined): boolean {
   return NUMBER_RE.test(char) || (prev?.type === TEXT_TYPE.number && (char === '.' || char === '%'))
+}
+
+export function isLatinWordType(type: string | undefined): boolean {
+  if (!type)
+    return false
+  return type === 'latin'
 }
 
 const TEXT_TYPE_MATCHERS = [

@@ -1,12 +1,20 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
+import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/boundary-spacing/analyze'
 import { createRule } from '@/utils'
-import { fixBoundarySpace, getBoundarySpaceMessageId, isNumberType } from '@/utils/text'
 
 export const RULE_NAME = 'space-around-number'
+export const MESSAGE_IDS = {
+  missingSpaceBefore: 'missingSpaceBefore',
+  missingSpaceAfter: 'missingSpaceAfter',
+  missingSpacesAround: 'missingSpacesAround',
+  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
+  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
+  unexpectedSpaceAround: 'unexpectedSpaceAround',
+} as const
 
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
+
 type Options = []
 
 export default createRule<Options, MessageIds>({
@@ -31,7 +39,7 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       text(node: Text) {
-        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, isNumberType)
+        const { fixed, missingBefore, missingAfter, unexpectedBefore, unexpectedAfter } = fixBoundarySpace(node, type => type === 'number')
 
         if (fixed === node.value)
           return

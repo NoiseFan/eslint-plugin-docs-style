@@ -1,8 +1,9 @@
 import type { ValueOf } from '@/types'
+import { getNodeContext, getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
-import { calcAnchorPositionCompensate, getLikeAnchor, hasChinese, isStrictAnchor, normalizeAnchor } from '@/utils/anchor'
-import { getNodeContext, getNodePosition } from '@/utils/ast'
-import { hasFrontmatter } from '@/utils/heading'
+import { getLikeAnchor } from '@/utils/anchor'
+import { calcAnchorPositionCompensate, hasChinese, isStrictAnchor, normalizeAnchor } from './anchor'
+import { hasFrontmatter } from './frontmatter'
 
 export const RULE_NAME = 'valid-heading-anchor'
 const MESSAGE_IDS = {
