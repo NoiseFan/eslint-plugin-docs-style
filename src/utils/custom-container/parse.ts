@@ -1,5 +1,5 @@
 import type { ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
-import { CUSTOM_CONTAINER_OPEN_MARKER_RE } from '.'
+import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE } from '.'
 
 /**
  * Parses custom-container markup into a nested AST while preserving source offsets.
@@ -93,7 +93,8 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | nu
   if (!match)
     return null
 
-  const [tag, type] = match
+  const [_, marker, type, titleAndAttrs] = match
+  const tag = marker + type
   const offset = prevNode?.position.end || 0
   const valueStart = offset + tag.length - type.length
   const value = {
@@ -101,7 +102,18 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | nu
     start: valueStart,
     end: valueStart + type.length,
   }
-  const title = raw.slice(tag.length).trim() || void 0
+  const titleAndAttrsValue = titleAndAttrs?.trim() || ''
+
+  // parse attrs
+  const attributeMatch = titleAndAttrsValue.match(CUSTOM_CONTAINER_ATTRS_RE)
+  const attrs = attributeMatch
+    ? { content: attributeMatch[1].slice(1, -1), raw: attributeMatch[1] }
+    : void 0
+
+  // parse title
+  const title = (attributeMatch
+    ? titleAndAttrsValue.slice(0, attributeMatch.index).trim()
+    : titleAndAttrsValue) || void 0
 
   const start = prevNode ? prevNode.position.end : 0
   const end = start + raw.length
@@ -110,6 +122,7 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | nu
     raw,
     value,
     title,
+    ...(attrs ? { attribute: attrs } : {}),
     position: { start, end },
   }
 }

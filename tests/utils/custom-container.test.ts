@@ -62,6 +62,12 @@ describe('parseCustomContainers', () => {
       .toMatchFileSnapshot('__snapshots__/custom-container/nested-container-ast.json')
   })
 
+  it('parses a details container with the open attribute', async () => {
+    const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')
+    await expect(JSON.stringify(container, null, 2))
+      .toMatchFileSnapshot(`__snapshots__/custom-container/multi-attrs.json`)
+  })
+
   it('keeps text that is not part of a container', () => {
     expect(parseCustomContainers('first\nsecond')).toMatchObject({
       depth: 1,
@@ -139,6 +145,24 @@ describe('parseOpenTag', () => {
       value: { content: 'info', start: 4, end: 8 },
       title: 'Optional title',
       position: { start: 0, end: 23 },
+    })
+  })
+
+  it('parses an optional opening-tag attribute', () => {
+    expect(parseOpenTag('::: details Click me {open}')).toMatchObject({
+      title: 'Click me',
+      attribute: { content: 'open', raw: '{open}' },
+    })
+    expect(parseOpenTag('::: details Click me')).not.toHaveProperty('attribute')
+  })
+
+  it('parses title and attribute from the same optional suffix', () => {
+    expect(parseOpenTag('::: details {open}')).toMatchObject({
+      title: undefined,
+      attribute: { content: 'open', raw: '{open}' },
+    })
+    expect(parseOpenTag('::: info Optional title')).toMatchObject({
+      title: 'Optional title',
     })
   })
 

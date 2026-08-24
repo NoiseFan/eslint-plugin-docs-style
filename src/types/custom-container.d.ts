@@ -47,6 +47,10 @@ export interface TagNode {
    */
   title?: string
   /**
+   * Optional attribute block associated with an opening tag
+   */
+  attribute?: { content: string, raw: string }
+  /**
    * Source range covering the tag
    */
   position: OffsetRange

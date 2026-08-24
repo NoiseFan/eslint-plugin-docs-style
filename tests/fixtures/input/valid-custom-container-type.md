@@ -16,6 +16,10 @@ danger content.
 [Getting Started](/guide/)
 :::
 
+::: details Click me {open}
+Content
+:::
+
 <!-- nested containers -->
 
 :::: info Outer container

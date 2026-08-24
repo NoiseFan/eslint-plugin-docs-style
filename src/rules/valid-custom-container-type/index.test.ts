@@ -13,6 +13,10 @@ const valid: ValidTestCase[] = [
     description: 'allows a custom title',
     code: '::: warning Stop here\ncontent\n:::',
   },
+  {
+    description: 'allows a details container with the open attribute',
+    code: '::: details Click me {open} \nContent\n:::',
+  },
 ]
 
 const invalid: InvalidTestCase[] = [
