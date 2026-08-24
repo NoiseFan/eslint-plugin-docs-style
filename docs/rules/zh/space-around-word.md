@@ -11,7 +11,7 @@
 - CJK 字符与相邻的英文单词之间保留一个空格
 - 如果已有多个连续空格，会自动压缩为一个空格
 
-该规则的**正确**示例：
+该规则的 **正确** 示例：
 
 ```md
 在 watch 模式下
@@ -23,7 +23,7 @@ WebStorm、PhpStorm、IntelliJ IDEA Ultimate 和其他 JetBrains IDE 内置了�
 A mock that always returns `undefined` isn't very useful on its own.
 ```
 
-该规则的**错误**示例：
+该规则的 **错误** 示例：
 
 ```md
 在watch 模式下
