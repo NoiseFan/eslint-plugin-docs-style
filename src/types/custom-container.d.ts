@@ -66,6 +66,29 @@ export interface OffsetRange {
   end: number
 }
 
+/** A source line with absolute offsets and blank-line classification. */
+export interface SourceLine extends OffsetRange {
+  value: string
+  blank: boolean
+}
+
+/** The kind of whitespace violation reported by the padding rule. */
+export type CustomContainerPaddingIssueKind = 'missing' | 'unexpected'
+
+/** A source edit needed to normalize whitespace around a custom container. */
+export interface CustomContainerPaddingIssue {
+  kind: CustomContainerPaddingIssueKind
+  range: OffsetRange
+  replacement: string
+  tag: OffsetRange
+}
+
+/** Absolute ranges of a custom container's opening and closing markers. */
+export interface CustomContainerTags {
+  open: OffsetRange
+  close?: OffsetRange
+}
+
 /**
  *  AST node representing a blank line inside a custom container.
  */

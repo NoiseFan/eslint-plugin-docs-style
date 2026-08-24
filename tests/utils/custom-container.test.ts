@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import {
   CUSTOM_CONTAINER_TYPES,
+  getContainerTags,
+  getContainerTagsFromSource,
+  getCustomContainerPaddingIssues,
+  isCustomContainerCloseLine,
   isCustomContainerMarker,
   isCustomContainerType,
   parseBlankNode,
@@ -23,6 +27,18 @@ describe('isCustomContainerMarker', () => {
     for (const input of inputs) {
       expect(isCustomContainerMarker(input)).toBeFalsy()
     }
+  })
+})
+
+describe('isCustomContainerCloseLine', () => {
+  it('accepts closing fences with optional indentation', () => {
+    expect(isCustomContainerCloseLine(':::')).toBeTruthy()
+    expect(isCustomContainerCloseLine('  :::::')).toBeTruthy()
+  })
+
+  it('rejects opening fences and content', () => {
+    expect(isCustomContainerCloseLine('::: info')).toBeFalsy()
+    expect(isCustomContainerCloseLine('content :::')).toBeFalsy()
   })
 })
 
@@ -109,6 +125,77 @@ describe('parseCustomContainers', () => {
 
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/custom-container/CRLF-container.json')
+  })
+})
+
+describe('custom container padding', () => {
+  it('flattens parsed nested containers and applies a source offset', () => {
+    const source = 'prefix\n:::: info\n::: tip\ninner\n:::\n::::'
+    const root = parseCustomContainers(source.slice(7))
+    const tags = getContainerTags(root, 7, source.slice(7))
+
+    expect(tags.map(tag => ({ open: tag.open, close: tag.close }))).toStrictEqual([
+      { open: { start: 7, end: 16 }, close: { start: 35, end: 39 } },
+      { open: { start: 17, end: 24 }, close: { start: 31, end: 34 } },
+    ])
+  })
+
+  it('finds top-level and nested container tags from a source document', () => {
+    const source = ':::: info\nouter\n\n::: tip\ninner\n:::\n\nouter\n::::'
+    const tags = getContainerTagsFromSource(source)
+
+    expect(tags).toHaveLength(2)
+    expect(tags.map(tag => ({ open: tag.open, close: tag.close }))).toStrictEqual([
+      { open: { start: 0, end: 9 }, close: { start: 42, end: 46 } },
+      { open: { start: 17, end: 24 }, close: { start: 31, end: 34 } },
+    ])
+  })
+
+  it('resolves repeated nested marker text in source order', () => {
+    const source = '::: info\nouter\n::: info\ninner\n:::\n:::'
+    const tags = getContainerTagsFromSource(source)
+
+    expect(tags.map(tag => ({ open: tag.open.start, close: tag.close?.start }))).toStrictEqual([
+      { open: 0, close: 34 },
+      { open: 15, close: 30 },
+    ])
+  })
+
+  it('ignores container-looking lines inside excluded source ranges', () => {
+    const source = '```md\n::: info\n\nexample\n\n:::\n```'
+
+    expect(getContainerTagsFromSource(source, [{ start: 0, end: source.length }])).toStrictEqual([])
+  })
+
+  it('ignores nested container-looking lines inside excluded ranges', () => {
+    const source = '::: info\n```md\n::: tip\nexample\n:::\n```\ncontent\n:::'
+    const codeStart = source.indexOf('```md')
+    const codeEnd = source.indexOf('```', codeStart + 5) + 3
+    const tags = getContainerTagsFromSource(source, [{ start: codeStart, end: codeEnd }])
+
+    expect(tags.map(tag => ({ open: tag.open.start, close: tag.close?.start }))).toStrictEqual([
+      { open: 0, close: 47 },
+    ])
+  })
+
+  it('reports missing and unexpected padding with exact replacements', () => {
+    const source = 'before\n::: info\n\ncontent\n\n:::\nafter'
+    const issues = getCustomContainerPaddingIssues(source)
+
+    expect(issues.map(issue => ({ kind: issue.kind, replacement: issue.replacement }))).toStrictEqual([
+      { kind: 'missing', replacement: '\n\n' },
+      { kind: 'unexpected', replacement: '\n' },
+      { kind: 'unexpected', replacement: '\n' },
+      { kind: 'missing', replacement: '\n\n' },
+    ])
+  })
+
+  it('preserves CRLF when adding external padding', () => {
+    const source = 'before\r\n::: info\r\ncontent\r\n:::\r\nafter'
+    const issues = getCustomContainerPaddingIssues(source)
+
+    expect(issues).toHaveLength(2)
+    expect(issues.every(issue => issue.replacement === '\r\n\r\n')).toBeTruthy()
   })
 })
 

@@ -1,4 +1,6 @@
+export * from './padding'
 export * from './parse'
+export * from './tags'
 
 export const CUSTOM_CONTAINER_TYPES = [
   'info',
@@ -25,6 +27,11 @@ export function isCustomContainerType(value: string): value is CustomContainerTy
 
 export const CUSTOM_CONTAINER_OPEN_MARKER_RE = /^ {0,3}:{3,}[ \t]+([\w-]+)(?=$|[ \t]|\r?\n)/
 export const CUSTOM_CONTAINER_CLOSE_MARKER_RE = /^\r?\n {0,3}:{3,}[ \t]*$/
+
+/** Checks whether a source line is an exact custom-container closing marker. */
+export function isCustomContainerCloseLine(value: string): boolean {
+  return CUSTOM_CONTAINER_CLOSE_MARKER_RE.test(`\n${value}`)
+}
 
 /**
  * Checks whether adjacent text is a custom container marker on the next line.
