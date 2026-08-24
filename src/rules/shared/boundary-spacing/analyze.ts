@@ -1,12 +1,16 @@
 import type { Text } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { TokenContext } from '@/parser/ast'
 import type { BoundarySpaceResult } from '@/types/text/boundary-space'
-import type { TokenContext } from '@/utils/ast'
-import { getNodeContextByParent } from '@/utils/ast'
-import { SPACE_MESSAGE_IDS } from '@/utils/space'
-import { buildTextNodeAst, TEXT_TYPE } from './tokenizer'
+import { getNodeContextByParent } from '@/parser/ast'
+import { buildTextNodeAst, TEXT_TYPE } from '@/utils/text/tokenizer'
 
-type BoundarySpaceMessageId = ValueOf<typeof SPACE_MESSAGE_IDS>
+export type BoundarySpaceIssue
+  = 'missing-space-before'
+    | 'missing-space-after'
+    | 'missing-spaces-around'
+    | 'unexpected-space-before'
+    | 'unexpected-space-after'
+    | 'unexpected-spaces-around'
 
 /**
  * Normalizes an existing space token around the target token type.
@@ -69,31 +73,31 @@ function processTargetToken(
 }
 
 /**
- * Chooses the most specific shared boundary-space message id from the
+ * Chooses the most specific shared boundary-space issue from the
  * collected missing or redundant space flags.
  */
-export function getBoundarySpaceMessageId(boundary: {
+export function getBoundarySpaceIssue(boundary: {
   missingBefore: boolean
   missingAfter: boolean
   unexpectedBefore: boolean
   unexpectedAfter: boolean
-}): BoundarySpaceMessageId {
+}): BoundarySpaceIssue {
   if (boundary.missingBefore && boundary.missingAfter)
-    return SPACE_MESSAGE_IDS.missingSpacesAround
+    return 'missing-spaces-around'
 
   if (boundary.unexpectedBefore && boundary.unexpectedAfter)
-    return SPACE_MESSAGE_IDS.unexpectedSpaceAround
+    return 'unexpected-spaces-around'
 
   if (boundary.missingBefore)
-    return SPACE_MESSAGE_IDS.missingSpaceBefore
+    return 'missing-space-before'
 
   if (boundary.missingAfter)
-    return SPACE_MESSAGE_IDS.missingSpaceAfter
+    return 'missing-space-after'
 
   if (boundary.unexpectedBefore)
-    return SPACE_MESSAGE_IDS.unexpectedSpaceBefore
+    return 'unexpected-space-before'
 
-  return SPACE_MESSAGE_IDS.unexpectedSpaceAfter
+  return 'unexpected-space-after'
 }
 
 /**

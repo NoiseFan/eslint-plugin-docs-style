@@ -1,4 +1,4 @@
-import type { AdjacentTextContext } from './inline-element'
+import type { AdjacentTextContext } from './types'
 
 /**
  * The spacing context around a link.
@@ -12,10 +12,4 @@ export interface SpaceContext {
    * The next adjacent text context.
    */
   next?: AdjacentTextContext
-}
-
-export interface WhiteSpaceReturn {
-  count: number
-  start: number
-  end: number
 }

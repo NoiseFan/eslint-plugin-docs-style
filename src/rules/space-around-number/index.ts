@@ -1,12 +1,30 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { SPACE_MESSAGE_IDS as MESSAGE_IDS } from '@/utils/space'
+import { fixBoundarySpace, getBoundarySpaceIssue } from '@/rules/shared/boundary-spacing/analyze'
 import { createRule } from '@/utils'
-import { fixBoundarySpace, getBoundarySpaceMessageId, isNumberType } from '@/utils/text'
 
 export const RULE_NAME = 'space-around-number'
+export const MESSAGE_IDS = {
+  missingSpaceBefore: 'missingSpaceBefore',
+  missingSpaceAfter: 'missingSpaceAfter',
+  missingSpacesAround: 'missingSpacesAround',
+  unexpectedSpaceBefore: 'unexpectedSpaceBefore',
+  unexpectedSpaceAfter: 'unexpectedSpaceAfter',
+  unexpectedSpaceAround: 'unexpectedSpaceAround',
+} as const
 
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
+
+const isNumberType = (type: string | undefined): boolean => type === 'number'
+
+const ISSUE_TO_MESSAGE_ID = {
+  'missing-space-before': 'missingSpaceBefore',
+  'missing-space-after': 'missingSpaceAfter',
+  'missing-spaces-around': 'missingSpacesAround',
+  'unexpected-space-before': 'unexpectedSpaceBefore',
+  'unexpected-space-after': 'unexpectedSpaceAfter',
+  'unexpected-spaces-around': 'unexpectedSpaceAround',
+} as const satisfies Record<ReturnType<typeof getBoundarySpaceIssue>, MessageIds>
 type Options = []
 
 export default createRule<Options, MessageIds>({
@@ -38,7 +56,7 @@ export default createRule<Options, MessageIds>({
 
         context.report({
           node,
-          messageId: getBoundarySpaceMessageId({ missingBefore, missingAfter, unexpectedBefore, unexpectedAfter }),
+          messageId: ISSUE_TO_MESSAGE_ID[getBoundarySpaceIssue({ missingBefore, missingAfter, unexpectedBefore, unexpectedAfter })],
           fix(fixer) {
             return fixer.replaceText(node, fixed)
           },

@@ -1,6 +1,19 @@
 import type { Text } from 'mdast'
 import type { Position } from '../ast'
-import type { TextType } from '@/utils/text'
+
+export type TextType
+  = | 'cjk'
+    | 'latin'
+    | 'number'
+    | 'space'
+    | 'newline'
+    | 'fullwidth-punctuation'
+    | 'halfwidth-punctuation'
+    | 'dash'
+    | 'symbol'
+    | 'emoji'
+    | 'invisible'
+    | 'other'
 
 export interface TextToken {
   /**

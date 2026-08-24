@@ -8,8 +8,8 @@ import {
   isLinkNode,
   isParagraphNode,
   isTextNode,
-} from '@/utils/ast'
-import { parseMarkdown } from '@/utils/markdown'
+} from '@/parser/ast'
+import { parseMarkdown } from '@/parser/markdown'
 import { buildTextNodeAst } from '@/utils/text'
 
 describe('isParentNode', () => {
@@ -29,21 +29,6 @@ describe('isParentNode', () => {
   })
 })
 
-describe('findNode', () => {
-  it('returns the first node that matches the predicate', () => {
-    const { ast } = parseMarkdown('First [one](/one/) and [two](/two/).')
-    const link = findNode(ast, isLinkNode)
-
-    expect(link?.url).toStrictEqual('/one/')
-  })
-
-  it('returns undefined when no node matches', () => {
-    const { ast } = parseMarkdown('Plain text.')
-
-    expect(findNode(ast, isLinkNode)).toBeUndefined()
-  })
-})
-
 describe('isLinkNode', () => {
   it('narrows link nodes', () => {
     const { ast } = parseMarkdown('[guide](/guide/)')
@@ -55,31 +40,15 @@ describe('isLinkNode', () => {
   })
 })
 
-describe('getNodeContextByParent', () => {
-  it('returns adjacent token nodes from a tokenized text AST', () => {
-    const { children } = buildTextNodeAst({
-      type: 'text',
-      value: '在 watch 模式下，',
-    })
-
-    expect(getNodeContextByParent(children, 1)).toStrictEqual({
-      prev: children[0],
-      current: children[1],
-      next: children[2],
-    })
+describe('findNode', () => {
+  it('returns the first node that matches the predicate', () => {
+    const { ast } = parseMarkdown('First [one](/one/) and [two](/two/).')
+    expect(findNode(ast, isLinkNode)?.url).toStrictEqual('/one/')
   })
 
-  it('returns undefined for missing adjacent siblings at the edges', () => {
-    const { children } = buildTextNodeAst({
-      type: 'text',
-      value: '在 watch 模式下，',
-    })
-
-    expect(getNodeContextByParent(children, 0)).toStrictEqual({
-      prev: undefined,
-      current: children[0],
-      next: children[1],
-    })
+  it('returns undefined when no node matches', () => {
+    const { ast } = parseMarkdown('Plain text.')
+    expect(findNode(ast, isLinkNode)).toBeUndefined()
   })
 })
 
@@ -108,6 +77,18 @@ describe('getNodeContext', () => {
       next: undefined,
       current: paragraph,
     })
+  })
+})
+
+describe('getNodeContextByParent', () => {
+  it('returns adjacent token nodes from a tokenized text AST', () => {
+    const { children } = buildTextNodeAst({ type: 'text', value: '在 watch 模式下，' })
+    expect(getNodeContextByParent(children, 1)).toStrictEqual({ prev: children[0], current: children[1], next: children[2] })
+  })
+
+  it('returns undefined for missing adjacent siblings at the edges', () => {
+    const { children } = buildTextNodeAst({ type: 'text', value: '在 watch 模式下，' })
+    expect(getNodeContextByParent(children, 0)).toStrictEqual({ prev: undefined, current: children[0], next: children[1] })
   })
 })
 

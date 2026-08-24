@@ -1,5 +1,5 @@
 import type { RootContent } from 'mdast'
-import { parseMarkdown } from './markdown'
+import { parseMarkdown } from '@/parser/markdown'
 
 /**
  * Returns true when the Markdown document starts with YAML frontmatter.

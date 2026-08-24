@@ -1,7 +1,7 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
+import { getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
-import { getNodePosition } from '@/utils/ast'
 
 export const RULE_NAME = 'example'
 const MESSAGE_IDS = {

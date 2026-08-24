@@ -44,3 +44,11 @@ export type RuleContext<MessageIds extends string, Options extends unknown[]> = 
 export type RuleListener = MarkdownRuleVisitor
 
 export type ValueOf<T> = T[keyof T]
+
+export type PositionOptions = 'head' | 'tail'
+
+export interface WhiteSpaceReturn {
+  count: number
+  start: number
+  end: number
+}

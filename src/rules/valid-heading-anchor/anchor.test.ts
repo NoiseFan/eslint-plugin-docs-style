@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calcAnchorPositionCompensate, getAnchor, getLikeAnchor, isStrictAnchor, normalizeAnchor } from '@/utils/anchor'
+import { calcAnchorPositionCompensate, getAnchor, getLikeAnchor, isStrictAnchor, normalizeAnchor } from './anchor'
 
 describe('getAnchor', () => {
   it('should extract anchor content from strict and loose anchors', () => {

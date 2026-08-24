@@ -1,7 +1,7 @@
 import type { Link, Nodes, PhrasingContent, RootContent } from 'mdast'
 import type { NodeContextReturnType } from '@/types/ast'
-import { findNode, getNodeContext, isLinkNode } from '@/utils/ast'
-import { parseMarkdown } from '@/utils/markdown'
+import { findNode, getNodeContext, isLinkNode } from '@/parser/ast'
+import { parseMarkdown } from '@/parser/markdown'
 
 /**
  * Parses a Markdown fixture and returns context for the first requested node.
