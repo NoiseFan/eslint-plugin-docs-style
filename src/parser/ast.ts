@@ -1,7 +1,11 @@
-import type { InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
+import type { Code, InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
 import type { PositionOptions } from '@/types'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
 import type { TextToken } from '@/types/text/tokenizer'
+
+export function isObject(val: unknown): boolean {
+  return !!val && typeof val === 'object'
+}
 
 /* ==================== Node type guards ==================== */
 
@@ -32,16 +36,20 @@ export function isTextNode(node: Nodes | undefined): node is Text {
 /**
  * Narrows an mdast node to a Markdown link node.
  */
-export function isLinkNode(node: Nodes): node is Link {
-  return node.type === 'link'
+export function isLinkNode(node: Nodes | undefined): node is Link {
+  return node?.type === 'link'
 }
 
-export function isInlineCodeNode(node: Nodes): node is InlineCode {
-  return node.type === 'inlineCode'
+export function isCodeNode(node: Nodes | undefined): node is Code {
+  return node?.type === 'code'
 }
 
-export function isTableCell(node: Nodes): node is TableCell {
-  return node.type === 'tableCell'
+export function isInlineCodeNode(node: Nodes | undefined): node is InlineCode {
+  return node?.type === 'inlineCode'
+}
+
+export function isTableCell(node: Nodes | undefined): node is TableCell {
+  return node?.type === 'tableCell'
 }
 
 /* ==================== Tree traversal ==================== */

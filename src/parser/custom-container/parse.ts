@@ -1,4 +1,4 @@
-import type { ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
+import type { BlankNode, ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
 import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE } from '.'
 
 /**
@@ -35,7 +35,7 @@ export function parseCustomContainers(
     const closeTag = parseCloseTag(item, prevNode)
     if (closeTag) {
       children.push(closeTag)
-      if (hasOpenTag)
+      if (hasOpenTag && parentNode)
         break
       continue
     }
@@ -45,7 +45,8 @@ export function parseCustomContainers(
     children.push({ type: 'text', value: item, position: { start, end } })
   }
   const start = parentNode?.position.end || 0
-  return { type: 'cumstom-container', depth, children, position: { start, end: start + value.length } }
+  const end = children.at(-1)?.position.end || start
+  return { type: 'cumstom-container', depth, children, position: { start, end } }
 }
 
 /**
@@ -169,3 +170,8 @@ export function parseBlankNode(
     })
   }
 }
+
+export const isCoustomContainer = (node: ChildrenNode | undefined): node is CustomContainerAST => !!node && node.type === 'cumstom-container'
+export const isBlankNode = (node: ChildrenNode | undefined): node is BlankNode => !!node && node.type === 'blank'
+export const isOpenNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'open'
+export const isCloseNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'close'
