@@ -1,3 +1,4 @@
+import type { CustomContainerAST } from '@/types/custom-container'
 import { describe, expect, it } from 'vitest'
 import {
   parseBlankNode,
@@ -9,14 +10,14 @@ import {
 
 describe('parseCustomContainers', () => {
   it('parses opening, text, and closing nodes', async () => {
-    const container = parseCustomContainers('::: info Title content\ncontent\n:::')
+    const container = parseCustomContainers('::: info Title content\ncontent\n:::')[0] as CustomContainerAST
 
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/container-ast.json')
   })
 
   it('includes a blank node for an empty line', () => {
-    const container = parseCustomContainers('::: info Title\n\ncontent\n:::')
+    const container = parseCustomContainers('::: info Title\n\ncontent\n:::')[0] as CustomContainerAST
 
     expect(container.children).toContainEqual({
       type: 'blank',
@@ -25,64 +26,67 @@ describe('parseCustomContainers', () => {
     })
   })
 
+  it('parses continuous containers', async () => {
+    const container = parseCustomContainers(['::: info Title', 'content', ':::', '::: info Title2', 'content', ':::'].join('\n'))
+    await expect(JSON.stringify(container, null, 2))
+      .toMatchFileSnapshot(`__snapshots__/continuous-container-ast.json`)
+  })
+
+  it('text and parses continuous containers', async () => {
+    const container = parseCustomContainers(['top content', '::: info Title', 'content', ':::', '::: info Title2', 'content', ':::', 'bottom content'].join('\n'))
+    await expect(JSON.stringify(container, null, 2))
+      .toMatchFileSnapshot(`__snapshots__/text-and-continuous-container-ast.json`)
+  })
+
   it('parses nested containers and increments their depth', async () => {
     const container = parseCustomContainers(':::: info\ntext\n::: tip\nnested\n:::\n::::')
-    const nested = container.children.find(child => child.type === 'cumstom-container')
+    const nested = (container[0] as CustomContainerAST).children.find(child => child.type === 'cumstom-container')
 
     await expect(JSON.stringify(nested, null, 2))
       .toMatchFileSnapshot('__snapshots__/nested-container-ast.json')
   })
 
   it('parses a details container with the open attribute', async () => {
-    const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')
+    const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')[0] as CustomContainerAST
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot(`__snapshots__/multi-attrs.json`)
   })
 
   it('keeps text that is not part of a container', () => {
-    expect(parseCustomContainers('first\nsecond')).toMatchObject({
-      depth: 1,
-      children: [
-        { type: 'text', value: 'first' },
-        { type: 'blank', value: '\n' },
-        { type: 'text', value: 'second' },
-      ],
-    })
+    expect(parseCustomContainers('first\nsecond')).toMatchObject([
+      { type: 'text', value: 'first' },
+      { type: 'blank', value: '\n' },
+      { type: 'text', value: 'second' },
+    ])
   })
 
   it('preserves consecutive line breaks as one blank node with its full offset', () => {
-    expect(parseCustomContainers('first\n\nsecond')).toMatchObject({
-      children: [
-        { type: 'text', value: 'first', position: { start: 0, end: 5 } },
-        { type: 'blank', value: '\n\n', position: { start: 5, end: 7 } },
-        { type: 'text', value: 'second', position: { start: 7, end: 13 } },
-      ],
-    })
+    expect(parseCustomContainers('first\n\nsecond')).toMatchObject([
+      { type: 'text', value: 'first', position: { start: 0, end: 5 } },
+      { type: 'blank', value: '\n\n', position: { start: 5, end: 7 } },
+      { type: 'text', value: 'second', position: { start: 7, end: 13 } },
+    ])
   })
 
   it('preserves a trailing line break and its source offset', () => {
-    expect(parseCustomContainers('first\n')).toMatchObject({
-      children: [
-        { type: 'text', value: 'first', position: { start: 0, end: 5 } },
-        { type: 'blank', value: '\n', position: { start: 5, end: 6 } },
-      ],
-    })
+    expect(parseCustomContainers('first\n')).toMatchObject([
+      { type: 'text', value: 'first', position: { start: 0, end: 5 } },
+      { type: 'blank', value: '\n', position: { start: 5, end: 6 } },
+    ])
   })
 
   it('preserves mixed LF and CRLF line breaks', () => {
-    expect(parseCustomContainers('first\r\nsecond\nthird')).toMatchObject({
-      children: [
-        { type: 'text', value: 'first', position: { start: 0, end: 5 } },
-        { type: 'blank', value: '\r\n', position: { start: 5, end: 7 } },
-        { type: 'text', value: 'second', position: { start: 7, end: 13 } },
-        { type: 'blank', value: '\n', position: { start: 13, end: 14 } },
-        { type: 'text', value: 'third', position: { start: 14, end: 19 } },
-      ],
-    })
+    expect(parseCustomContainers('first\r\nsecond\nthird')).toMatchObject([
+      { type: 'text', value: 'first', position: { start: 0, end: 5 } },
+      { type: 'blank', value: '\r\n', position: { start: 5, end: 7 } },
+      { type: 'text', value: 'second', position: { start: 7, end: 13 } },
+      { type: 'blank', value: '\n', position: { start: 13, end: 14 } },
+      { type: 'text', value: 'third', position: { start: 14, end: 19 } },
+    ])
   })
 
   it('parses CRLF input and closes the container', async () => {
-    const container = parseCustomContainers('::: info Title content\r\ncontent\r\n:::')
+    const container = parseCustomContainers('::: info Title content\r\ncontent\r\n:::')[0] as CustomContainerAST
 
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/CRLF-container.json')
@@ -180,23 +184,14 @@ describe('parseCloseTag', () => {
 
 describe('parseBlankNode', () => {
   it('creates a blank node and merges consecutive blank lines', () => {
-    const children: Parameters<typeof parseBlankNode>[0] = []
+    const node = parseBlankNode()
+    parseBlankNode({ prevNode: node })
 
-    parseBlankNode(children)
-    parseBlankNode(children, { prevNode: children.at(-1) })
-
-    expect(children).toStrictEqual([
-      { type: 'blank', value: '\n\n', position: { start: 0, end: 2 } },
-    ])
+    expect(node).toStrictEqual({ type: 'blank', value: '\n\n', position: { start: 0, end: 2 } })
   })
 
   it('preserves CRLF line endings and offsets', () => {
-    const children: Parameters<typeof parseBlankNode>[0] = []
-
-    parseBlankNode(children, { newline: '\r\n' })
-
-    expect(children).toStrictEqual([
-      { type: 'blank', value: '\r\n', position: { start: 0, end: 2 } },
-    ])
+    const node = parseBlankNode({ newline: '\r\n' })
+    expect(node).toStrictEqual({ type: 'blank', value: '\r\n', position: { start: 0, end: 2 } })
   })
 })

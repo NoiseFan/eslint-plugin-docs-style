@@ -22,6 +22,11 @@ export interface CustomContainerAST {
 }
 
 /**
+ * A top-level block emitted while parsing custom-container text.
+ */
+export type CustomContainerBlockNode = CustomContainerAST | BlankNode | TextNode
+
+/**
  * A node that can occur inside a custom container.
  */
 export type ChildrenNode = CustomContainerAST | TagNode | BlankNode | TextNode

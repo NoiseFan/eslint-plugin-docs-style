@@ -1,5 +1,32 @@
-import type { ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
-import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE } from '.'
+import type { BlankNode, ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange, TagNode } from '@/types/custom-container'
+import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE, isBlank } from '.'
+
+interface ParseState { splits: string[], offset: number }
+
+export function parseCustomContainers(value: string): CustomContainerBlockNode[] {
+  const state: ParseState = { splits: splitLines(value), offset: 0 }
+  const nodes: CustomContainerBlockNode[] = []
+
+  while (state.splits.length) {
+    const item = state.splits[0]
+    const previous = nodes.at(-1)
+    if (parseOpenTag(item, previous)) {
+      nodes.push(parseCustomContainer(state, 1, previous))
+      continue
+    }
+
+    const consumed = consume(state)
+    if (isBlank(consumed.value)) {
+      const blankNode = parseBlankNode({ newline: consumed.value, prevNode: previous })
+      if (blankNode)
+        nodes.push(blankNode)
+      continue
+    }
+
+    nodes.push({ type: 'text', value: consumed.value, position: consumed.position })
+  }
+  return nodes
+}
 
 /**
  * Parses custom-container markup into a nested AST while preserving source offsets.
@@ -7,45 +34,59 @@ import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE } from '.'
  * The optional split state is used by recursive calls so nested containers can
  * continue consuming the same input without reparsing already visited lines.
  */
-export function parseCustomContainers(
-  value: string,
-  opts?: { remainSplits?: Array<string>, depth?: number, parentNode?: ChildrenNode },
-): CustomContainerAST {
-  const { remainSplits, depth = 1, parentNode } = opts || {}
-  const splits: Array<string> = remainSplits ?? splitLines(value)
+function parseCustomContainer(state: ParseState, depth: number, parentNode?: ChildrenNode): CustomContainerAST {
   const children: ChildrenNode[] = []
-  let hasOpenTag = false
+  const raw = state.splits[0]
+  const openTag = parseOpenTag(raw, parentNode)
+  /* v8 ignore if -- @preserve */
+  if (!openTag)
+    return { type: 'cumstom-container', depth, children, position: { start: state.offset, end: state.offset } }
+  consume(state)
+  children.push(openTag)
+  const markerLength = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)?.[1].match(/:{3,}/)?.[0].length ?? 3
 
-  while (splits.length) {
-    const item = splits.shift()
-    const prevNode: ChildrenNode | undefined = children.at(-1) || parentNode
-    /* v8 ignore if -- @preserve */
-    if (item === undefined)
+  while (state.splits.length) {
+    const item = state.splits[0]
+    const previous = children.at(-1)
+    const nestedOpen = parseOpenTag(item, previous)
+    if (nestedOpen) {
+      children.push(parseCustomContainer(state, depth + 1, previous))
+      continue
+    }
+    const closeMatch = item.match(CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE)
+    const closeMarkerLength = closeMatch?.[0].match(/:{3,}/)?.[0].length ?? 0
+
+    if (closeMatch && closeMarkerLength >= markerLength) {
+      const consumed = consume(state)
+      children.push(parseCloseTag(consumed.value, previous)!)
       break
-    if (item === '\n' || item === '\r\n') {
-      parseBlankNode(children, { newline: item, prevNode })
+    }
+    const consumed = consume(state)
+    if (isBlank(consumed.value)) {
+      const blankNode = parseBlankNode({ newline: consumed.value, prevNode: previous })
+      if (blankNode)
+        children.push(blankNode)
       continue
     }
 
-    if (parseOpenNode(item, { value, splits, depth, children, hasOpenTag, prevNode })) {
-      hasOpenTag = true
-      continue
-    }
-
-    const closeTag = parseCloseTag(item, prevNode)
-    if (closeTag) {
-      children.push(closeTag)
-      if (hasOpenTag)
-        break
-      continue
-    }
-
-    const start = prevNode?.position.end || 0
-    const end = start + item.length
-    children.push({ type: 'text', value: item, position: { start, end } })
+    children.push({ type: 'text', value: consumed.value, position: consumed.position })
   }
-  const start = parentNode?.position.end || 0
-  return { type: 'cumstom-container', depth, children, position: { start, end: start + value.length } }
+  return {
+    type: 'cumstom-container',
+    depth,
+    children,
+    position: {
+      start: openTag.position.start,
+      end: children.at(-1)?.position.end ?? openTag.position.end,
+    },
+  }
+}
+
+function consume(state: ParseState): { value: string, position: OffsetRange } {
+  const value = state.splits.shift()!
+  const start = state.offset
+  state.offset += value.length
+  return { value, position: { start, end: state.offset } }
 }
 
 /**
@@ -56,39 +97,9 @@ export function splitLines(value: string): Array<string> {
 }
 
 /**
- * Handles an opening-tag line and, when appropriate,
- * delegates nested content to a recursive container parse.
- */
-export function parseOpenNode(
-  item: string,
-  opts: {
-    value: string
-    splits: Array<string>
-    depth: number
-    children: Array<ChildrenNode>
-    hasOpenTag: boolean
-    prevNode?: ChildrenNode
-  },
-): boolean {
-  const { value, splits, depth, children, hasOpenTag, prevNode } = opts
-  const openTag = parseOpenTag(item, prevNode)
-  if (!openTag)
-    return false
-
-  if (!hasOpenTag) {
-    children.push(openTag)
-  }
-  else {
-    splits.unshift(item)
-    children.push(parseCustomContainers(value.substring(prevNode?.position.end || 0), { remainSplits: splits, depth: depth + 1, parentNode: prevNode }))
-  }
-  return true
-}
-
-/**
  *  Parses an opening custom-container tag and calculates its source ranges.
  */
-export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | null {
+export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
   const match = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)
   if (!match)
     return null
@@ -115,15 +126,13 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | nu
     ? titleAndAttrsValue.slice(0, attributeMatch.index).trim()
     : titleAndAttrsValue) || void 0
 
-  const start = prevNode ? prevNode.position.end : 0
-  const end = start + raw.length
   return {
     type: 'open',
     raw,
     value,
     title,
     ...(attrs ? { attribute: attrs } : {}),
-    position: { start, end },
+    position: { start: offset, end: offset + raw.length },
   }
 }
 
@@ -131,11 +140,11 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode): TagNode | nu
  * Parses the exact closing marker,
  * `:::` and calculates its source range.
  */
-export function parseCloseTag(value: string, prevNode?: ChildrenNode): TagNode | null {
-  if (!value.endsWith(':::'))
+export function parseCloseTag(value: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
+  if (!CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE.test(value))
     return null
 
-  const start = prevNode ? prevNode.position.end : 0
+  const start = prevNode?.position.end || 0
   const end = start + value.length
   return {
     type: 'close',
@@ -149,23 +158,21 @@ export function parseCloseTag(value: string, prevNode?: ChildrenNode): TagNode |
  *  Adds a blank-line node, merging it with the preceding blank line when possible.
  */
 export function parseBlankNode(
-  children: Array<ChildrenNode>,
   opts?: Partial<{
-    newline: string
-    prevNode: ChildrenNode
+    newline?: string
+    prevNode?: ChildrenNode | CustomContainerBlockNode
   }>,
-): void {
+): BlankNode | null {
   const { newline = '\n', prevNode } = opts || {}
   if (prevNode?.type === 'blank') {
     prevNode.value += newline
     prevNode.position.end += newline.length
+    return null
   }
-  else {
-    const prevEndPoint = prevNode ? prevNode.position.end : 0
-    children.push({
-      type: 'blank',
-      value: newline,
-      position: { start: prevEndPoint, end: prevEndPoint + newline.length },
-    })
+  const start = prevNode?.position.end || 0
+  return {
+    type: 'blank',
+    value: newline,
+    position: { start, end: start + newline.length },
   }
 }
