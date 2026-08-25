@@ -33,11 +33,11 @@ export function isCustomContainerType(value: string): value is CustomContainerTy
   return CUSTOM_CONTAINER_TYPE_SET.has(value)
 }
 
-export function isOpeningTag(value: string): boolean {
+export function isOpenTag(value: string): boolean {
   return CUSTOM_CONTAINER_OPEN_MARKER_RE.test(value)
 }
 
-export function isClosingTag(value: string): boolean {
+export function isCloseTag(value: string): boolean {
   return new RegExp(`${CUSTOM_CONTAINER_CLOSE_MARKER_PATTERN}`).test(value)
 }
 

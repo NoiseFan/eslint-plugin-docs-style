@@ -40,6 +40,10 @@ export interface TagNode {
    */
   type: 'open' | 'close'
   /**
+   * Marker's length
+   */
+  markerLength: number
+  /**
    * Original tag text as it appeared in the source
    */
   raw: string

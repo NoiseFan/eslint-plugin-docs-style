@@ -10,15 +10,13 @@ import {
 
 describe('parseCustomContainers', () => {
   it('parses opening, text, and closing nodes', async () => {
-    const container = parseCustomContainers('::: info Title content\ncontent\n:::')[0] as CustomContainerAST
-
+    const container = parseCustomContainers('::: info Title content\ncontent\n:::')
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/container-ast.json')
   })
 
   it('includes a blank node for an empty line', () => {
     const container = parseCustomContainers('::: info Title\n\ncontent\n:::')[0] as CustomContainerAST
-
     expect(container.children).toContainEqual({
       type: 'blank',
       value: '\n',
@@ -27,27 +25,47 @@ describe('parseCustomContainers', () => {
   })
 
   it('parses continuous containers', async () => {
-    const container = parseCustomContainers(['::: info Title', 'content', ':::', '::: info Title2', 'content', ':::'].join('\n'))
+    const container = parseCustomContainers([
+      '::: info Title',
+      'content',
+      ':::',
+      '::: info Title2',
+      'content',
+      ':::',
+    ].join('\n'))
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot(`__snapshots__/continuous-container-ast.json`)
   })
 
   it('text and parses continuous containers', async () => {
-    const container = parseCustomContainers(['top content', '::: info Title', 'content', ':::', '::: info Title2', 'content', ':::', 'bottom content'].join('\n'))
+    const container = parseCustomContainers([
+      'top content',
+      '::: info Title',
+      'content',
+      ':::',
+      '::: info Title2',
+      'content',
+      ':::',
+      'bottom content',
+    ].join('\n'))
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot(`__snapshots__/text-and-continuous-container-ast.json`)
   })
 
   it('parses nested containers and increments their depth', async () => {
     const container = parseCustomContainers(':::: info\ntext\n::: tip\nnested\n:::\n::::')
-    const nested = (container[0] as CustomContainerAST).children.find(child => child.type === 'custom-container')
-
-    await expect(JSON.stringify(nested, null, 2))
+    await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/nested-container-ast.json')
   })
 
+  it('does not close a wider container with a shorter closing fence', async () => {
+    const container = parseCustomContainers(':::: info\ntext\n:::\nmore\n::::')
+    await expect(JSON.stringify(container, null, 2))
+      .toMatchFileSnapshot('__snapshots__/short-closing-fence-ast.json')
+  })
+
   it('parses a details container with the open attribute', async () => {
-    const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')[0] as CustomContainerAST
+    const container = parseCustomContainers('::: details Click me {open}\nContent\n:::')
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot(`__snapshots__/multi-attrs.json`)
   })
@@ -86,8 +104,7 @@ describe('parseCustomContainers', () => {
   })
 
   it('parses CRLF input and closes the container', async () => {
-    const container = parseCustomContainers('::: info Title content\r\ncontent\r\n:::')[0] as CustomContainerAST
-
+    const container = parseCustomContainers('::: info Title content\r\ncontent\r\n:::')
     await expect(JSON.stringify(container, null, 2))
       .toMatchFileSnapshot('__snapshots__/CRLF-container.json')
   })
@@ -117,6 +134,7 @@ describe('parseOpenTag', () => {
     expect(parseOpenTag('::: info Optional title')).toStrictEqual({
       type: 'open',
       raw: '::: info Optional title',
+      markerLength: 3,
       value: { content: 'info', start: 4, end: 8 },
       title: 'Optional title',
       position: { start: 0, end: 23 },
@@ -147,6 +165,7 @@ describe('parseOpenTag', () => {
     expect(parseOpenTag('::: warning Title', prevNode)).toStrictEqual({
       type: 'open',
       raw: '::: warning Title',
+      markerLength: 3,
       value: { content: 'warning', start: 12, end: 19 },
       title: 'Title',
       position: { start: 8, end: 25 },
@@ -172,6 +191,7 @@ describe('parseCloseTag', () => {
     expect(parseCloseTag(':::', prevNode)).toStrictEqual({
       type: 'close',
       raw: ':::',
+      markerLength: 3,
       value: { content: ':::', start: 8, end: 11 },
       position: { start: 8, end: 11 },
     })
@@ -185,7 +205,7 @@ describe('parseCloseTag', () => {
 describe('parseBlankNode', () => {
   it('creates a blank node and merges consecutive blank lines', () => {
     const node = parseBlankNode()
-    parseBlankNode({ prevNode: node })
+    parseBlankNode({ prevNode: node! })
 
     expect(node).toStrictEqual({ type: 'blank', value: '\n\n', position: { start: 0, end: 2 } })
   })

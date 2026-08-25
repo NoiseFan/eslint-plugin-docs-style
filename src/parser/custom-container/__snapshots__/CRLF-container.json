@@ -1,61 +1,65 @@
-{
-  "type": "custom-container",
-  "depth": 1,
-  "children": [
-    {
-      "type": "open",
-      "raw": "::: info Title content",
-      "value": {
-        "content": "info",
-        "start": 4,
-        "end": 8
+[
+  {
+    "type": "custom-container",
+    "depth": 1,
+    "children": [
+      {
+        "type": "open",
+        "markerLength": 3,
+        "raw": "::: info Title content",
+        "value": {
+          "content": "info",
+          "start": 4,
+          "end": 8
+        },
+        "title": "Title content",
+        "position": {
+          "start": 0,
+          "end": 22
+        }
       },
-      "title": "Title content",
-      "position": {
-        "start": 0,
-        "end": 22
-      }
-    },
-    {
-      "type": "blank",
-      "value": "\r\n",
-      "position": {
-        "start": 22,
-        "end": 24
-      }
-    },
-    {
-      "type": "text",
-      "value": "content",
-      "position": {
-        "start": 24,
-        "end": 31
-      }
-    },
-    {
-      "type": "blank",
-      "value": "\r\n",
-      "position": {
-        "start": 31,
-        "end": 33
-      }
-    },
-    {
-      "type": "close",
-      "raw": ":::",
-      "value": {
-        "content": ":::",
-        "start": 33,
-        "end": 36
+      {
+        "type": "blank",
+        "value": "\r\n",
+        "position": {
+          "start": 22,
+          "end": 24
+        }
       },
-      "position": {
-        "start": 33,
-        "end": 36
+      {
+        "type": "text",
+        "value": "content",
+        "position": {
+          "start": 24,
+          "end": 31
+        }
+      },
+      {
+        "type": "blank",
+        "value": "\r\n",
+        "position": {
+          "start": 31,
+          "end": 33
+        }
+      },
+      {
+        "type": "close",
+        "markerLength": 3,
+        "raw": ":::",
+        "value": {
+          "content": ":::",
+          "start": 33,
+          "end": 36
+        },
+        "position": {
+          "start": 33,
+          "end": 36
+        }
       }
+    ],
+    "position": {
+      "start": 0,
+      "end": 36
     }
-  ],
-  "position": {
-    "start": 0,
-    "end": 36
   }
-}
+]

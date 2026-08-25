@@ -21,6 +21,7 @@
     "children": [
       {
         "type": "open",
+        "markerLength": 3,
         "raw": "::: info Title",
         "value": {
           "content": "info",
@@ -59,6 +60,7 @@
       },
       {
         "type": "close",
+        "markerLength": 3,
         "raw": ":::",
         "value": {
           "content": ":::",
@@ -90,6 +92,7 @@
     "children": [
       {
         "type": "open",
+        "markerLength": 3,
         "raw": "::: info Title2",
         "value": {
           "content": "info",
@@ -128,6 +131,7 @@
       },
       {
         "type": "close",
+        "markerLength": 3,
         "raw": ":::",
         "value": {
           "content": ":::",

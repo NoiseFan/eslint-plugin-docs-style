@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CUSTOM_CONTAINER_TYPES, isClosingTag, isCustomContainerMarker, isCustomContainerType, isOpeningTag } from '.'
+import { CUSTOM_CONTAINER_TYPES, isCloseTag, isCustomContainerMarker, isCustomContainerType, isOpenTag } from '.'
 
 describe('isCustomContainerType', () => {
   it.each(CUSTOM_CONTAINER_TYPES)('accepts %s', (type) => {
@@ -11,32 +11,32 @@ describe('isCustomContainerType', () => {
   })
 })
 
-describe('isOpeningTag', () => {
+describe('isOpenTag', () => {
   it('should return true for opening tags', () => {
     // maybe include :::info ?
     const inputs = ['::: info', '::: info\ncontent', ':::: warning Optional title', ' ::: details {open}', '   ::: code-group', ':::\ttip']
     for (const input of inputs)
-      expect(isOpeningTag(input), input).toBeTruthy()
+      expect(isOpenTag(input), input).toBeTruthy()
   })
 
   it('should return false for non-opening tags', () => {
     const inputs = [':::', '    ::: info', 'text ::: info']
     for (const input of inputs)
-      expect(isOpeningTag(input), input).toBeFalsy()
+      expect(isOpenTag(input), input).toBeFalsy()
   })
 })
 
-describe('isClosingTag', () => {
+describe('isCloseTag', () => {
   it('should return true for closing tags', () => {
     const inputs = [':::', '::::', ' :::', '   :::', ':::\t', 'text:::', '::: text', '\n:::', ':::\n']
     for (const input of inputs)
-      expect(isClosingTag(input), input).toBeTruthy()
+      expect(isCloseTag(input), input).toBeTruthy()
   })
 
   it('should return false for non-closing tags', () => {
     const inputs = [':', '::']
     for (const input of inputs)
-      expect(isClosingTag(input), input).toBeFalsy()
+      expect(isCloseTag(input), input).toBeFalsy()
   })
 })
 

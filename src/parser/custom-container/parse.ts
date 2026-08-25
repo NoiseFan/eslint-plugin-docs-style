@@ -1,8 +1,11 @@
 import type { BlankNode, ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange, TagNode } from '@/types/custom-container'
-import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE, isBlank } from '.'
+import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE, isBlank, isOpenTag } from '.'
 
 interface ParseState { splits: string[], offset: number }
 
+/**
+ * Parses top-level text into container, blank-line, and text nodes.
+ */
 export function parseCustomContainers(value: string): CustomContainerBlockNode[] {
   const state: ParseState = { splits: splitLines(value), offset: 0 }
   const nodes: CustomContainerBlockNode[] = []
@@ -10,7 +13,7 @@ export function parseCustomContainers(value: string): CustomContainerBlockNode[]
   while (state.splits.length) {
     const item = state.splits[0]
     const previous = nodes.at(-1)
-    if (parseOpenTag(item, previous)) {
+    if (isOpenTag(item)) {
       nodes.push(parseCustomContainer(state, 1, previous))
       continue
     }
@@ -29,38 +32,37 @@ export function parseCustomContainers(value: string): CustomContainerBlockNode[]
 }
 
 /**
- * Parses custom-container markup into a nested AST while preserving source offsets.
- *
- * The optional split state is used by recursive calls so nested containers can
- * continue consuming the same input without reparsing already visited lines.
+ * Parses one container by consuming its opening tag, nested containers, content,
+ * and a closing fence whose marker is at least as wide as the opening fence.
  */
 function parseCustomContainer(state: ParseState, depth: number, parentNode?: ChildrenNode): CustomContainerAST {
   const children: ChildrenNode[] = []
   const raw = state.splits[0]
-  const openTag = parseOpenTag(raw, parentNode)
-  if (!openTag)
-    return { type: 'custom-container', depth, children, position: { start: state.offset, end: state.offset } }
+  const openTag = parseOpenTag(raw, parentNode)!
   consume(state)
   children.push(openTag)
-  const markerLength = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)?.[1].match(/:{3,}/)?.[0].length ?? 3
 
   while (state.splits.length) {
     const item = state.splits[0]
     const previous = children.at(-1)
+
+    // nested container
     const nestedOpen = parseOpenTag(item, previous)
     if (nestedOpen) {
       children.push(parseCustomContainer(state, depth + 1, previous))
       continue
     }
-    const closeMatch = item.match(CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE)
-    const closeMarkerLength = closeMatch?.[0].match(/:{3,}/)?.[0].length ?? 0
 
-    if (closeMatch && closeMarkerLength >= markerLength) {
-      const consumed = consume(state)
-      children.push(parseCloseTag(consumed.value, previous)!)
+    // close node
+    const closeTag = parseCloseTag(item, previous)
+    const consumed = consume(state)
+
+    if (closeTag && closeTag.markerLength >= openTag.markerLength) {
+      children.push(closeTag)
       break
     }
-    const consumed = consume(state)
+
+    // blank node
     if (isBlank(consumed.value)) {
       const blankNode = parseBlankNode({ newline: consumed.value, prevNode: previous })
       if (blankNode)
@@ -68,6 +70,7 @@ function parseCustomContainer(state: ParseState, depth: number, parentNode?: Chi
       continue
     }
 
+    // text node
     children.push({ type: 'text', value: consumed.value, position: consumed.position })
   }
   return {
@@ -81,6 +84,9 @@ function parseCustomContainer(state: ParseState, depth: number, parentNode?: Chi
   }
 }
 
+/**
+ * Consumes the next split and advances its source offset.
+ */
 function consume(state: ParseState): { value: string, position: OffsetRange } {
   const value = state.splits.shift()!
   const start = state.offset
@@ -96,7 +102,7 @@ export function splitLines(value: string): Array<string> {
 }
 
 /**
- *  Parses an opening custom-container tag and calculates its source ranges.
+ * Parses an opening custom-container tag and calculates its source ranges.
  */
 export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
   const match = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)
@@ -104,8 +110,9 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContai
   if (!match)
     return null
 
-  const [_, marker, type, titleAndAttrs] = match
-  const tag = marker + type
+  const [_, rawMarker, type, titleAndAttrs] = match
+  const tag = rawMarker + type
+  const marker = rawMarker.trim()
   const offset = prevNode?.position.end || 0
   const valueStart = offset + tag.length - type.length
   const value = {
@@ -128,6 +135,7 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContai
 
   return {
     type: 'open',
+    markerLength: marker.length,
     raw,
     value,
     title,
@@ -140,23 +148,27 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContai
  * Parses the exact closing marker,
  * `:::` and calculates its source range.
  */
-export function parseCloseTag(value: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
+export function parseCloseTag(raw: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
+  const match = raw.match(CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE)
   /* v8 ignore if -- @preserve */
-  if (!CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE.test(value))
+  if (!match)
     return null
+  const marker = match[0].match(/:{3,}/)?.[0] ?? ''
 
   const start = prevNode?.position.end || 0
-  const end = start + value.length
+  const end = start + raw.length
   return {
     type: 'close',
-    raw: value,
-    value: { content: value, start, end },
+    markerLength: marker.length,
+    raw,
+    value: { content: raw, start, end },
     position: { start, end },
   }
 }
 
 /**
- *  Adds a blank-line node, merging it with the preceding blank line when possible.
+ * Adds a blank-line node
+ * merging it with the preceding blank line when possible.
  */
 export function parseBlankNode(
   opts?: Partial<{
