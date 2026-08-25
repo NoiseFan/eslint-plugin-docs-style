@@ -50,6 +50,6 @@ describe('isCustomContainerMarker', () => {
   it('should return false for inline punctuation and non-marker values', () => {
     const inputs = [undefined, '', ':::', ' ::: ', '\n::', '\n: text', '\n::: text', 'text\n:::']
     for (const input of inputs)
-      expect(isCustomContainerMarker(input), `${input}`).toBeFalsy()
+      expect(isCustomContainerMarker(input), input).toBeFalsy()
   })
 })

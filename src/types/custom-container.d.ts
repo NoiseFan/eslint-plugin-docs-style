@@ -5,7 +5,7 @@ export interface CustomContainerAST {
   /**
    * Node discriminator for custom containers
    */
-  type: 'cumstom-container'
+  type: 'custom-container'
   /**
    *  Source range covering the complete container
    */

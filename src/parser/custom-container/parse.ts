@@ -38,9 +38,8 @@ function parseCustomContainer(state: ParseState, depth: number, parentNode?: Chi
   const children: ChildrenNode[] = []
   const raw = state.splits[0]
   const openTag = parseOpenTag(raw, parentNode)
-  /* v8 ignore if -- @preserve */
   if (!openTag)
-    return { type: 'cumstom-container', depth, children, position: { start: state.offset, end: state.offset } }
+    return { type: 'custom-container', depth, children, position: { start: state.offset, end: state.offset } }
   consume(state)
   children.push(openTag)
   const markerLength = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)?.[1].match(/:{3,}/)?.[0].length ?? 3
@@ -72,7 +71,7 @@ function parseCustomContainer(state: ParseState, depth: number, parentNode?: Chi
     children.push({ type: 'text', value: consumed.value, position: consumed.position })
   }
   return {
-    type: 'cumstom-container',
+    type: 'custom-container',
     depth,
     children,
     position: {
@@ -101,6 +100,7 @@ export function splitLines(value: string): Array<string> {
  */
 export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
   const match = raw.match(CUSTOM_CONTAINER_OPEN_MARKER_RE)
+  /* v8 ignore if -- @preserve */
   if (!match)
     return null
 
@@ -141,6 +141,7 @@ export function parseOpenTag(raw: string, prevNode?: ChildrenNode | CustomContai
  * `:::` and calculates its source range.
  */
 export function parseCloseTag(value: string, prevNode?: ChildrenNode | CustomContainerBlockNode): TagNode | null {
+  /* v8 ignore if -- @preserve */
   if (!CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE.test(value))
     return null
 

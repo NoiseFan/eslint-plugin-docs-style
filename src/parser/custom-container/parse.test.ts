@@ -40,7 +40,7 @@ describe('parseCustomContainers', () => {
 
   it('parses nested containers and increments their depth', async () => {
     const container = parseCustomContainers(':::: info\ntext\n::: tip\nnested\n:::\n::::')
-    const nested = (container[0] as CustomContainerAST).children.find(child => child.type === 'cumstom-container')
+    const nested = (container[0] as CustomContainerAST).children.find(child => child.type === 'custom-container')
 
     await expect(JSON.stringify(nested, null, 2))
       .toMatchFileSnapshot('__snapshots__/nested-container-ast.json')

@@ -1,6 +1,6 @@
 [
   {
-    "type": "cumstom-container",
+    "type": "custom-container",
     "depth": 1,
     "children": [
       {
@@ -69,7 +69,7 @@
     }
   },
   {
-    "type": "cumstom-container",
+    "type": "custom-container",
     "depth": 1,
     "children": [
       {

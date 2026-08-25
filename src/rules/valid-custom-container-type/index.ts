@@ -66,7 +66,7 @@ export default createRule<Options, MessageIds>({
 
 function* getOpeningTags(nodes: CustomContainerBlockNode[]): Generator<TagNode> {
   for (const node of nodes) {
-    if (node.type !== 'cumstom-container')
+    if (node.type !== 'custom-container')
       continue
     yield* getOpeningTagsFromContainer(node)
   }
@@ -74,7 +74,7 @@ function* getOpeningTags(nodes: CustomContainerBlockNode[]): Generator<TagNode> 
 
 function* getOpeningTagsFromContainer(container: CustomContainerAST): Generator<TagNode> {
   for (const child of container.children) {
-    if (child.type === 'cumstom-container')
+    if (child.type === 'custom-container')
       yield* getOpeningTagsFromContainer(child)
     else if (child.type === 'open')
       yield child
