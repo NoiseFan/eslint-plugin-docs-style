@@ -78,6 +78,23 @@ describe('parseCustomContainers', () => {
     ])
   })
 
+  it('continues parsing same-level content after a top-level container', () => {
+    expect(parseCustomContainers('::: info\ncontent\n:::\nAfter')).toMatchObject([
+      {
+        type: 'custom-container',
+        children: [
+          { type: 'open' },
+          { type: 'blank', value: '\n' },
+          { type: 'text', value: 'content' },
+          { type: 'blank', value: '\n' },
+          { type: 'close' },
+        ],
+      },
+      { type: 'blank', value: '\n' },
+      { type: 'text', value: 'After' },
+    ])
+  })
+
   it('preserves consecutive line breaks as one blank node with its full offset', () => {
     expect(parseCustomContainers('first\n\nsecond')).toMatchObject([
       { type: 'text', value: 'first', position: { start: 0, end: 5 } },

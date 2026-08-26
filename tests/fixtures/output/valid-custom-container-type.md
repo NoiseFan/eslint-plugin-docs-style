@@ -38,7 +38,6 @@ Information.
 ::: danger
 danger content.
 :::
-
 :::
 
 ::: info
@@ -47,6 +46,7 @@ Information.
 ::: danger
 danger content.
 :::
+
 Information.
 :::
 
@@ -76,4 +76,5 @@ content:::
 top content :::info
 content
 :::
+
 bottom content

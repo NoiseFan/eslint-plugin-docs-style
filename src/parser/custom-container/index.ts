@@ -1,3 +1,5 @@
+import type { BlankNode, ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
+
 export * from './parse'
 
 export const CUSTOM_CONTAINER_TYPES = [
@@ -57,3 +59,10 @@ export function isCustomContainerMarker(str: string | undefined): boolean {
     return false
   return CUSTOM_CONTAINER_CLOSE_MARKER_RE.test(str) || CUSTOM_CONTAINER_OPEN_MARKER_RE.test(str)
 }
+
+/* ==================== Node Type Assertion ==================== */
+
+export const isCustomContainerNode = (node: ChildrenNode | undefined): node is CustomContainerAST => !!node && node.type === 'custom-container'
+export const isBlankNode = (node: ChildrenNode | undefined): node is BlankNode => !!node && node.type === 'blank'
+export const isOpenNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'open'
+export const isCloseNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'close'

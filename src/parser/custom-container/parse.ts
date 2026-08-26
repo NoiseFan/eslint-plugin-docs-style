@@ -1,5 +1,18 @@
-import type { BlankNode, ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange, TagNode } from '@/types/custom-container'
-import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE, isBlank, isOpenTag } from '.'
+import type {
+  BlankNode,
+  ChildrenNode,
+  CustomContainerAST,
+  CustomContainerBlockNode,
+  OffsetRange,
+  TagNode,
+} from '@/types/custom-container'
+import {
+  CUSTOM_CONTAINER_ATTRS_RE,
+  CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE,
+  CUSTOM_CONTAINER_OPEN_MARKER_RE,
+  isBlank,
+  isOpenTag,
+} from '.'
 
 interface ParseState { splits: string[], offset: number }
 
