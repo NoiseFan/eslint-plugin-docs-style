@@ -1,5 +1,6 @@
 import type { Root } from 'mdast'
 import type { ValueOf } from '@/types'
+import { getNodePosition } from '@/parser/ast'
 import { parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'
 import { getCodeNodeRanges, getNodesIssues, MESSAGE_IDS } from './analyzs'
@@ -27,9 +28,13 @@ export default createRule<Options, MessageIds>({
   create(context) {
     return {
       root(node: Root) {
+        const { position, start } = getNodePosition(node)
+        /* v8 ignore if -- @preserve */
+        if (!position)
+          return
+
         const source = context.sourceCode.text
         const ignoreRanges = getCodeNodeRanges(node)
-        const start = node.position?.start.offset ?? 0
         const nodes = parseCustomContainers(source.slice(start))
         const edits = getNodesIssues(nodes, start)
 

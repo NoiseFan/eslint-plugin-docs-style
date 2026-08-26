@@ -24,6 +24,10 @@ const valid: ValidTestCase[] = [
     description: 'ignores an unclosed container',
     code: 'Before\n::: info\ncontent',
   },
+  {
+    description: 'allows content lines ending with a closing-marker suffix',
+    code: 'Before\n\n::: info\ntext :::\ncontent\n:::\n\nAfter',
+  },
 ]
 
 const invalid: InvalidTestCase[] = [

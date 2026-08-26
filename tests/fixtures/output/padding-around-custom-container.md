@@ -13,3 +13,13 @@ console.log('Hello, VitePress!')
 ```
 :::
 ::::
+
+<!-- nested plain text -->
+Before
+
+::: info
+text :::
+content
+:::
+
+After
