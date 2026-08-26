@@ -2,7 +2,7 @@ import type { Nodes, Root } from 'mdast'
 import type { ValueOf } from '@/types'
 import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange } from '@/types/custom-container'
 import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
-import { isBlankNode, isCloseNode, isCoustomContainer, isOpenNode } from '@/parser/custom-container'
+import { isBlankNode, isCloseNode, isCustomContainerNode, isOpenNode } from '@/parser/custom-container'
 
 export const MESSAGE_IDS = {
   missing: 'missing',
@@ -69,7 +69,7 @@ export function getNodesIssues(nodes: CustomContainerBlockNode[], offset: number
 export function analyzeLevel(nodes: ChildrenNode[], offset: number, issues: Issues): void {
   for (let index = 0; index < nodes.length; index++) {
     const container = nodes[index]
-    if (!isCoustomContainer(container))
+    if (!isCustomContainerNode(container))
       continue
 
     const boundary = getContainerBoundary(container)

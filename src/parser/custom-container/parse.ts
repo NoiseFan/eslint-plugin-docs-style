@@ -1,5 +1,18 @@
-import type { BlankNode, ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange, TagNode } from '@/types/custom-container'
-import { CUSTOM_CONTAINER_ATTRS_RE, CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE, CUSTOM_CONTAINER_OPEN_MARKER_RE, isBlank, isOpenTag } from '.'
+import type {
+  BlankNode,
+  ChildrenNode,
+  CustomContainerAST,
+  CustomContainerBlockNode,
+  OffsetRange,
+  TagNode,
+} from '@/types/custom-container'
+import {
+  CUSTOM_CONTAINER_ATTRS_RE,
+  CUSTOM_CONTAINER_CLOSE_MARKER_STRICT_RE,
+  CUSTOM_CONTAINER_OPEN_MARKER_RE,
+  isBlank,
+  isOpenTag,
+} from '.'
 
 interface ParseState { splits: string[], offset: number }
 
@@ -189,8 +202,3 @@ export function parseBlankNode(
     position: { start, end: start + newline.length },
   }
 }
-
-export const isCoustomContainer = (node: ChildrenNode | undefined): node is CustomContainerAST => !!node && node.type === 'custom-container'
-export const isBlankNode = (node: ChildrenNode | undefined): node is BlankNode => !!node && node.type === 'blank'
-export const isOpenNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'open'
-export const isCloseNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'close'
