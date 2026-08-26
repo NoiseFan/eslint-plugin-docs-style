@@ -1,6 +1,6 @@
 import type { Nodes, Root } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { ChildrenNode, CustomContainerAST, OffsetRange, TagNode } from '@/types/custom-container'
+import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange } from '@/types/custom-container'
 import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
 import { isBlankNode, isCloseNode, isCoustomContainer, isOpenNode } from '@/parser/custom-container'
 
@@ -15,14 +15,9 @@ export interface Edit extends OffsetRange {
   messageId: MessageIds
 }
 
-interface ContainerRange {
-  open: TagNode
-  close: TagNode
-  outer: {
-    start: ChildrenNode
-    end: ChildrenNode
-  }
-  children: ChildrenNode[]
+interface ContainerBoundary {
+  openIndex: number
+  closeIndex: number
 }
 
 export function getCodeRanges(node: Root): Array<{ start: number, end: number }> {
@@ -38,7 +33,7 @@ export function getCodeRanges(node: Root): Array<{ start: number, end: number }>
 
       const start = position.start?.offset
       const end = position.end?.offset
-      if (start && end)
+      if (start !== undefined && end !== undefined)
         ranges.push({ start, end })
     }
     if (hasChildren(current)) {
@@ -51,53 +46,54 @@ export function getCodeRanges(node: Root): Array<{ start: number, end: number }>
   return ranges
 }
 
-export function collectEdits(ast: CustomContainerAST, offset: number): Edit[] {
+export function collectEdits(nodes: CustomContainerBlockNode[], offset: number): Edit[] {
   const edits: Edit[] = []
-  const rootRanges = getTopLevelContainerRanges(ast.children)
+  analyzeLevel(nodes, offset, edits)
 
-  for (const range of rootRanges)
-    analyzeContainer(range, ast.children, offset, edits)
-
-  return edits
+  return dedupeEdits(edits)
 }
 
-function analyzeContainer(
-  range: ContainerRange,
-  parentChildren: ChildrenNode[],
+function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[]): void {
+  for (let index = 0; index < nodes.length; index++) {
+    const container = nodes[index]
+    if (!isCoustomContainer(container))
+      continue
+
+    const boundary = getContainerBoundary(container)
+    if (!boundary)
+      continue
+
+    analyzeInnerBoundary(container.children, boundary, offset, edits)
+    analyzeOuterBoundary(nodes, index, offset, edits)
+    analyzeLevel(container.children, offset, edits)
+  }
+}
+
+function analyzeInnerBoundary(
+  children: ChildrenNode[],
+  { openIndex, closeIndex }: ContainerBoundary,
   offset: number,
   edits: Edit[],
 ): void {
-  analyzeInnerBoundary(range, offset, edits)
-  analyzeOuterBoundary(range, parentChildren, offset, edits)
+  const first = children[openIndex + 1]
+  if (isBlankNode(first))
+    addInnerEdit(first, offset, edits)
 
-  for (const child of range.children) {
-    if (!isCoustomContainer(child))
-      continue
-    const nested = getNestedContainerRange(child)
-    if (nested)
-      analyzeContainer(nested, range.children, offset, edits)
-  }
-}
-
-function analyzeInnerBoundary(range: ContainerRange, offset: number, edits: Edit[]): void {
-  const openIndex = range.children.findIndex(child => child === range.open)
-  const closeIndex = range.children.findIndex(child => child === range.close)
-  if (openIndex === -1 || closeIndex === -1 || closeIndex <= openIndex)
-    return
-
-  const first = range.children[openIndex + 1]
-  if (isBlankNode(first)) {
-    const next = range.children[openIndex + 2]
-    addInnerEdit(first, isCloseNode(next), offset, edits)
-  }
-
-  const last = range.children[closeIndex - 1]
+  const last = children[closeIndex - 1]
   if (isBlankNode(last) && last !== first)
-    addInnerEdit(last, false, offset, edits)
+    addInnerEdit(last, offset, edits)
 }
 
-function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, empty: boolean, offset: number, edits: Edit[]): void {
-  const replacement = empty ? '' : getLineBreak(blank.value)
+function getContainerBoundary(container: CustomContainerAST): ContainerBoundary | undefined {
+  const openIndex = container.children.findIndex(isOpenNode)
+  const closeIndex = container.children.findLastIndex(isCloseNode)
+  if (openIndex === -1 || closeIndex <= openIndex)
+    return
+  return { openIndex, closeIndex }
+}
+
+function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, offset: number, edits: Edit[]): void {
+  const replacement = getLineBreak(blank.value)
   if (blank.value === replacement)
     return
 
@@ -110,18 +106,13 @@ function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, empty: bo
 }
 
 function analyzeOuterBoundary(
-  range: ContainerRange,
-  parentChildren: ChildrenNode[],
+  children: ChildrenNode[],
+  boundaryIndex: number,
   offset: number,
   edits: Edit[],
 ): void {
-  const startIndex = parentChildren.findIndex(child => child === range.outer.start)
-  const endIndex = parentChildren.findIndex(child => child === range.outer.end)
-  if (startIndex === -1 || endIndex === -1)
-    return
-
-  checkOuterSide(parentChildren, startIndex, -1, offset, edits)
-  checkOuterSide(parentChildren, endIndex, 1, offset, edits)
+  checkOuterSide(children, boundaryIndex, -1, offset, edits)
+  checkOuterSide(children, boundaryIndex, 1, offset, edits)
 }
 
 function checkOuterSide(
@@ -175,46 +166,15 @@ function isExternalContent(node: ChildrenNode | undefined, index: number, length
   return true
 }
 
-function getTopLevelContainerRanges(children: ChildrenNode[]): ContainerRange[] {
-  const ranges: ContainerRange[] = []
-  for (let index = 0; index < children.length; index++) {
-    const child = children[index]
-    if (isCoustomContainer(child)) {
-      const nested = getNestedContainerRange(child)
-      if (nested)
-        ranges.push(nested)
-      continue
-    }
-    if (!isOpenNode(child))
-      continue
-    const closeIndex = children.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === 'close')
-    if (closeIndex === -1)
-      continue
-    ranges.push({
-      open: child,
-      close: children[closeIndex] as TagNode,
-      outer: {
-        start: child,
-        end: children[closeIndex],
-      },
-      children: children.slice(index, closeIndex + 1),
-    })
-    index = closeIndex
-  }
-  return ranges
-}
-
-function getNestedContainerRange(container: CustomContainerAST): ContainerRange | undefined {
-  const open = container.children.find(child => isOpenNode(child))
-  const close = [...container.children].reverse().find(child => isCloseNode(child))
-  if (!open || !close)
-    return undefined
-  return {
-    open,
-    close,
-    outer: { start: container, end: container },
-    children: container.children,
-  }
+function dedupeEdits(edits: Edit[]): Edit[] {
+  const seen = new Set<string>()
+  return edits.filter((edit) => {
+    const key = `${edit.start}:${edit.end}:${edit.replacement}`
+    if (seen.has(key))
+      return false
+    seen.add(key)
+    return true
+  })
 }
 
 function getLineBreak(value: string): string {

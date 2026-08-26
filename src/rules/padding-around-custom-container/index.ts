@@ -30,18 +30,12 @@ export default createRule<Options, MessageIds>({
         const source = context.sourceCode.text
         const codeRanges = getCodeRanges(node)
         const start = node.position?.start.offset ?? 0
-        const ast = parseCustomContainers(source.slice(start))
-        const edits = collectEdits(ast, start)
-        const seen = new Set<string>()
+        const nodes = parseCustomContainers(source.slice(start))
+        const edits = collectEdits(nodes, start)
 
         for (const edit of edits) {
           if (codeRanges.some(range => edit.start < range.end && edit.end > range.start))
             continue
-
-          const key = `${edit.start}:${edit.end}:${edit.replacement}`
-          if (seen.has(key))
-            continue
-          seen.add(key)
 
           context.report({
             node,

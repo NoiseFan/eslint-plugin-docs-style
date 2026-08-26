@@ -39,4 +39,24 @@ describe('collectEdits', () => {
       { start: 32, end: 34, replacement: '\r\n\r\n', messageId: 'missing' },
     ])
   })
+
+  it('reports a shared boundary between continuous containers once', () => {
+    const source = '::: info\ncontent\n:::\n::: tip\ncontent\n:::'
+
+    expect(collectEdits(parseCustomContainers(source), 0)).toEqual([
+      { start: 20, end: 21, replacement: '\n\n', messageId: 'missing' },
+    ])
+  })
+
+  it('preserves the required line break inside an empty container', () => {
+    expect(collectEdits(parseCustomContainers('::: info\n:::'), 0)).toEqual([])
+    expect(collectEdits(parseCustomContainers('::: info\n\n:::'), 0)).toEqual([
+      { start: 8, end: 10, replacement: '\n', messageId: 'unexpected' },
+    ])
+  })
+
+  it('ignores an unclosed container', () => {
+    const source = 'Before\n::: info\ncontent'
+    expect(collectEdits(parseCustomContainers(source), 0)).toEqual([])
+  })
 })

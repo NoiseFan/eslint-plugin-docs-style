@@ -18,7 +18,11 @@ const valid: ValidTestCase[] = [
   },
   {
     description: 'ignores fenced code blocks',
-    code: '```md\n\n::: info\ncontent\n:::\n\n```',
+    code: '```md\n::: info\n\ncontent\n\n:::\n```',
+  },
+  {
+    description: 'ignores an unclosed container',
+    code: 'Before\n::: info\ncontent',
   },
 ]
 
