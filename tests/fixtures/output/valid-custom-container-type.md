@@ -67,3 +67,13 @@ Unsupported container.
 ::: NOTE
 This is an example, not a container.
 :::
+
+<!-- boundary situation -->
+
+::: info
+content:::
+
+top content :::info
+content
+:::
+bottom content

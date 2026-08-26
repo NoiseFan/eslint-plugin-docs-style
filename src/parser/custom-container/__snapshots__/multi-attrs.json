@@ -1,65 +1,69 @@
-{
-  "type": "cumstom-container",
-  "depth": 1,
-  "children": [
-    {
-      "type": "open",
-      "raw": "::: details Click me {open}",
-      "value": {
-        "content": "details",
-        "start": 4,
-        "end": 11
+[
+  {
+    "type": "custom-container",
+    "depth": 1,
+    "children": [
+      {
+        "type": "open",
+        "markerLength": 3,
+        "raw": "::: details Click me {open}",
+        "value": {
+          "content": "details",
+          "start": 4,
+          "end": 11
+        },
+        "title": "Click me",
+        "attribute": {
+          "content": "open",
+          "raw": "{open}"
+        },
+        "position": {
+          "start": 0,
+          "end": 27
+        }
       },
-      "title": "Click me",
-      "attribute": {
-        "content": "open",
-        "raw": "{open}"
+      {
+        "type": "blank",
+        "value": "\n",
+        "position": {
+          "start": 27,
+          "end": 28
+        }
       },
-      "position": {
-        "start": 0,
-        "end": 27
-      }
-    },
-    {
-      "type": "blank",
-      "value": "\n",
-      "position": {
-        "start": 27,
-        "end": 28
-      }
-    },
-    {
-      "type": "text",
-      "value": "Content",
-      "position": {
-        "start": 28,
-        "end": 35
-      }
-    },
-    {
-      "type": "blank",
-      "value": "\n",
-      "position": {
-        "start": 35,
-        "end": 36
-      }
-    },
-    {
-      "type": "close",
-      "raw": ":::",
-      "value": {
-        "content": ":::",
-        "start": 36,
-        "end": 39
+      {
+        "type": "text",
+        "value": "Content",
+        "position": {
+          "start": 28,
+          "end": 35
+        }
       },
-      "position": {
-        "start": 36,
-        "end": 39
+      {
+        "type": "blank",
+        "value": "\n",
+        "position": {
+          "start": 35,
+          "end": 36
+        }
+      },
+      {
+        "type": "close",
+        "markerLength": 3,
+        "raw": ":::",
+        "value": {
+          "content": ":::",
+          "start": 36,
+          "end": 39
+        },
+        "position": {
+          "start": 36,
+          "end": 39
+        }
       }
+    ],
+    "position": {
+      "start": 0,
+      "end": 39
     }
-  ],
-  "position": {
-    "start": 0,
-    "end": 39
   }
-}
+]

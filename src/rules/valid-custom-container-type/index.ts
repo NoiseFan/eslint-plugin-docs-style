@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import type { CustomContainerAST, TagNode } from '@/types/custom-container'
+import type { CustomContainerAST, CustomContainerBlockNode, TagNode } from '@/types/custom-container'
 import { getNodePosition } from '@/parser/ast'
 import { isCustomContainerType, parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'
@@ -64,10 +64,18 @@ export default createRule<Options, MessageIds>({
   },
 })
 
-function* getOpeningTags(container: CustomContainerAST): Generator<TagNode> {
+function* getOpeningTags(nodes: CustomContainerBlockNode[]): Generator<TagNode> {
+  for (const node of nodes) {
+    if (node.type !== 'custom-container')
+      continue
+    yield* getOpeningTagsFromContainer(node)
+  }
+}
+
+function* getOpeningTagsFromContainer(container: CustomContainerAST): Generator<TagNode> {
   for (const child of container.children) {
-    if (child.type === 'cumstom-container')
-      yield* getOpeningTags(child)
+    if (child.type === 'custom-container')
+      yield* getOpeningTagsFromContainer(child)
     else if (child.type === 'open')
       yield child
   }

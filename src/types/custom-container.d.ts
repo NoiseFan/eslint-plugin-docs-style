@@ -5,7 +5,7 @@ export interface CustomContainerAST {
   /**
    * Node discriminator for custom containers
    */
-  type: 'cumstom-container'
+  type: 'custom-container'
   /**
    *  Source range covering the complete container
    */
@@ -22,6 +22,11 @@ export interface CustomContainerAST {
 }
 
 /**
+ * A top-level block emitted while parsing custom-container text.
+ */
+export type CustomContainerBlockNode = CustomContainerAST | BlankNode | TextNode
+
+/**
  * A node that can occur inside a custom container.
  */
 export type ChildrenNode = CustomContainerAST | TagNode | BlankNode | TextNode
@@ -34,6 +39,10 @@ export interface TagNode {
    * Whether the tag opens or closes the container
    */
   type: 'open' | 'close'
+  /**
+   * Marker's length
+   */
+  markerLength: number
   /**
    * Original tag text as it appeared in the source
    */
