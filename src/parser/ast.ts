@@ -3,11 +3,13 @@ import type { PositionOptions } from '@/types'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
 import type { TextToken } from '@/types/text/tokenizer'
 
-export function isObject(val: unknown): boolean {
+export function isObject(val: unknown): val is object {
   return !!val && typeof val === 'object'
 }
 
 /* ==================== Node type guards ==================== */
+
+type NodeWithUndefined = Nodes | undefined
 
 /**
  * Checks whether an unknown value behaves like an mdast parent node.
@@ -15,40 +17,40 @@ export function isObject(val: unknown): boolean {
  * This intentionally accepts unknown values because ESLint's ancestor API does
  * not expose mdast-specific types.
  */
-export function hasChildren(node: unknown): node is Parents {
-  return !!node && typeof node === 'object' && 'children' in node && Array.isArray(node.children)
+export function hasChildren(node: NodeWithUndefined | unknown): node is Parents {
+  return isObject(node) && 'children' in node && Array.isArray(node.children)
 }
 
 /**
  * Narrows an mdast node to a paragraph node.
  */
-export function isParagraphNode(node: Nodes | undefined): node is Paragraph {
+export function isParagraphNode(node: NodeWithUndefined): node is Paragraph {
   return node?.type === 'paragraph'
 }
 
 /**
  * Narrows an mdast node to a text node.
  */
-export function isTextNode(node: Nodes | undefined): node is Text {
+export function isTextNode(node: NodeWithUndefined): node is Text {
   return node?.type === 'text'
 }
 
 /**
  * Narrows an mdast node to a Markdown link node.
  */
-export function isLinkNode(node: Nodes | undefined): node is Link {
+export function isLinkNode(node: NodeWithUndefined): node is Link {
   return node?.type === 'link'
 }
 
-export function isCodeNode(node: Nodes | undefined): node is Code {
+export function isCodeNode(node: NodeWithUndefined): node is Code {
   return node?.type === 'code'
 }
 
-export function isInlineCodeNode(node: Nodes | undefined): node is InlineCode {
+export function isInlineCodeNode(node: NodeWithUndefined): node is InlineCode {
   return node?.type === 'inlineCode'
 }
 
-export function isTableCell(node: Nodes | undefined): node is TableCell {
+export function isTableCell(node: NodeWithUndefined): node is TableCell {
   return node?.type === 'tableCell'
 }
 

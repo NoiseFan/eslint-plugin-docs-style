@@ -8,24 +8,29 @@ export const MESSAGE_IDS = {
   missing: 'missing',
   unexpected: 'unexpected',
 } as const
+
 type MessageIds = ValueOf<typeof MESSAGE_IDS>
 
-export interface Edit extends OffsetRange {
+export interface Issue extends OffsetRange {
   replacement: string
   messageId: MessageIds
 }
+
+type Issues = Array<Issue>
 
 interface ContainerBoundary {
   openIndex: number
   closeIndex: number
 }
 
-/**
- *  Collects source offsets for fenced code blocks and inline code nodes.
- */
-export function getCodeRanges(node: Root): Array<{ start: number, end: number }> {
-  const ranges: Array<{ start: number, end: number }> = []
+interface RangeOffset { start: number, end: number }
 
+/**
+ * Ignore `Custom-containerNode` in `CodeNode` & `InlineCodeNode`.
+ * Collects source offsets for fenced code blocks and inline code nodes.
+ */
+export function getCodeNodeRanges(node: Root): Array<RangeOffset> {
+  const ranges: Array<RangeOffset> = []
   function visit(current: Nodes): void {
     if (!isObject(current))
       return
@@ -50,19 +55,18 @@ export function getCodeRanges(node: Root): Array<{ start: number, end: number }>
 }
 
 /**
- *  Analyzes custom containers and returns de-duplicated padding edits.
+ * Analyzes custom containers and returns de-duplicated padding issues.
  */
-export function collectEdits(nodes: CustomContainerBlockNode[], offset: number): Edit[] {
-  const edits: Edit[] = []
-  analyzeLevel(nodes, offset, edits)
-
-  return dedupeEdits(edits)
+export function getNodesIssues(nodes: CustomContainerBlockNode[], offset: number): Issues {
+  const issues: Issues = []
+  analyzeLevel(nodes, offset, issues)
+  return dedupeIssues(issues)
 }
 
 /**
- *  Recursively analyzes every custom-container level in a parsed document.
+ * Recursively analyzes every custom-container level in a parsed document.
  */
-export function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[]): void {
+export function analyzeLevel(nodes: ChildrenNode[], offset: number, issues: Issues): void {
   for (let index = 0; index < nodes.length; index++) {
     const container = nodes[index]
     if (!isCoustomContainer(container))
@@ -72,9 +76,9 @@ export function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[
     if (!boundary)
       continue
 
-    analyzeInnerBoundary(container.children, boundary, offset, edits)
-    analyzeOuterBoundary(nodes, index, offset, edits)
-    analyzeLevel(container.children, offset, edits)
+    analyzeInnerBoundary(container.children, boundary, offset, issues)
+    analyzeOuterBoundary(nodes, index, offset, issues)
+    analyzeLevel(container.children, offset, issues)
   }
 }
 
@@ -85,15 +89,15 @@ export function analyzeInnerBoundary(
   children: ChildrenNode[],
   { openIndex, closeIndex }: ContainerBoundary,
   offset: number,
-  edits: Edit[],
+  issues: Issues,
 ): void {
   const first = children[openIndex + 1]
   if (isBlankNode(first))
-    addInnerEdit(first, offset, edits)
+    addInnerIssues(first, offset, issues)
 
   const last = children[closeIndex - 1]
   if (isBlankNode(last) && last !== first)
-    addInnerEdit(last, offset, edits)
+    addInnerIssues(last, offset, issues)
 }
 
 /**
@@ -110,12 +114,16 @@ export function getContainerBoundary(container: CustomContainerAST): ContainerBo
 /**
  *  Adds an edit that normalizes an inner blank line to one line break.
  */
-export function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, offset: number, edits: Edit[]): void {
+export function addInnerIssues(
+  blank: Extract<ChildrenNode, { type: 'blank' }>,
+  offset: number,
+  issues: Issues,
+): void {
   const replacement = getLineBreak(blank.value)
   if (blank.value === replacement)
     return
 
-  edits.push({
+  issues.push({
     start: offset + blank.position.start,
     end: offset + blank.position.end,
     replacement,
@@ -130,21 +138,21 @@ export function analyzeOuterBoundary(
   children: ChildrenNode[],
   boundaryIndex: number,
   offset: number,
-  edits: Edit[],
+  issues: Issues,
 ): void {
-  checkOuterSide(children, boundaryIndex, -1, offset, edits)
-  checkOuterSide(children, boundaryIndex, 1, offset, edits)
+  checkOuterSide(children, boundaryIndex, -1, offset, issues)
+  checkOuterSide(children, boundaryIndex, 1, offset, issues)
 }
 
 /**
- * Checks one side of a container and records insertion or normalization edits.
+ * Checks one side of a container and records insertion or normalization issues.
  */
 export function checkOuterSide(
   children: ChildrenNode[],
   boundaryIndex: number,
   direction: -1 | 1,
   offset: number,
-  edits: Edit[],
+  issues: Issues,
 ): void {
   const blankIndex = boundaryIndex + direction
   const blank = children[blankIndex]
@@ -158,7 +166,7 @@ export function checkOuterSide(
     const insertion = direction === -1
       ? children[boundaryIndex].position.start
       : children[boundaryIndex].position.end
-    edits.push({
+    issues.push({
       start: offset + insertion,
       end: offset + insertion,
       replacement: getLineBreakFromChildren(children),
@@ -172,7 +180,7 @@ export function checkOuterSide(
   if (blank.value === expected)
     return
 
-  edits.push({
+  issues.push({
     start: offset + blank.position.start,
     end: offset + blank.position.end,
     replacement: expected,
@@ -183,7 +191,11 @@ export function checkOuterSide(
 /**
  * Returns whether a node is content outside the container's own boundary tags.
  */
-export function isExternalContent(node: ChildrenNode | undefined, index: number, length: number): boolean {
+export function isExternalContent(
+  node: ChildrenNode | undefined,
+  index: number,
+  length: number,
+): boolean {
   if (!node || isBlankNode(node))
     return false
   if (index === 0 && isOpenNode(node))
@@ -193,10 +205,12 @@ export function isExternalContent(node: ChildrenNode | undefined, index: number,
   return true
 }
 
-/** Removes edits that target the same range with the same replacement. */
-export function dedupeEdits(edits: Edit[]): Edit[] {
+/**
+ * Removes issues that target the same range with the same replacement.
+ */
+export function dedupeIssues(issues: Issues): Issues {
   const seen = new Set<string>()
-  return edits.filter((edit) => {
+  return issues.filter((edit) => {
     const key = `${edit.start}:${edit.end}:${edit.replacement}`
     if (seen.has(key))
       return false

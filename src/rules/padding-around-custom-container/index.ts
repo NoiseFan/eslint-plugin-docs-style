@@ -2,7 +2,7 @@ import type { Root } from 'mdast'
 import type { ValueOf } from '@/types'
 import { parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'
-import { collectEdits, getCodeRanges, MESSAGE_IDS } from './analyzs'
+import { getCodeNodeRanges, getNodesIssues, MESSAGE_IDS } from './analyzs'
 
 export const RULE_NAME = 'padding-around-custom-container'
 export { MESSAGE_IDS }
@@ -28,23 +28,23 @@ export default createRule<Options, MessageIds>({
     return {
       root(node: Root) {
         const source = context.sourceCode.text
-        const codeRanges = getCodeRanges(node)
+        const ignoreRanges = getCodeNodeRanges(node)
         const start = node.position?.start.offset ?? 0
         const nodes = parseCustomContainers(source.slice(start))
-        const edits = collectEdits(nodes, start)
+        const edits = getNodesIssues(nodes, start)
 
-        for (const edit of edits) {
-          if (codeRanges.some(range => edit.start < range.end && edit.end > range.start))
+        for (const { start, end, messageId, replacement } of edits) {
+          if (ignoreRanges.some(range => start < range.end && end > range.start))
             continue
 
           context.report({
             node,
-            messageId: edit.messageId,
+            messageId,
             loc: {
-              start: context.sourceCode.getLocFromIndex(edit.start),
-              end: context.sourceCode.getLocFromIndex(edit.end),
+              start: context.sourceCode.getLocFromIndex(start),
+              end: context.sourceCode.getLocFromIndex(end),
             },
-            fix: fixer => fixer.replaceTextRange([edit.start, edit.end], edit.replacement),
+            fix: fixer => fixer.replaceTextRange([start, end], replacement),
           })
         }
       },
