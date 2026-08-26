@@ -20,6 +20,9 @@ interface ContainerBoundary {
   closeIndex: number
 }
 
+/**
+ *  Collects source offsets for fenced code blocks and inline code nodes.
+ */
 export function getCodeRanges(node: Root): Array<{ start: number, end: number }> {
   const ranges: Array<{ start: number, end: number }> = []
 
@@ -46,6 +49,9 @@ export function getCodeRanges(node: Root): Array<{ start: number, end: number }>
   return ranges
 }
 
+/**
+ *  Analyzes custom containers and returns de-duplicated padding edits.
+ */
 export function collectEdits(nodes: CustomContainerBlockNode[], offset: number): Edit[] {
   const edits: Edit[] = []
   analyzeLevel(nodes, offset, edits)
@@ -53,7 +59,10 @@ export function collectEdits(nodes: CustomContainerBlockNode[], offset: number):
   return dedupeEdits(edits)
 }
 
-function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[]): void {
+/**
+ *  Recursively analyzes every custom-container level in a parsed document.
+ */
+export function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[]): void {
   for (let index = 0; index < nodes.length; index++) {
     const container = nodes[index]
     if (!isCoustomContainer(container))
@@ -69,7 +78,10 @@ function analyzeLevel(nodes: ChildrenNode[], offset: number, edits: Edit[]): voi
   }
 }
 
-function analyzeInnerBoundary(
+/**
+ * Checks the blank lines immediately inside a container's opening and closing tags.
+ */
+export function analyzeInnerBoundary(
   children: ChildrenNode[],
   { openIndex, closeIndex }: ContainerBoundary,
   offset: number,
@@ -84,7 +96,10 @@ function analyzeInnerBoundary(
     addInnerEdit(last, offset, edits)
 }
 
-function getContainerBoundary(container: CustomContainerAST): ContainerBoundary | undefined {
+/**
+ * Finds the first opening tag and last closing tag for a custom container.
+ */
+export function getContainerBoundary(container: CustomContainerAST): ContainerBoundary | undefined {
   const openIndex = container.children.findIndex(isOpenNode)
   const closeIndex = container.children.findLastIndex(isCloseNode)
   if (openIndex === -1 || closeIndex <= openIndex)
@@ -92,7 +107,10 @@ function getContainerBoundary(container: CustomContainerAST): ContainerBoundary 
   return { openIndex, closeIndex }
 }
 
-function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, offset: number, edits: Edit[]): void {
+/**
+ *  Adds an edit that normalizes an inner blank line to one line break.
+ */
+export function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, offset: number, edits: Edit[]): void {
   const replacement = getLineBreak(blank.value)
   if (blank.value === replacement)
     return
@@ -105,7 +123,10 @@ function addInnerEdit(blank: Extract<ChildrenNode, { type: 'blank' }>, offset: n
   })
 }
 
-function analyzeOuterBoundary(
+/**
+ *  Checks both sides of a container for the required external blank line.
+ */
+export function analyzeOuterBoundary(
   children: ChildrenNode[],
   boundaryIndex: number,
   offset: number,
@@ -115,7 +136,10 @@ function analyzeOuterBoundary(
   checkOuterSide(children, boundaryIndex, 1, offset, edits)
 }
 
-function checkOuterSide(
+/**
+ * Checks one side of a container and records insertion or normalization edits.
+ */
+export function checkOuterSide(
   children: ChildrenNode[],
   boundaryIndex: number,
   direction: -1 | 1,
@@ -156,7 +180,10 @@ function checkOuterSide(
   })
 }
 
-function isExternalContent(node: ChildrenNode | undefined, index: number, length: number): boolean {
+/**
+ * Returns whether a node is content outside the container's own boundary tags.
+ */
+export function isExternalContent(node: ChildrenNode | undefined, index: number, length: number): boolean {
   if (!node || isBlankNode(node))
     return false
   if (index === 0 && isOpenNode(node))
@@ -166,7 +193,8 @@ function isExternalContent(node: ChildrenNode | undefined, index: number, length
   return true
 }
 
-function dedupeEdits(edits: Edit[]): Edit[] {
+/** Removes edits that target the same range with the same replacement. */
+export function dedupeEdits(edits: Edit[]): Edit[] {
   const seen = new Set<string>()
   return edits.filter((edit) => {
     const key = `${edit.start}:${edit.end}:${edit.replacement}`
@@ -177,11 +205,17 @@ function dedupeEdits(edits: Edit[]): Edit[] {
   })
 }
 
-function getLineBreak(value: string): string {
+/**
+ * Returns the line-break sequence used by a string.
+ */
+export function getLineBreak(value: string): string {
   return value.includes('\r\n') ? '\r\n' : '\n'
 }
 
-function getLineBreakFromChildren(children: ChildrenNode[]): string {
+/**
+ * Uses the first blank child to infer a container's line-break sequence.
+ */
+export function getLineBreakFromChildren(children: ChildrenNode[]): string {
   const blank = children.find(child => isBlankNode(child))
   return isBlankNode(blank) ? getLineBreak(blank.value) : '\n'
 }

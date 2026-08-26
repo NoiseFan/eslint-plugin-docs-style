@@ -1,6 +1,18 @@
+import type { CustomContainerAST } from '@/types/custom-container'
 import { describe, expect, it } from 'vitest'
 import { parseCustomContainers } from '@/parser/custom-container'
-import { collectEdits } from './analyzs'
+import { parseMarkdown } from '@/parser/markdown'
+import {
+  addInnerEdit,
+  checkOuterSide,
+  collectEdits,
+  dedupeEdits,
+  getCodeRanges,
+  getContainerBoundary,
+  getLineBreak,
+  getLineBreakFromChildren,
+  isExternalContent,
+} from './analyzs'
 
 describe('collectEdits', () => {
   it('reports missing padding around a top-level container', () => {
@@ -58,5 +70,53 @@ describe('collectEdits', () => {
   it('ignores an unclosed container', () => {
     const source = 'Before\n::: info\ncontent'
     expect(collectEdits(parseCustomContainers(source), 0)).toEqual([])
+  })
+})
+
+describe('analyzs helpers', () => {
+  it('collects code node ranges while walking nested markdown', () => {
+    const { ast } = parseMarkdown('Before `inline`\n\n```ts\ncode\n```')
+    expect(getCodeRanges(ast)).toEqual([{ start: 17, end: 31 }])
+    expect(getCodeRanges(null as unknown as Parameters<typeof getCodeRanges>[0])).toEqual([])
+    expect(getCodeRanges({ type: 'root', children: [{ type: 'code', lang: null, meta: null, value: 'code' }] })).toEqual([])
+  })
+
+  it('finds the outermost container tags', () => {
+    const container = parseCustomContainers('::: info\ntext\n:::').find(node => node.type === 'custom-container')!
+    expect(getContainerBoundary(container)).toEqual({ openIndex: 0, closeIndex: 4 })
+    expect(getContainerBoundary({ ...container, children: [container.children[0]] })).toBeUndefined()
+  })
+
+  it('normalizes inner blank lines and skips already normalized values', () => {
+    const edits = [] as Parameters<typeof addInnerEdit>[2]
+    addInnerEdit({ type: 'blank', value: '\n\n', position: { start: 4, end: 6 } }, 10, edits)
+    addInnerEdit({ type: 'blank', value: '\n', position: { start: 8, end: 9 } }, 10, edits)
+    expect(edits).toEqual([{ start: 14, end: 16, replacement: '\n', messageId: 'unexpected' }])
+  })
+
+  it('identifies external content and line-break styles', () => {
+    const nodes = parseCustomContainers('::: info\ncontent\n:::').find(node => node.type === 'custom-container')!.children
+    expect(isExternalContent(nodes[0], 0, nodes.length)).toBeFalsy()
+    expect(isExternalContent(nodes[2], 2, nodes.length)).toBeTruthy()
+    expect(isExternalContent(nodes.at(-1), nodes.length - 1, nodes.length)).toBeFalsy()
+    expect(isExternalContent(undefined, 0, 0)).toBeFalsy()
+    expect(getLineBreak('a\r\nb')).toBe('\r\n')
+    expect(getLineBreak('a\nb')).toBe('\n')
+    expect(getLineBreakFromChildren([{ type: 'text', value: 'x', position: { start: 0, end: 1 } }])).toBe('\n')
+  })
+
+  it('creates outer edits and removes exact duplicates', () => {
+    const container = parseCustomContainers('::: info\ncontent\n:::').find(node => node.type === 'custom-container') as CustomContainerAST
+    const children = container.children
+    const edits = [] as Parameters<typeof checkOuterSide>[4]
+    checkOuterSide(children, 0, -1, 0, edits)
+    expect(edits).toEqual([])
+    const compactChildren = children.filter(node => node.type !== 'blank')
+    const missing = [] as Parameters<typeof checkOuterSide>[4]
+    checkOuterSide(compactChildren, 0, 1, 5, missing)
+    checkOuterSide(compactChildren, 2, -1, 5, missing)
+    expect(missing).toHaveLength(2)
+    const duplicate = { start: 1, end: 1, replacement: '\n', messageId: 'missing' as const }
+    expect(dedupeEdits([duplicate, duplicate])).toEqual([duplicate])
   })
 })
