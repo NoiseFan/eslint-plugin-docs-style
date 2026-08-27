@@ -13,6 +13,7 @@ export type Issues = Array<Issue>
 interface AnalyzeContext {
   offset: number
   issues: Issues
+  mode?: 'compact' | 'loose'
 }
 
 interface ContainerBoundary {
@@ -27,9 +28,10 @@ export function getNodesIssues(
   nodes: CustomContainerBlockNode[],
   offset: number,
   ignoreRanges: OffsetRange[] = [],
+  mode: 'compact' | 'loose' = 'compact',
 ): Issues {
   const issues: Issues = []
-  analyzeLevel(nodes, { offset, issues })
+  analyzeLevel(nodes, { offset, issues, mode })
   return dedupeIssues(issues).filter(issue => !ignoreRanges.some(range => issue.start < range.end && issue.end > range.start))
 }
 
@@ -62,12 +64,44 @@ export function analyzeInnerBoundary(
 ): void {
   const { openIndex, closeIndex } = containerBoundary
   const first = children[openIndex + 1]
-  if (isBlankNode(first))
-    addInnerIssues(first, opts)
+  checkInnerSide(first, 1, children, opts)
 
   const last = children[closeIndex - 1]
-  if (isBlankNode(last) && last !== first)
-    addInnerIssues(last, opts)
+  if (last !== first)
+    checkInnerSide(last, -1, children, opts)
+}
+
+/**
+ *  Checks one side of a container's inner boundary for the selected mode.
+ */
+function checkInnerSide(
+  node: ChildrenNode | undefined,
+  direction: -1 | 1,
+  children: ChildrenNode[],
+  opts: AnalyzeContext,
+): void {
+  if (isBlankNode(node)) {
+    const lineBreak = getLineBreak(node.value)
+    const expected = opts.mode === 'loose' ? `${lineBreak}${lineBreak}` : lineBreak
+    if (node.value !== expected) {
+      opts.issues.push({
+        start: opts.offset + node.position.start,
+        end: opts.offset + node.position.end,
+        replacement: expected,
+        messageId: node.value.length < expected.length ? MESSAGE_IDS.missing : MESSAGE_IDS.unexpected,
+      })
+    }
+    return
+  }
+  if (opts.mode === 'loose' && node && !isOpenNode(node) && !isCloseNode(node)) {
+    const insertion = direction === 1 ? node.position.start : node.position.end
+    opts.issues.push({
+      start: opts.offset + insertion,
+      end: opts.offset + insertion,
+      replacement: getLineBreakFromChildren(children) + getLineBreakFromChildren(children),
+      messageId: MESSAGE_IDS.missing,
+    })
+  }
 }
 
 /**

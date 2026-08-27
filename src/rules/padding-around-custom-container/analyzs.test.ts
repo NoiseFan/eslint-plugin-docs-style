@@ -34,6 +34,14 @@ describe('collectIssues', () => {
     ])
   })
 
+  it('requires one blank line at inner boundaries in loose mode', () => {
+    const source = '::: info\ncontent\n:::'
+    expect(getNodesIssues(parseCustomContainers(source), 0, [], 'loose')).toEqual([
+      { start: 8, end: 9, replacement: '\n\n', messageId: 'missing' },
+      { start: 16, end: 17, replacement: '\n\n', messageId: 'missing' },
+    ])
+  })
+
   it('analyzes nested containers using their parent children', () => {
     const source = '::: info\nOuter\n\n::: tip\n\nInner\n\n:::\n\nOuter\n:::'
 
