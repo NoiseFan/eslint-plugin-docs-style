@@ -1,9 +1,9 @@
 import type { Root } from 'mdast'
 import type { ValueOf } from '@/types'
 import { getNodePosition } from '@/parser/ast'
-import { getCodeNodeRanges } from '@/rules/padding-around-custom-container/analyzs'
+import { getCodeNodeRanges } from '@/parser/custom-container'
 import { createRule } from '@/utils'
-import { getCustomContainerMarkerIssues } from './analyzs'
+import { getSourceIssues } from './analyzs'
 
 export const RULE_NAME = 'space-around-custom-container'
 
@@ -42,7 +42,8 @@ export default createRule<[], MessageIds>({
           return
 
         const source = context.sourceCode.text
-        const issues = getCustomContainerMarkerIssues(source, getCodeNodeRanges(node))
+        const ignoreRanges = getCodeNodeRanges(node)
+        const issues = getSourceIssues(source, ignoreRanges)
 
         for (const { start, end, messageId, replacement } of issues) {
           context.report({

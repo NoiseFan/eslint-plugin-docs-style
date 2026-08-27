@@ -1,72 +1,42 @@
-import type { Nodes, Root } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { MessageIds } from '.'
 import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange } from '@/types/custom-container'
-import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
 import { isBlankNode, isCloseNode, isCustomContainerNode, isOpenNode } from '@/parser/custom-container'
+import { MESSAGE_IDS } from '.'
 
-export const MESSAGE_IDS = {
-  missing: 'missing',
-  unexpected: 'unexpected',
-} as const
-
-type MessageIds = ValueOf<typeof MESSAGE_IDS>
-
-export interface Issue extends OffsetRange {
+interface Issue extends OffsetRange {
   replacement: string
   messageId: MessageIds
 }
 
-type Issues = Array<Issue>
+export type Issues = Array<Issue>
+
+interface AnalyzeContext {
+  offset: number
+  issues: Issues
+}
 
 interface ContainerBoundary {
   openIndex: number
   closeIndex: number
 }
 
-interface RangeOffset { start: number, end: number }
-
-/**
- * Ignore `Custom-containerNode` in `CodeNode` & `InlineCodeNode`.
- * Collects source offsets for fenced code blocks and inline code nodes.
- */
-export function getCodeNodeRanges(node: Root): Array<RangeOffset> {
-  const ranges: Array<RangeOffset> = []
-  function visit(current: Nodes): void {
-    if (!isObject(current))
-      return
-    if (isCodeNode(current)) {
-      const position = current.position
-      if (!position)
-        return
-
-      const start = position.start?.offset
-      const end = position.end?.offset
-      if (start !== undefined && end !== undefined)
-        ranges.push({ start, end })
-    }
-    if (hasChildren(current)) {
-      for (const child of current.children)
-        visit(child)
-    }
-  }
-
-  visit(node)
-  return ranges
-}
-
 /**
  * Analyzes custom containers and returns de-duplicated padding issues.
  */
-export function getNodesIssues(nodes: CustomContainerBlockNode[], offset: number): Issues {
+export function getNodesIssues(
+  nodes: CustomContainerBlockNode[],
+  offset: number,
+  ignoreRanges: OffsetRange[] = [],
+): Issues {
   const issues: Issues = []
-  analyzeLevel(nodes, offset, issues)
-  return dedupeIssues(issues)
+  analyzeLevel(nodes, { offset, issues })
+  return dedupeIssues(issues).filter(issue => !ignoreRanges.some(range => issue.start < range.end && issue.end > range.start))
 }
 
 /**
  * Recursively analyzes every custom-container level in a parsed document.
  */
-export function analyzeLevel(nodes: ChildrenNode[], offset: number, issues: Issues): void {
+export function analyzeLevel(nodes: ChildrenNode[], opts: AnalyzeContext): void {
   for (let index = 0; index < nodes.length; index++) {
     const container = nodes[index]
     if (!isCustomContainerNode(container))
@@ -76,9 +46,9 @@ export function analyzeLevel(nodes: ChildrenNode[], offset: number, issues: Issu
     if (!boundary)
       continue
 
-    analyzeInnerBoundary(container.children, boundary, offset, issues)
-    analyzeOuterBoundary(nodes, index, offset, issues)
-    analyzeLevel(container.children, offset, issues)
+    analyzeInnerBoundary(container.children, boundary, opts)
+    analyzeOuterBoundary(nodes, index, opts)
+    analyzeLevel(container.children, opts)
   }
 }
 
@@ -87,17 +57,17 @@ export function analyzeLevel(nodes: ChildrenNode[], offset: number, issues: Issu
  */
 export function analyzeInnerBoundary(
   children: ChildrenNode[],
-  { openIndex, closeIndex }: ContainerBoundary,
-  offset: number,
-  issues: Issues,
+  containerBoundary: ContainerBoundary,
+  opts: AnalyzeContext,
 ): void {
+  const { openIndex, closeIndex } = containerBoundary
   const first = children[openIndex + 1]
   if (isBlankNode(first))
-    addInnerIssues(first, offset, issues)
+    addInnerIssues(first, opts)
 
   const last = children[closeIndex - 1]
   if (isBlankNode(last) && last !== first)
-    addInnerIssues(last, offset, issues)
+    addInnerIssues(last, opts)
 }
 
 /**
@@ -116,12 +86,12 @@ export function getContainerBoundary(container: CustomContainerAST): ContainerBo
  */
 export function addInnerIssues(
   blank: Extract<ChildrenNode, { type: 'blank' }>,
-  offset: number,
-  issues: Issues,
+  opts: AnalyzeContext,
 ): void {
   const replacement = getLineBreak(blank.value)
   if (blank.value === replacement)
     return
+  const { offset, issues } = opts
 
   issues.push({
     start: offset + blank.position.start,
@@ -137,11 +107,10 @@ export function addInnerIssues(
 export function analyzeOuterBoundary(
   children: ChildrenNode[],
   boundaryIndex: number,
-  offset: number,
-  issues: Issues,
+  opts: AnalyzeContext,
 ): void {
-  checkOuterSide(children, boundaryIndex, -1, offset, issues)
-  checkOuterSide(children, boundaryIndex, 1, offset, issues)
+  checkOuterSide(children, { direction: -1, boundaryIndex, ...opts })
+  checkOuterSide(children, { direction: 1, boundaryIndex, ...opts })
 }
 
 /**
@@ -149,11 +118,15 @@ export function analyzeOuterBoundary(
  */
 export function checkOuterSide(
   children: ChildrenNode[],
-  boundaryIndex: number,
-  direction: -1 | 1,
-  offset: number,
-  issues: Issues,
+  opts: {
+    boundaryIndex: number
+    offset: number
+    issues: Issues
+    direction: -1 | 1
+  },
 ): void {
+  const { boundaryIndex, direction, offset, issues } = opts
+
   const blankIndex = boundaryIndex + direction
   const blank = children[blankIndex]
   const contentIndex = isBlankNode(blank) ? blankIndex + direction : blankIndex

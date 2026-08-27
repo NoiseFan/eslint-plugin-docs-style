@@ -1,13 +1,17 @@
 import type { Root } from 'mdast'
 import type { ValueOf } from '@/types'
 import { getNodePosition } from '@/parser/ast'
-import { parseCustomContainers } from '@/parser/custom-container'
+import { getCodeNodeRanges, parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'
-import { getCodeNodeRanges, getNodesIssues, MESSAGE_IDS } from './analyzs'
+import { getNodesIssues } from './analyzs'
 
 export const RULE_NAME = 'padding-around-custom-container'
-export { MESSAGE_IDS }
-type MessageIds = ValueOf<typeof MESSAGE_IDS>
+
+export const MESSAGE_IDS = {
+  missing: 'missing',
+  unexpected: 'unexpected',
+} as const
+export type MessageIds = ValueOf<typeof MESSAGE_IDS>
 type Options = []
 
 export default createRule<Options, MessageIds>({
@@ -36,12 +40,9 @@ export default createRule<Options, MessageIds>({
         const source = context.sourceCode.text
         const ignoreRanges = getCodeNodeRanges(node)
         const nodes = parseCustomContainers(source.slice(start))
-        const edits = getNodesIssues(nodes, start)
+        const issues = getNodesIssues(nodes, start, ignoreRanges)
 
-        for (const { start, end, messageId, replacement } of edits) {
-          if (ignoreRanges.some(range => start < range.end && end > range.start))
-            continue
-
+        for (const { start, end, messageId, replacement } of issues) {
           context.report({
             node,
             messageId,

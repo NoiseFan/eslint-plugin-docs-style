@@ -47,9 +47,7 @@ export default createRule<Options, MessageIds>({
         context.report({
           node,
           messageId: getBoundarySpaceMessageId({ missingBefore, missingAfter, unexpectedBefore, unexpectedAfter }),
-          fix(fixer) {
-            return fixer.replaceText(node, fixed)
-          },
+          fix: fixer => fixer.replaceText(node, fixed),
         })
       },
     }

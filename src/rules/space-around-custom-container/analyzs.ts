@@ -7,6 +7,9 @@ export interface Issue extends OffsetRange {
   replacement: string
   messageId: MessageIds
 }
+
+type Issues = Array<Issue>
+
 /**
  * Finds custom-container marker lines and normalizes their surrounding spaces.
  *
@@ -14,11 +17,11 @@ export interface Issue extends OffsetRange {
  * while closing markers contain only the fence. Leading indentation is removed.
  * Ranges in `ignoredRanges` (for example fenced code blocks) are skipped.
  */
-export function getCustomContainerMarkerIssues(
+export function getSourceIssues(
   source: string,
   ignoredRanges: readonly OffsetRange[] = [],
-): Issue[] {
-  const issues: Issue[] = []
+): Issues {
+  const issues: Issues = []
   // Recursively visits parsed containers, including nested containers
   function visit(nodes: CustomContainerBlockNode[] | ChildrenNode[]): void {
     for (const node of nodes) {
@@ -27,7 +30,7 @@ export function getCustomContainerMarkerIssues(
 
       for (const child of node.children) {
         if (isOpenNode(child) || isCloseNode(child))
-          addMarkerIssue(child, ignoredRanges, issues)
+          analyzeMarker(child, ignoredRanges, issues)
         else if (isCustomContainerNode(child))
           visit([child])
       }
@@ -41,15 +44,14 @@ export function getCustomContainerMarkerIssues(
 /**
  * Adds a spacing issue for one parsed opening or closing marker.
  */
-export function addMarkerIssue(
+export function analyzeMarker(
   tag: TagNode,
   ignoredRanges: readonly OffsetRange[],
-  issues: Issue[],
+  issues: Issues,
 ): void {
   if (ignoredRanges.some(range => tag.position.start < range.end && tag.position.end > range.start))
     return
-
-  const replacement = getNormalizedMarker(tag)
+  const replacement = normalizedMarker(tag)
   if (tag.raw === replacement)
     return
 
@@ -63,14 +65,15 @@ export function addMarkerIssue(
 /**
  * Returns the normalized source text for a parsed container marker.
  */
-export function getNormalizedMarker(tag: TagNode): string {
+export function normalizedMarker(tag: TagNode): string {
   const fence = ':'.repeat(tag.markerLength)
   const closing: boolean = isCloseNode(tag)
   if (closing)
     return fence
 
   const valueStart = tag.value.start - tag.position.start
-  return `${fence} ${tag.raw.slice(valueStart).trim()}`
+  const title = tag.raw.slice(valueStart).trim()
+  return `${fence} ${title}`
 }
 
 /**
