@@ -10,8 +10,8 @@ export interface Issue extends OffsetRange {
 /**
  * Finds custom-container marker lines and normalizes their surrounding spaces.
  *
- * Opening markers use exactly one space between the fence and the type, while
- * closing markers contain only the fence. Leading indentation is removed.
+ * Opening markers use exactly one space between the fence and the type,
+ * while closing markers contain only the fence. Leading indentation is removed.
  * Ranges in `ignoredRanges` (for example fenced code blocks) are skipped.
  */
 export function getCustomContainerMarkerIssues(

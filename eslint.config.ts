@@ -37,9 +37,7 @@ export default antfu(
           context.report({
             node,
             message: 'Use @/ aliases instead of src/ import paths.',
-            fix(fixer) {
-              return fixer.replaceText(node.source, `'${nextPath}'`)
-            },
+            fix: fixer => fixer.replaceText(node.source, `'${nextPath}'`),
           })
         },
       }

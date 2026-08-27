@@ -20,7 +20,9 @@ export default createRule<[], MessageIds>({
   name: RULE_NAME,
   meta: {
     type: 'layout',
-    docs: { description: 'Enforce spacing around VitePress custom-container markers.' },
+    docs: {
+      description: 'Enforce spacing around VitePress custom-container markers.',
+    },
     messages: {
       unexpectedIndentation: 'Do not indent a custom-container marker.',
       missingSeparator: 'Add one space between the opening fence and its type.',
@@ -35,19 +37,22 @@ export default createRule<[], MessageIds>({
     return {
       root(node: Root) {
         const { position } = getNodePosition(node)
+        /* v8 ignore if -- @preserve */
         if (!position)
           return
+
         const source = context.sourceCode.text
         const issues = getCustomContainerMarkerIssues(source, getCodeNodeRanges(node))
-        for (const issue of issues) {
+
+        for (const { start, end, messageId, replacement } of issues) {
           context.report({
             node,
-            messageId: issue.messageId,
+            messageId,
             loc: {
-              start: context.sourceCode.getLocFromIndex(issue.start),
-              end: context.sourceCode.getLocFromIndex(issue.end),
+              start: context.sourceCode.getLocFromIndex(start),
+              end: context.sourceCode.getLocFromIndex(end),
             },
-            fix: fixer => fixer.replaceTextRange([issue.start, issue.end], issue.replacement),
+            fix: fixer => fixer.replaceTextRange([start, end], replacement),
           })
         }
       },
