@@ -1,20 +1,12 @@
+import type { MessageIds } from '.'
 import type { ChildrenNode, CustomContainerBlockNode, OffsetRange, TagNode } from '@/types/custom-container'
 import { isCloseNode, isCustomContainerNode, isOpenNode, parseCustomContainers } from '@/parser/custom-container'
+import { MESSAGE_IDS } from '.'
 
-export const CUSTOM_CONTAINER_MARKER_MESSAGE_IDS = {
-  unexpectedIndentation: 'unexpectedIndentation',
-  missingSeparator: 'missingSeparator',
-  unexpectedSeparator: 'unexpectedSeparator',
-  unexpectedTrailingSpace: 'unexpectedTrailingSpace',
-} as const
-
-export type CustomContainerMarkerMessageId = typeof CUSTOM_CONTAINER_MARKER_MESSAGE_IDS[keyof typeof CUSTOM_CONTAINER_MARKER_MESSAGE_IDS]
-
-export interface CustomContainerMarkerIssue extends OffsetRange {
+export interface Issue extends OffsetRange {
   replacement: string
-  messageId: CustomContainerMarkerMessageId
+  messageId: MessageIds
 }
-
 /**
  * Finds custom-container marker lines and normalizes their surrounding spaces.
  *
@@ -25,31 +17,25 @@ export interface CustomContainerMarkerIssue extends OffsetRange {
 export function getCustomContainerMarkerIssues(
   source: string,
   ignoredRanges: readonly OffsetRange[] = [],
-): CustomContainerMarkerIssue[] {
-  const issues: CustomContainerMarkerIssue[] = []
-  collectMarkerIssues(parseCustomContainers(source), ignoredRanges, issues)
-  return issues
-}
+): Issue[] {
+  const issues: Issue[] = []
+  // Recursively visits parsed containers, including nested containers
+  function visit(nodes: CustomContainerBlockNode[] | ChildrenNode[]): void {
+    for (const node of nodes) {
+      if (!isCustomContainerNode(node))
+        continue
 
-/**
- * Recursively collects spacing issues from parsed custom-container tags.
- */
-export function collectMarkerIssues(
-  nodes: CustomContainerBlockNode[] | ChildrenNode[],
-  ignoredRanges: readonly OffsetRange[],
-  issues: CustomContainerMarkerIssue[],
-): void {
-  for (const node of nodes) {
-    if (!isCustomContainerNode(node))
-      continue
-
-    for (const child of node.children) {
-      if (isOpenNode(child) || isCloseNode(child))
-        addMarkerIssue(child, ignoredRanges, issues)
-      else if (isCustomContainerNode(child))
-        collectMarkerIssues([child], ignoredRanges, issues)
+      for (const child of node.children) {
+        if (isOpenNode(child) || isCloseNode(child))
+          addMarkerIssue(child, ignoredRanges, issues)
+        else if (isCustomContainerNode(child))
+          visit([child])
+      }
     }
   }
+
+  visit(parseCustomContainers(source))
+  return issues
 }
 
 /**
@@ -58,7 +44,7 @@ export function collectMarkerIssues(
 export function addMarkerIssue(
   tag: TagNode,
   ignoredRanges: readonly OffsetRange[],
-  issues: CustomContainerMarkerIssue[],
+  issues: Issue[],
 ): void {
   if (ignoredRanges.some(range => tag.position.start < range.end && tag.position.end > range.start))
     return
@@ -90,15 +76,15 @@ export function getNormalizedMarker(tag: TagNode): string {
 /**
  * Classifies the spacing problem represented by a parsed marker.
  */
-export function getMarkerMessageId(tag: TagNode): CustomContainerMarkerMessageId {
+export function getMarkerMessageId(tag: TagNode): MessageIds {
   if (tag.raw.length !== tag.raw.trimStart().length)
-    return CUSTOM_CONTAINER_MARKER_MESSAGE_IDS.unexpectedIndentation
+    return MESSAGE_IDS.unexpectedIndentation
   const closing: boolean = isCloseNode(tag)
   if (closing)
-    return CUSTOM_CONTAINER_MARKER_MESSAGE_IDS.unexpectedTrailingSpace
+    return MESSAGE_IDS.unexpectedTrailingSpace
 
   const separator = tag.raw.slice(tag.markerLength, tag.value.start - tag.position.start)
   if (separator.length === 0)
-    return CUSTOM_CONTAINER_MARKER_MESSAGE_IDS.missingSeparator
-  return CUSTOM_CONTAINER_MARKER_MESSAGE_IDS.unexpectedSeparator
+    return MESSAGE_IDS.missingSeparator
+  return MESSAGE_IDS.unexpectedSeparator
 }

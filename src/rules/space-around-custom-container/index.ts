@@ -3,11 +3,18 @@ import type { ValueOf } from '@/types'
 import { getNodePosition } from '@/parser/ast'
 import { getCodeNodeRanges } from '@/rules/padding-around-custom-container/analyzs'
 import { createRule } from '@/utils'
-import { CUSTOM_CONTAINER_MARKER_MESSAGE_IDS, getCustomContainerMarkerIssues } from './analyzs'
+import { getCustomContainerMarkerIssues } from './analyzs'
 
 export const RULE_NAME = 'space-around-custom-container'
-export const MESSAGE_IDS = CUSTOM_CONTAINER_MARKER_MESSAGE_IDS
-type MessageIds = ValueOf<typeof MESSAGE_IDS>
+
+export const MESSAGE_IDS = {
+  unexpectedIndentation: 'unexpectedIndentation',
+  missingSeparator: 'missingSeparator',
+  unexpectedSeparator: 'unexpectedSeparator',
+  unexpectedTrailingSpace: 'unexpectedTrailingSpace',
+} as const
+
+export type MessageIds = ValueOf<typeof MESSAGE_IDS>
 
 export default createRule<[], MessageIds>({
   name: RULE_NAME,
