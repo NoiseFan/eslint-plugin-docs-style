@@ -18,7 +18,7 @@ export type CustomContainerType = typeof CUSTOM_CONTAINER_TYPES[number]
 
 const CUSTOM_CONTAINER_TYPE_SET = new Set<string>(CUSTOM_CONTAINER_TYPES)
 
-const CUSTOM_CONTAINER_MARKER_PATTERN = String.raw`(^ {0,3}:{3,}[ \t]+)`
+const CUSTOM_CONTAINER_MARKER_PATTERN = String.raw`(^ {0,3}:{3,}[ \t]*)`
 const CUSTOM_CONTAINER_TYPE_PATTERN = String.raw`([\w-]+)(?=$|[ \t]|\r?\n)`
 const CUSTOM_CONTAINER_TITLE_AND_ATTRS_PATTERN = String.raw`([ \t][^\r\n]*)?`
 const CUSTOM_CONTAINER_CLOSE_MARKER_PATTERN = String.raw` {0,3}:{3,}[ \t]*`
