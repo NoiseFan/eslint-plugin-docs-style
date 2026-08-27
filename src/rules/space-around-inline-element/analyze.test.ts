@@ -1,10 +1,7 @@
 import { getParsedNodeContext } from '@tests/helpers/markdown'
 import { describe, expect, it } from 'vitest'
 import { isInlineCodeNode } from '@/parser/ast'
-import {
-  validateSpace,
-  validateSpaceAfterPunctuation,
-} from '@/rules/space-around-inline-element/analyze'
+import { validateSpace, validateSpaceAfterPunctuation } from './analyze'
 
 describe('validateSpaceAfterPunctuation', () => {
   describe('closing paired punctuation', () => {
