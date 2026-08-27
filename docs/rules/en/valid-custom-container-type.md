@@ -49,3 +49,8 @@ Examples inside fenced code blocks are not checked.
 ## When Not To Use It
 
 Disable this rule if your project registers other custom container types through a Markdown plugin, or if you are not using VitePress's built-in custom containers.
+
+## Related Rules
+
+- [`space-around-custom-container`](./space-around-custom-container.md) enforces spacing around container opening and closing markers.
+- [`padding-around-custom-container`](./padding-around-custom-container.md) enforces blank lines around container blocks.

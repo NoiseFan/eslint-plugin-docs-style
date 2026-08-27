@@ -161,4 +161,5 @@ Disable this rule if the project does not use VitePress custom containers, inten
 
 ## Related Rules
 
+- [`space-around-custom-container`](./space-around-custom-container.md) enforces spacing around container opening and closing markers.
 - [`valid-custom-container-type`](./valid-custom-container-type.md) validates the type used by an opening marker.

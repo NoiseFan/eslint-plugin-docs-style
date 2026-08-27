@@ -161,4 +161,5 @@ content
 
 ## 相关规则
 
+- [`space-around-custom-container`](./space-around-custom-container.md) 用于规范容器起始和结束标记周围的空格。
 - [`valid-custom-container-type`](./valid-custom-container-type.md) 用于校验起始标记中的容器类型。
