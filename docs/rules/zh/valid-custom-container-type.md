@@ -49,3 +49,8 @@
 ## 不适用场景
 
 如果项目通过 Markdown 插件注册了其他自定义容器类型，或者没有使用 VitePress 的内置自定义容器，可以关闭这条规则。
+
+## 相关规则
+
+- [`space-around-custom-container`](./space-around-custom-container.md) 用于规范容器起始和结束标记周围的空格。
+- [`padding-around-custom-container`](./padding-around-custom-container.md) 用于规范容器块周围的空行。

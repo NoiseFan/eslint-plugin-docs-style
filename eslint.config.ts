@@ -37,9 +37,24 @@ export default antfu(
           context.report({
             node,
             message: 'Use @/ aliases instead of src/ import paths.',
-            fix(fixer) {
-              return fixer.replaceText(node.source, `'${nextPath}'`)
-            },
+            fix: fixer => fixer.replaceText(node.source, `'${nextPath}'`),
+          })
+        },
+      }
+    },
+  }),
+  createSimplePlugin({
+    name: 'no-import-rules',
+    include: ['src/rules/**/*.ts'],
+    create(context) {
+      return {
+        ImportDeclaration(node) {
+          const source = node.source?.value
+          if (typeof source !== 'string' || !source.startsWith('@/rules') || source.startsWith('@/rules/shared'))
+            return
+          context.report({
+            node,
+            message: 'Avoid direct imports from `@/rules`; use `@/rules/shared` for shared utils.',
           })
         },
       }

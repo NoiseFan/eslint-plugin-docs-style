@@ -1,4 +1,6 @@
+import type { Nodes, Root } from 'mdast'
 import type { BlankNode, ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
+import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
 
 export * from './parse'
 
@@ -18,7 +20,7 @@ export type CustomContainerType = typeof CUSTOM_CONTAINER_TYPES[number]
 
 const CUSTOM_CONTAINER_TYPE_SET = new Set<string>(CUSTOM_CONTAINER_TYPES)
 
-const CUSTOM_CONTAINER_MARKER_PATTERN = String.raw`(^ {0,3}:{3,}[ \t]+)`
+const CUSTOM_CONTAINER_MARKER_PATTERN = String.raw`(^ {0,3}:{3,}[ \t]*)`
 const CUSTOM_CONTAINER_TYPE_PATTERN = String.raw`([\w-]+)(?=$|[ \t]|\r?\n)`
 const CUSTOM_CONTAINER_TITLE_AND_ATTRS_PATTERN = String.raw`([ \t][^\r\n]*)?`
 const CUSTOM_CONTAINER_CLOSE_MARKER_PATTERN = String.raw` {0,3}:{3,}[ \t]*`
@@ -66,3 +68,37 @@ export const isCustomContainerNode = (node: ChildrenNode | undefined): node is C
 export const isBlankNode = (node: ChildrenNode | undefined): node is BlankNode => !!node && node.type === 'blank'
 export const isOpenNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'open'
 export const isCloseNode = (node: ChildrenNode | undefined): node is TagNode => !!node && node.type === 'close'
+
+/* ==================== Utils ==================== */
+
+interface RangeOffset { start: number, end: number }
+
+/**
+ * Ignore `Custom-containerNode` in `CodeNode` & `InlineCodeNode`.
+ * Collects source offsets for fenced code blocks and inline code nodes.
+ */
+export function getCodeNodeRanges(node: Root): Array<RangeOffset> {
+  const ranges: Array<RangeOffset> = []
+
+  function visit(current: Nodes): void {
+    if (!isObject(current))
+      return
+    if (isCodeNode(current)) {
+      const position = current.position
+      if (!position)
+        return
+
+      const start = position.start?.offset
+      const end = position.end?.offset
+      if (start !== undefined && end !== undefined)
+        ranges.push({ start, end })
+    }
+    if (hasChildren(current)) {
+      for (const child of current.children)
+        visit(child)
+    }
+  }
+
+  visit(node)
+  return ranges
+}

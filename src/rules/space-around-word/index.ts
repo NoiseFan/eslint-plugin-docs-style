@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import type { ValueOf } from '@/types'
-import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/boundary-spacing/analyze'
+import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/text-boundary-spacing'
 import { createRule } from '@/utils'
 import { isLatinWordType } from '@/utils/text'
 

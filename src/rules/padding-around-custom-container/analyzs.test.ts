@@ -1,17 +1,18 @@
+import type { Issues } from './analyzs'
 import type { CustomContainerAST } from '@/types/custom-container'
 import { describe, expect, it } from 'vitest'
-import { parseCustomContainers } from '@/parser/custom-container'
+import { getCodeNodeRanges, parseCustomContainers } from '@/parser/custom-container'
 import { parseMarkdown } from '@/parser/markdown'
 import {
   addInnerIssues,
   checkOuterSide,
   dedupeIssues,
-  getCodeNodeRanges,
   getContainerBoundary,
   getLineBreak,
   getLineBreakFromChildren,
   getNodesIssues,
   isExternalContent,
+
 } from './analyzs'
 
 describe('collectIssues', () => {
@@ -88,9 +89,12 @@ describe('analyzs helpers', () => {
   })
 
   it('normalizes inner blank lines and skips already normalized values', () => {
-    const issues = [] as Parameters<typeof addInnerIssues>[2]
-    addInnerIssues({ type: 'blank', value: '\n\n', position: { start: 4, end: 6 } }, 10, issues)
-    addInnerIssues({ type: 'blank', value: '\n', position: { start: 8, end: 9 } }, 10, issues)
+    const issues: Issues = []
+    const opts = { offset: 10, issues }
+
+    addInnerIssues({ type: 'blank', value: '\n\n', position: { start: 4, end: 6 } }, opts)
+    addInnerIssues({ type: 'blank', value: '\n', position: { start: 8, end: 9 } }, opts)
+
     expect(issues).toEqual([{ start: 14, end: 16, replacement: '\n', messageId: 'unexpected' }])
   })
 
@@ -100,6 +104,7 @@ describe('analyzs helpers', () => {
     expect(isExternalContent(nodes[2], 2, nodes.length)).toBeTruthy()
     expect(isExternalContent(nodes.at(-1), nodes.length - 1, nodes.length)).toBeFalsy()
     expect(isExternalContent(undefined, 0, 0)).toBeFalsy()
+
     expect(getLineBreak('a\r\nb')).toBe('\r\n')
     expect(getLineBreak('a\nb')).toBe('\n')
     expect(getLineBreakFromChildren([{ type: 'text', value: 'x', position: { start: 0, end: 1 } }])).toBe('\n')
@@ -108,14 +113,17 @@ describe('analyzs helpers', () => {
   it('creates outer issues and removes exact duplicates', () => {
     const container = parseCustomContainers('::: info\ncontent\n:::').find(node => node.type === 'custom-container') as CustomContainerAST
     const children = container.children
-    const issues = [] as Parameters<typeof checkOuterSide>[4]
-    checkOuterSide(children, 0, -1, 0, issues)
+
+    const issues: Issues = []
+    checkOuterSide(children, { boundaryIndex: 0, direction: -1, offset: 0, issues })
     expect(issues).toEqual([])
+
     const compactChildren = children.filter(node => node.type !== 'blank')
-    const missing = [] as Parameters<typeof checkOuterSide>[4]
-    checkOuterSide(compactChildren, 0, 1, 5, missing)
-    checkOuterSide(compactChildren, 2, -1, 5, missing)
+    const missing: Issues = []
+    checkOuterSide(compactChildren, { boundaryIndex: 0, direction: 1, offset: 5, issues: missing })
+    checkOuterSide(compactChildren, { boundaryIndex: 2, direction: -1, offset: 5, issues: missing })
     expect(missing).toHaveLength(2)
+
     const duplicate = { start: 1, end: 1, replacement: '\n', messageId: 'missing' as const }
     expect(dedupeIssues([duplicate, duplicate])).toEqual([duplicate])
   })

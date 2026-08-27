@@ -13,8 +13,7 @@ describe('isCustomContainerType', () => {
 
 describe('isOpenTag', () => {
   it('should return true for opening tags', () => {
-    // maybe include :::info ?
-    const inputs = ['::: info', '::: info\ncontent', ':::: warning Optional title', ' ::: details {open}', '   ::: code-group', ':::\ttip']
+    const inputs = ['::: info', ':::info', '::: info\ncontent', ':::: warning Optional title', ' ::: details {open}', '   ::: code-group', ':::\ttip']
     for (const input of inputs)
       expect(isOpenTag(input), input).toBeTruthy()
   })

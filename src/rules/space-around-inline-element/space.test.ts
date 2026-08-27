@@ -1,7 +1,7 @@
 import type { SpaceContext } from './space-types'
 import { getParsedLinkContext, getParsedNodeContext } from '@tests/helpers/markdown'
 import { isInlineCodeNode } from '@/parser/ast'
-import { getSpaceContext } from '@/rules/space-around-inline-element/analyze'
+import { getSpaceContext } from './analyze'
 
 describe('getSpaceContext', () => {
   // Reuse the same assertion flow for link nodes to keep cases focused on expected metadata.
