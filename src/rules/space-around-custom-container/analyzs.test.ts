@@ -31,7 +31,7 @@ describe('getCustomContainerMarkerIssues', () => {
   })
 
   it('collects marker issues from nested parsed containers', () => {
-    expect(getSourceIssues('::::  info\n :::  tip\n内容\n :::\n::::')).toHaveLength(3)
+    expect(getSourceIssues('::::  info\n :::  tip\nContent\n :::\n::::')).toHaveLength(3)
   })
 
   it('normalizes parsed opening and closing tags', () => {
