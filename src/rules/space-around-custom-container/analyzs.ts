@@ -8,7 +8,7 @@ export interface Issue extends OffsetRange {
   messageId: MessageIds
 }
 
-type Issues = Array<Issue>
+export type Issues = Array<Issue>
 
 /**
  * Finds custom-container marker lines and normalizes their surrounding spaces.

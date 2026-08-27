@@ -1,6 +1,8 @@
+import type { Issues } from './analyzs'
 import type { CustomContainerAST, TagNode } from '@/types/custom-container'
 import { describe, expect, it } from 'vitest'
 import { parseCustomContainers } from '@/parser/custom-container'
+import { MESSAGE_IDS } from '.'
 import {
   analyzeMarker,
   getMarkerMessageId,
@@ -14,14 +16,14 @@ describe('getCustomContainerMarkerIssues', () => {
   })
 
   it('normalizes indentation and opening separators', () => {
-    expect(getSourceIssues('  :::  tip 提示\n内容\n  :::  ')).toEqual([
-      { start: 0, end: 13, replacement: '::: tip 提示', messageId: 'unexpectedIndentation' },
-      { start: 17, end: 24, replacement: ':::', messageId: 'unexpectedIndentation' },
+    expect(getSourceIssues('  :::  tip Note\nContent\n  :::  ')).toEqual([
+      { start: 0, end: 15, replacement: '::: tip Note', messageId: MESSAGE_IDS.unexpectedIndentation },
+      { start: 24, end: 31, replacement: ':::', messageId: MESSAGE_IDS.unexpectedIndentation },
     ])
   })
 
   it('requires a separator after the opening fence', () => {
-    expect(getSourceIssues(':::tip\n内容\n:::')).toMatchObject([{ replacement: '::: tip' }])
+    expect(getSourceIssues(':::tip\nContent\n:::')).toMatchObject([{ replacement: '::: tip' }])
   })
 
   it('ignores markers inside ignored ranges', () => {
@@ -33,15 +35,15 @@ describe('getCustomContainerMarkerIssues', () => {
   })
 
   it('normalizes parsed opening and closing tags', () => {
-    const container = parseCustomContainers(' :::  tip 提示\n内容\n :::  ')[0] as CustomContainerAST
+    const container = parseCustomContainers(' :::  tip Note\nContent\n :::  ')[0] as CustomContainerAST
     const open = container.children[0] as TagNode
     const close = container.children.at(-1) as TagNode
 
-    expect(normalizedMarker(open)).toBe('::: tip 提示')
-    expect(getMarkerMessageId(open)).toBe('unexpectedIndentation')
+    expect(normalizedMarker(open)).toBe('::: tip Note')
+    expect(getMarkerMessageId(open)).toBe(MESSAGE_IDS.unexpectedIndentation)
     expect(normalizedMarker(close)).toBe(':::')
 
-    const issues = [] as Parameters<typeof analyzeMarker>[2]
+    const issues: Issues = []
     analyzeMarker(open, [], issues)
     analyzeMarker(close, [close.position], issues)
     expect(issues).toHaveLength(1)
@@ -61,9 +63,12 @@ describe('getCustomContainerMarkerIssues', () => {
 
   it('skips already normalized markers when adding an issue', () => {
     const container = parseCustomContainers('::: tip\ncontent\n:::')[0] as CustomContainerAST
-    const issues = [] as Parameters<typeof analyzeMarker>[2]
-    analyzeMarker(container.children[0] as TagNode, [], issues)
-    analyzeMarker(container.children.at(-1) as TagNode, [], issues)
+    const open = container.children[0] as TagNode
+    const close = container.children.at(-1) as TagNode
+
+    const issues: Issues = []
+    analyzeMarker(open, [], issues)
+    analyzeMarker(close, [], issues)
     expect(issues).toEqual([])
   })
 })

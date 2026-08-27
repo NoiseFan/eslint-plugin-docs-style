@@ -1,14 +1,14 @@
-# 容器标记空格
+# Custom container marker spacing
 
-  :::  tip 提示
-内容
+  :::  tip Note
+Content
   :::  
 
 :::tip
-内容
+Content
 :::
 
 ```md
-  :::  tip 不应修改
+  :::  tip Should not be modified
   :::
 ```

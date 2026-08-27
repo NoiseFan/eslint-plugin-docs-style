@@ -6,7 +6,7 @@ import rule, { MESSAGE_IDS, RULE_NAME } from './index'
 const valid: ValidTestCase[] = [
   {
     description: 'allows normalized markers',
-    code: '::: tip 提示\n内容\n:::',
+    code: '::: tip Note\nContent\n:::',
   },
   {
     description: 'ignores markers in fenced code',
@@ -17,22 +17,31 @@ const valid: ValidTestCase[] = [
 const invalid: InvalidTestCase[] = [
   {
     description: 'removes indentation around markers',
-    code: '  ::: tip 提示\n内容\n  :::  ',
-    output: '::: tip 提示\n内容\n:::',
-    errors: [{ messageId: MESSAGE_IDS.unexpectedIndentation }, { messageId: MESSAGE_IDS.unexpectedIndentation }],
+    code: '  ::: tip Note\nContent\n  :::  ',
+    output: '::: tip Note\nContent\n:::',
+    errors: [
+      { messageId: MESSAGE_IDS.unexpectedIndentation },
+      { messageId: MESSAGE_IDS.unexpectedIndentation },
+    ],
   },
   {
     description: 'normalizes the opening separator',
-    code: ':::  tip 提示\n内容\n:::',
-    output: '::: tip 提示\n内容\n:::',
+    code: ':::  tip Note\nContent\n:::',
+    output: '::: tip Note\nContent\n:::',
     errors: [{ messageId: MESSAGE_IDS.unexpectedSeparator }],
   },
   {
     description: 'adds the opening separator',
-    code: ':::tip\n内容\n:::',
-    output: '::: tip\n内容\n:::',
+    code: ':::tip\nContent\n:::',
+    output: '::: tip\nContent\n:::',
     errors: [{ messageId: MESSAGE_IDS.missingSeparator }],
   },
 ]
 
-run({ name: RULE_NAME, rule, valid, invalid, configs: { plugins: { markdown }, language: 'markdown/gfm' } })
+run({
+  name: RULE_NAME,
+  rule,
+  valid,
+  invalid,
+  configs: { plugins: { markdown }, language: 'markdown/gfm' },
+})
