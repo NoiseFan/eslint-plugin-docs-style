@@ -135,7 +135,7 @@ Outer
 
 ## Ignored Contexts
 
-Custom-container-looking text inside fenced code blocks is not checked or modified:
+Custom-container-looking text inside code blocks is not checked or modified:
 
 ````md
 ```md
