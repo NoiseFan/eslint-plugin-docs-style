@@ -1,120 +1,164 @@
 # Padding around custom container
 
-Require consistent blank-line padding between VitePress custom containers and surrounding content, as well as at the boundaries between containers and their contents.
+Require consistent blank-line padding outside VitePress custom containers and remove blank lines directly inside their boundaries.
 
-## Rule details
+## Rule Details
 
-### Regular containers
+For every closed custom container, this rule enforces the following boundaries:
 
-When a custom container has content at the same level before or after it, exactly one blank line is required between the container markers and the surrounding content:
+- When same-level content appears before or after a container, exactly one blank line must separate that content from the container marker.
+- No blank line is allowed immediately after an opening marker or immediately before its matching closing marker. The line break required by the Markdown syntax is retained.
+- A container at the beginning or end of a file does not require outer padding at that file boundary.
 
-- Keep one blank line before the container's opening marker.
-- Keep one blank line after the container's closing marker.
-- Compress consecutive extra blank lines to one blank line.
-- Containers at the beginning or end of a file do not require padding before or after them.
+Nested containers are checked recursively. An inner container is separated from surrounding content in its parent by one blank line. When an inner marker is directly adjacent to its parent's opening or closing marker, no blank line is inserted because that position is also an inner boundary of the parent container.
 
-Blank lines are not allowed directly inside a container boundary. The line after the opening marker and the line before the closing marker must be content or another container marker; any blank lines there are removed.
+## Options
 
-Examples of **correct** code for this rule:
+This rule has no options.
+
+## Valid
+
+A container may occupy the whole file, including an empty container:
 
 ```md
 ::: info
-Content one
+content
 :::
+```
+
+```md
+::: info
+:::
+```
+
+Sibling content and containers have exactly one blank line between them:
+
+```md
+Before
+
+::: info
+content
+:::
+
+After
+```
+
+Nested containers follow the same boundary rules:
+
+```md
+::: info
+Outer
 
 ::: tip
-Content two
+Inner
+:::
+
+After
 :::
 ```
 
-Examples of **incorrect** code for this rule:
+## Invalid
+
+Missing outer padding:
 
 ```md
-
+Before
 ::: info
-
-Content
-
+content
 :::
-
-
-Other content
+After
 ```
 
-In the example above, blank lines inside the container are removed, and extra blank lines outside the container are compressed to one blank line.
-
-### Nested containers
-
-Nested containers are processed independently according to the same rules. No blank line is kept between adjacent outer and inner opening markers, or between adjacent inner and outer closing markers, in order to prioritize the requirement that the inside of a container boundary must not be blank:
-
-- Keep one blank line before an inner container's opening marker.
-- Keep one blank line after an inner container's closing marker when there is more outer content.
-- The line after an inner container's opening marker and the line before its closing marker must not be blank.
-- No blank line is allowed between an outer container's closing marker and its last piece of content.
-
-Examples of **correct** code for this rule:
+Extra inner and outer blank lines:
 
 ```md
-::: info
-This is an info box.
+Before
 
-::: tip
-This is a tip box.
+
+::: info
+
+content
+
 :::
-:::
+
+
+After
 ```
 
-```md
-::: info
-This is an info box.
-
-::: tip
-This is a tip box.
-:::
-
-This is an info box.
-:::
-```
-
-Examples of **incorrect** code for this rule:
+Extra blank lines at nested boundaries:
 
 ```md
 ::: info
-This is an info box.
-
-
-::: tip
-
-This is a tip box.
-
-:::
-
-:::
-```
-
-```md
-::: info
-This is an info box.
+Outer
 
 
 ::: tip
 
-This is a tip box.
+Inner
 
 :::
 
 
-This is an info box.
-
+Outer
 :::
 ```
 
-After fixing, consecutive blank lines before and after the inner container are each compressed to one. Blank lines at the inner container boundaries and before the outer closing marker are removed.
+## Autofix
 
-This rule supports autofix.
+This rule is autofixable. The fixer inserts a missing blank line outside a container, compresses extra outer blank lines to one, and removes blank lines immediately inside opening and closing markers. It preserves the document's LF or CRLF line endings.
 
-Custom-container-looking text inside fenced code blocks is not checked or modified.
+For example, the second invalid example is fixed to:
 
-## When not to use it
+```md
+Before
 
-Disable this rule if the project does not use VitePress custom containers or does not want to enforce consistent blank lines between containers and surrounding content.
+::: info
+content
+:::
+
+After
+```
+
+The nested invalid example is fixed to:
+
+```md
+::: info
+Outer
+
+::: tip
+Inner
+:::
+
+Outer
+:::
+```
+
+## Ignored Contexts
+
+Custom-container-looking text inside code blocks is not checked or modified:
+
+````md
+```md
+::: info
+
+content
+
+:::
+```
+````
+
+An opening marker without a matching closing marker is also ignored:
+
+```md
+Before
+::: info
+content
+```
+
+## When Not To Use It
+
+Disable this rule if the project does not use VitePress custom containers, intentionally uses different padding, or delegates container formatting to another tool.
+
+## Related Rules
+
+- [`valid-custom-container-type`](./valid-custom-container-type.md) validates the type used by an opening marker.
