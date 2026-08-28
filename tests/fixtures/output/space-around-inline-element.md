@@ -43,4 +43,3 @@ Asserts that `value` is a function.
 `toMatchSnapshot()`/`toMatchInlineSnapshot()`/`toMatchFileSnapshot()`
 
 The `-t` (or `--testNamePattern`) option filters by the (`test's` name) rather than the filename.
-
