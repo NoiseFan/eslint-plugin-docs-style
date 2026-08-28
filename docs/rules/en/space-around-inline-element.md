@@ -1,17 +1,17 @@
 # Space Around Inline Elements
 
-Keep spacing around selected Markdown inline elements in prose consistent.
+Keep spacing around the boundaries of selected Markdown inline elements in prose consistent.
 
 ## Rule Details
 
-This rule checks the following Markdown node types: `link`, `image`, `inlineCode`, `emphasis`, and `strong`. When an inline element is adjacent to ordinary text or another selected inline element, the boundary normally must contain exactly one space.
+This rule checks the following Markdown node types: `link`, `image`, `inlineCode`, `emphasis`, and `strong`. When an inline element is adjacent to ordinary text or another selected inline element, both boundaries normally must contain exactly one space.
 
 Punctuation changes the boundary requirements:
 
 - Before an inline element, fullwidth punctuation, an opening paired mark (`(`, `[`, `{`, `<`, `（`, `【`, `《`, `“`, `‘`), or `/` must not have a space.
 - Before an inline element, halfwidth punctuation (such as `,` or `.`) must have exactly one space.
-- After an inline element, a closing paired mark (such as `)`, `]`, `}`, or `）`) or other punctuation must not have a space, except for dash-like punctuation.
-- After an inline element, dash-like punctuation (`-`, `–`, `—`, `−`) or a halfwidth opening parenthesis must have exactly one space.
+- After an inline element, a closing paired mark (such as `)`, `]`, `}`, `>`, `）`, `】`, `》`, `”`, or `’`) or other punctuation must not have a space, except for dash- or hyphen-like punctuation.
+- After an inline element, dash- or hyphen-like punctuation (`-`, `–`, `—`, `−`) must not have a space.
 
 At the beginning or end of a paragraph, heading, table cell, or container, there is no missing boundary to report.
 
@@ -48,16 +48,16 @@ See![Example image](/img/example.png)for details.
 Use`-t` (or `--testNamePattern`) to filter.
 ```
 
-After a halfwidth punctuation mark, the inline element still needs exactly one space:
+When an inline element is at the beginning of a sentence and preceded by punctuation, no extra space should follow the period:
 
 ```md
 See.  [Getting Started](/guide/) guide.
 ```
 
-An inline element must touch a closing punctuation mark; the extra space before `.` is invalid:
+When an inline element is at the end of a sentence and followed by punctuation, no space should precede the comma:
 
 ```md
-See [Getting Started](/guide/) . guide
+See [Getting Started](/guide/) , guide
 ```
 
 Slash punctuation must touch adjacent inline elements; spaces around `/` are invalid:
@@ -66,13 +66,13 @@ Slash punctuation must touch adjacent inline elements; spaces around `/` are inv
 `toMatchSnapshot()` / `toMatchInlineSnapshot()` / `toMatchFileSnapshot()`
 ```
 
-Adjacent selected inline elements are checked as one sequence:
+Adjacent inline elements are checked in sequence for spacing:
 
 ```md
 _emphasis_[link](/link)`code`**strong**![alt](/img.png)
 ```
 
-This is fixed to:
+The above example is fixed to:
 
 ```md
 _emphasis_ [link](/link) `code` **strong** ![alt](/img.png)
