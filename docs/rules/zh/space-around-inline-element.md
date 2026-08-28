@@ -71,4 +71,5 @@ _emphasis_ [link](/link) `code` **strong** ![alt](/img.png)
 
 ## 相关规则
 
+- [`space-around-number`](./space-around-number.md) 约束中日韩字符与数字之间的空格。
 - [`space-around-word`](./space-around-word.md) 约束中日韩字符与英文单词之间的空格。

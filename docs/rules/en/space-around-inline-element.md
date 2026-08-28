@@ -71,4 +71,5 @@ If the project intentionally uses a different spacing convention around links, i
 
 ## Related Rules
 
+- [`space-around-number`](./space-around-number.md) enforces spacing between CJK characters and numbers.
 - [`space-around-word`](./space-around-word.md) enforces spacing between CJK characters and English words.
