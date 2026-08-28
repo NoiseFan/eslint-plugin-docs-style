@@ -38,14 +38,31 @@
 
 ## 错误示例
 
+行内元素与周围普通文本之间必须用一个空格分隔：
+
 ```md
 在[入门指南](/guide/)中，
 执行`pnpm test`验证
 这是**strong**文本
 请看![示例图片](/img/example.png)说明
-在。 [入门指南](/guide/) 中，
-在 [入门指南](/guide/) ，中
 执行`-t`（或 `--testNamePattern`）参数进行过滤。
+```
+
+全角标点后，行内元素必须直接相接；句号后的空格不正确：
+
+```md
+在。  [入门指南](/guide/) 中，
+```
+
+行内元素必须与结束标点相接；句点前的多余空格不正确：
+
+```md
+在 [入门指南](/guide/) ，中
+```
+
+斜线标点必须与相邻的行内元素直接相接；`/` 两侧的空格不正确：
+
+```md
 `toMatchSnapshot()` / `toMatchInlineSnapshot()` / `toMatchFileSnapshot()`
 ```
 

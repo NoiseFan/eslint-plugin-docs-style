@@ -38,14 +38,31 @@ See details in (`option` notes).
 
 ## Invalid
 
+An inline element must be separated from surrounding text by one space:
+
 ```md
 See[Getting Started](/guide/)guide.
 Run`pnpm test`to verify.
 This is**strong**text
 See![Example image](/img/example.png)for details.
-See.  [Getting Started](/guide/) guide.
-See [Getting Started](/guide/) . guide
 Use`-t` (or `--testNamePattern`) to filter.
+```
+
+After a halfwidth punctuation mark, the inline element still needs exactly one space:
+
+```md
+See.  [Getting Started](/guide/) guide.
+```
+
+An inline element must touch a closing punctuation mark; the extra space before `.` is invalid:
+
+```md
+See [Getting Started](/guide/) . guide
+```
+
+Slash punctuation must touch adjacent inline elements; spaces around `/` are invalid:
+
+```md
 `toMatchSnapshot()` / `toMatchInlineSnapshot()` / `toMatchFileSnapshot()`
 ```
 
