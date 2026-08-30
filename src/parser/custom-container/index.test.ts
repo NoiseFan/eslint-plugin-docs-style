@@ -1,5 +1,7 @@
+import type { Root } from 'mdast'
 import { describe, expect, it } from 'vitest'
-import { CUSTOM_CONTAINER_TYPES, isCloseTag, isCustomContainerMarker, isCustomContainerType, isOpenTag } from '.'
+import { CUSTOM_CONTAINER_TYPES, getCodeNodeRanges, isCloseTag, isCustomContainerMarker, isCustomContainerType, isOpenTag } from '.'
+import { parseMarkdown } from '../markdown'
 
 describe('isCustomContainerType', () => {
   it.each(CUSTOM_CONTAINER_TYPES)('accepts %s', (type) => {
@@ -50,5 +52,15 @@ describe('isCustomContainerMarker', () => {
     const inputs = [undefined, '', ':::', ' ::: ', '\n::', '\n: text', '\n::: text', 'text\n:::']
     for (const input of inputs)
       expect(isCustomContainerMarker(input), input).toBeFalsy()
+  })
+})
+
+describe('getCodeNodeRanges', () => {
+  it('collects code node ranges while walking nested markdown', () => {
+    const { ast } = parseMarkdown('Before `inline`\n\n```ts\ncode\n```')
+    expect(getCodeNodeRanges(ast)).toEqual([{ start: 17, end: 31 }])
+
+    expect(getCodeNodeRanges(null as unknown as Root)).toEqual([])
+    expect(getCodeNodeRanges({ type: 'root', children: [{ type: 'code', value: 'code' }] })).toEqual([])
   })
 })

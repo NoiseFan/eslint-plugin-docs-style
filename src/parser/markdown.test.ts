@@ -12,13 +12,15 @@ describe('parseMarkdown', () => {
   })
 
   it('parses yaml frontmatter as a yaml node', () => {
-    const markdown = `---
-title: 快速起步 | 指南
-next:
-  text: Writing Tests
-  link: /guide/learn/writing-tests
-demo: 123
----`
+    const markdown = [
+      '---',
+      'title: 快速起步 | 指南',
+      'next:',
+      '  text: Writing Tests',
+      '  link: /guide/learn/writing-tests',
+      'demo: 123',
+      '---',
+    ].join('\n')
     const { ast } = parseMarkdown(markdown)
 
     expect(findNode(ast, node => node.type === 'yaml')?.type).toStrictEqual('yaml')

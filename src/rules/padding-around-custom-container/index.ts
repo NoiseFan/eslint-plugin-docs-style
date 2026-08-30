@@ -12,7 +12,8 @@ export const MESSAGE_IDS = {
   unexpected: 'unexpected',
 } as const
 export type MessageIds = ValueOf<typeof MESSAGE_IDS>
-type Options = []
+export type Mode = 'compact' | 'loose'
+type Options = [Mode?]
 
 export default createRule<Options, MessageIds>({
   name: RULE_NAME,
@@ -26,9 +27,9 @@ export default createRule<Options, MessageIds>({
       unexpected: 'Unexpected blank lines around a custom container.',
     },
     fixable: 'whitespace',
-    schema: [],
+    schema: [{ enum: ['compact', 'loose'] }],
   },
-  defaultOptions: [],
+  defaultOptions: ['loose'],
   create(context) {
     return {
       root(node: Root) {
@@ -40,7 +41,8 @@ export default createRule<Options, MessageIds>({
         const source = context.sourceCode.text
         const ignoreRanges = getCodeNodeRanges(node)
         const nodes = parseCustomContainers(source.slice(start))
-        const issues = getNodesIssues(nodes, start, ignoreRanges)
+        const [mode] = context.options
+        const issues = getNodesIssues(nodes, { offset: start, ignoreRanges, mode })
 
         for (const { start, end, messageId, replacement } of issues) {
           context.report({

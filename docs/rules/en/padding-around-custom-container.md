@@ -1,20 +1,20 @@
 # Padding around custom container
 
-Require consistent blank-line padding outside VitePress custom containers and remove blank lines directly inside their boundaries.
+Require consistent blank-line padding around VitePress custom containers, using loose mode by default.
 
 ## Rule Details
 
 For every closed custom container, this rule enforces the following boundaries:
 
 - When same-level content appears before or after a container, exactly one blank line must separate that content from the container marker.
-- No blank line is allowed immediately after an opening marker or immediately before its matching closing marker. The line break required by the Markdown syntax is retained.
+- Loose mode (the default) requires exactly one blank line immediately after an opening marker and before its matching closing marker.
 - A container at the beginning or end of a file does not require outer padding at that file boundary.
 
-Nested containers are checked recursively. An inner container is separated from surrounding content in its parent by one blank line. When an inner marker is directly adjacent to its parent's opening or closing marker, no blank line is inserted because that position is also an inner boundary of the parent container.
+Nested containers are checked recursively. In loose mode, an inner container is separated from surrounding content in its parent by one blank line; compact mode removes that inner padding. File-boundary rules still apply when a nested marker is directly adjacent to a parent marker.
 
 ## Options
 
-This rule has no options.
+This rule accepts one string option: `"loose"` (the default) requires exactly one blank line inside container boundaries; `"compact"` disallows inner blank lines. Both modes require exactly one blank line between a container marker and same-level surrounding content.
 
 ## Valid
 
@@ -22,12 +22,23 @@ A container may occupy the whole file, including an empty container:
 
 ```md
 ::: info
+
 content
+
 :::
 ```
 
 ```md
 ::: info
+
+:::
+```
+
+In compact mode (`"compact"`), content is placed directly inside the container markers:
+
+```md
+::: info
+content
 :::
 ```
 
@@ -37,7 +48,9 @@ Sibling content and containers have exactly one blank line between them:
 Before
 
 ::: info
+
 content
+
 :::
 
 After
@@ -47,13 +60,17 @@ Nested containers follow the same boundary rules:
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 After
+
 :::
 ```
 
@@ -64,12 +81,37 @@ Missing outer padding:
 ```md
 Before
 ::: info
+
 content
+
 :::
 After
 ```
 
-Extra inner and outer blank lines:
+Extra blank lines at nested boundaries:
+
+```md
+::: info
+
+
+Outer
+
+
+::: tip
+
+
+Inner
+
+:::
+
+
+Outer
+
+
+:::
+```
+
+Inner blank lines in compact mode (`"compact"`):
 
 ```md
 Before
@@ -85,27 +127,10 @@ content
 After
 ```
 
-Extra blank lines at nested boundaries:
-
-```md
-::: info
-Outer
-
-
-::: tip
-
-Inner
-
-:::
-
-
-Outer
-:::
-```
 
 ## Autofix
 
-This rule is autofixable. The fixer inserts a missing blank line outside a container, compresses extra outer blank lines to one, and removes blank lines immediately inside opening and closing markers. It preserves the document's LF or CRLF line endings.
+This rule is autofixable. The fixer normalizes inner blank lines according to the selected mode and inserts or compresses outer padding to one blank line. It preserves the document's LF or CRLF line endings.
 
 For example, the second invalid example is fixed to:
 
@@ -123,13 +148,17 @@ The nested invalid example is fixed to:
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 Outer
+
 :::
 ```
 

@@ -3,7 +3,7 @@
  * @example `中文标题 {#Chinese-Title}` -> `{#Chinese-Title}`
  * @example `使用 describe #Grouping Tests` -> `#Grouping Tests`
  */
-function getLikeAnchorMatch(str: string): string | null {
+export function getLikeAnchorMatch(str: string): string | null {
   const match = str.match(/(\{?#[\w\s.!`-]+\}?$)/)
   return match ? match[0] : null
 }
