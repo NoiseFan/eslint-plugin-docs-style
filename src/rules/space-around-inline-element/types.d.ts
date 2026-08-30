@@ -1,5 +1,5 @@
 import type { Emphasis, Image, InlineCode, Link, Strong } from 'mdast'
-import type { WhiteSpaceReturn } from '@/types'
+import type { WhiteSpaceReturn } from '@/types/text'
 
 /**
  * The Markdown inline element node types selected by space-around-inline-element.

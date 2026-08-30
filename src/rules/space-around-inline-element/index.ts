@@ -1,6 +1,7 @@
 import type { Emphasis, Image, InlineCode, Link, Strong } from 'mdast'
 import type { InlineElement, InlineElementSpaceIssue } from './types'
-import type { RuleContext, ValueOf } from '@/types'
+import type { RuleContext } from '@/types'
+import type { ValueOf } from '@/types/utils'
 import { getNodeContext, getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
 import { getSpaceContext, isNestedInlineElement, validateSpace } from './analyze'

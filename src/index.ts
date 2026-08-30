@@ -1,6 +1,9 @@
 import type { ESLint, Linter } from 'eslint'
+import type { RuleOptions } from './types'
 import markdown, { MarkdownLanguage } from '@eslint/markdown'
 import { rules } from './rules'
+
+export type { RuleOptions } from './types'
 
 export const plugin: ESLint.Plugin = {
   rules,
@@ -10,13 +13,15 @@ export const plugin: ESLint.Plugin = {
   },
 }
 
-const recommendedRules: Partial<Linter.RulesRecord> = {
+type MdStyleRules = Linter.RulesRecord & RuleOptions
+
+const recommendedRules: Partial<MdStyleRules> = {
   'md-style/valid-heading-anchor': 'error',
   'md-style/space-around-inline-element': 'error',
   'md-style/padding-around-custom-container': 'error',
   'md-style/valid-custom-container-type': 'error',
 }
-const allRules: Partial<Linter.RulesRecord>
+const allRules: Partial<MdStyleRules>
   = Object.fromEntries(Object.keys(rules)
     .map(ruleName => [`md-style/${ruleName}`, 'error']))
 

@@ -1,3 +1,5 @@
+import type { OffsetRange } from '@/types/ast'
+
 /**
  * AST node representing a custom Markdown container and its nested content.
  */
@@ -63,20 +65,6 @@ export interface TagNode {
    * Source range covering the tag
    */
   position: OffsetRange
-}
-
-/**
- * Half-open character offset range in the source document.
- */
-export interface OffsetRange {
-  /**
-   * Start offset
-   */
-  start: number
-  /**
-   * End offset
-   */
-  end: number
 }
 
 /**

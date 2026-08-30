@@ -2,10 +2,13 @@ node_modules
 dist
 coverage
 _fixtures
+src/types/typegen.d.ts
+
+skiils
+.claude
 
 *.log
 .DS_Store
 .eslintcache
 .local
 .idea
-skiils
