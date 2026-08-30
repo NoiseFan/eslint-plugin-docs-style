@@ -21,6 +21,7 @@ export default createRule<Options, MessageIds>({
     type: 'layout',
     docs: {
       description: 'Enforce padding around VitePress custom containers.',
+      recommended: true,
     },
     messages: {
       missing: 'A custom container must be separated from surrounding content by one blank line.',

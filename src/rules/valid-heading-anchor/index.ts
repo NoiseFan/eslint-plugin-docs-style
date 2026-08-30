@@ -19,6 +19,7 @@ export default createRule<Options, MessageIds>({
     type: 'layout',
     docs: {
       description: 'Require strict lowercase anchors for headings that contain CJK text.',
+      recommended: true,
     },
     messages: {
       missingAnchor: 'Non-ASCII heading must have an anchor in the format "{#lowercase-anchor}".',

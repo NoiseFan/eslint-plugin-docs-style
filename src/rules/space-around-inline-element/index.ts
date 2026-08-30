@@ -42,6 +42,7 @@ export default createRule<Options, MessageIds>({
     type: 'layout',
     docs: {
       description: 'Enforce spacing around Markdown inline elements.',
+      recommended: true,
     },
     messages: {
       missingSpaceBefore: 'A space is required before the inline element.',
