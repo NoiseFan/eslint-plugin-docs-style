@@ -30,4 +30,16 @@ content
 
 :::
 
+::: info
+
+Outer
+
+::: tip
+
+Inner
+
+:::
+
 After
+
+:::

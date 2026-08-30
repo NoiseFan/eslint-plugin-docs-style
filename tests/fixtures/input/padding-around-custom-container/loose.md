@@ -28,4 +28,16 @@ Before
 text :::
 content
 :::
+::: info
+
+Outer
+
+::: tip
+
+Inner
+
+:::
+
 After
+
+:::
