@@ -34,6 +34,20 @@ describe('parseFixtureRuleOverride', () => {
     })
   })
 
+  it('preserves YAML option types and values containing commas', () => {
+    const input = [
+      '---',
+      'rule: demo-rule',
+      'options: ["a,b", 2, true, null]',
+      '---',
+    ].join('\n')
+
+    expect(parseFixtureRuleOverride(input)).toEqual({
+      rule: 'demo-rule',
+      options: ['a,b', 2, true, null],
+    })
+  })
+
   it('uses the fixture parent directory as the default rule', () => {
     const input = [
       '---',

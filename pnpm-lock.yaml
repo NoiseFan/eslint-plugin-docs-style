@@ -65,6 +65,9 @@ importers:
       vitest:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@26.2.0)(@vitest/coverage-v8@4.1.11)(vite@8.0.10(@types/node@26.2.0)(jiti@2.7.0)(yaml@2.9.0))
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
 packages:
 

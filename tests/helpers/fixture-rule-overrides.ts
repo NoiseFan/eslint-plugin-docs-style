@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
+import { parse as parseYaml } from 'yaml'
 import { parseMarkdown } from '@/parser/markdown'
 
-const FIXTURE_RULE_RE = /^rule:\s*['"]?([\w-]+)['"]?\s*$/m
-const FIXTURE_OPTIONS_RE = /^options:\s*\[([^\]]*)\]\s*$/m
+const FIXTURE_RULE_RE = /^[\w-]+$/
 
 export interface FixtureRuleOverride {
   rule: string
@@ -36,13 +36,13 @@ export function parseFixtureRuleOverride(source: string, defaultRule?: string): 
   const frontmatter = parseMarkdown(source).ast.children[0]
   if (frontmatter?.type !== 'yaml')
     return
-  const rule = frontmatter.value.match(FIXTURE_RULE_RE)?.[1]
-  const optionsValue = frontmatter.value.match(FIXTURE_OPTIONS_RE)?.[1] ?? ''
+  const metadata = parseYaml(frontmatter.value)
+  const ruleValue = metadata.rule
+  const rule = typeof ruleValue === 'string' && FIXTURE_RULE_RE.test(ruleValue)
+    ? ruleValue
+    : undefined
   if (!rule && !defaultRule)
     return
-  const options = optionsValue
-    .split(',')
-    .map(value => value.trim().replace(/^['"]|['"]$/g, ''))
-    .filter(Boolean)
+  const options = Array.isArray(metadata.options) ? metadata.options : []
   return { rule: rule ?? defaultRule!, options }
 }

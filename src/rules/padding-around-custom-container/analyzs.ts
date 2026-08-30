@@ -28,7 +28,7 @@ export function getNodesIssues(
   nodes: CustomContainerBlockNode[],
   opts?: Partial<{ offset: number, ignoreRanges: OffsetRange[], mode: Mode }>,
 ): Issues {
-  const { offset = 0, ignoreRanges = [], mode = 'compact' } = opts || {}
+  const { offset = 0, ignoreRanges = [], mode = 'loose' } = opts || {}
   const issues: Issues = []
 
   /**
