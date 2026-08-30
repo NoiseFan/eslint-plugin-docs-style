@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-md-style",
   "type": "module",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packageManager": "pnpm@10.21.0",
   "description": "ESLint plugin for enforcing style rules in Markdown-based documentation",
   "author": "noisefan <noisefan@163.com>",
