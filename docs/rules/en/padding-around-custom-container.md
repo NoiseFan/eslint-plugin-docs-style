@@ -34,6 +34,14 @@ content
 :::
 ```
 
+In compact mode (`"compact"`), content is placed directly inside the container markers:
+
+```md
+::: info
+content
+:::
+```
+
 Sibling content and containers have exactly one blank line between them:
 
 ```md
@@ -80,22 +88,6 @@ content
 After
 ```
 
-Inner blank lines in compact mode (`"compact"`):
-
-```md
-Before
-
-
-::: info
-
-content
-
-:::
-
-
-After
-```
-
 Extra blank lines at nested boundaries:
 
 ```md
@@ -118,6 +110,23 @@ Outer
 
 :::
 ```
+
+Inner blank lines in compact mode (`"compact"`):
+
+```md
+Before
+
+
+::: info
+
+content
+
+:::
+
+
+After
+```
+
 
 ## Autofix
 
