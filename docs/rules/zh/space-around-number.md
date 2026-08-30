@@ -89,4 +89,5 @@ CJK-数字边界包含多个空格：
 
 ## 相关规则
 
+- [`space-around-inline-element`](./space-around-inline-element.md) 用于规范 Markdown 行内元素周围的空格。
 - [`space-around-word`](./space-around-word.md) 用于规范 CJK 文本与拉丁单词之间的类似边界空格。

@@ -89,4 +89,5 @@ Disable this rule when your project intentionally keeps CJK characters and numbe
 
 ## Related Rules
 
+- [`space-around-inline-element`](./space-around-inline-element.md) enforces spacing around Markdown inline elements.
 - [`space-around-word`](./space-around-word.md) enforces the analogous boundary spacing between CJK text and Latin words.
