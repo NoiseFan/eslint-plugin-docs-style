@@ -30,6 +30,7 @@ content
 
 ```md
 ::: info
+
 :::
 ```
 
@@ -39,7 +40,9 @@ Sibling content and containers have exactly one blank line between them:
 Before
 
 ::: info
+
 content
+
 :::
 
 After
@@ -49,13 +52,17 @@ Nested containers follow the same boundary rules:
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 After
+
 :::
 ```
 
@@ -66,7 +73,9 @@ Missing outer padding:
 ```md
 Before
 ::: info
+
 content
+
 :::
 After
 ```
@@ -91,10 +100,13 @@ Extra blank lines at nested boundaries:
 
 ```md
 ::: info
+
+
 Outer
 
 
 ::: tip
+
 
 Inner
 
@@ -102,6 +114,8 @@ Inner
 
 
 Outer
+
+
 :::
 ```
 
@@ -125,13 +139,17 @@ The nested invalid example is fixed to:
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 Outer
+
 :::
 ```
 

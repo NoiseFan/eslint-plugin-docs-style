@@ -30,6 +30,7 @@ content
 
 ```md
 ::: info
+
 :::
 ```
 
@@ -39,7 +40,9 @@ content
 Before
 
 ::: info
+
 content
+
 :::
 
 After
@@ -49,13 +52,17 @@ After
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 After
+
 :::
 ```
 
@@ -66,7 +73,9 @@ After
 ```md
 Before
 ::: info
+
 content
+
 :::
 After
 ```
@@ -91,10 +100,13 @@ After
 
 ```md
 ::: info
+
+
 Outer
 
 
 ::: tip
+
 
 Inner
 
@@ -102,6 +114,8 @@ Inner
 
 
 Outer
+
+
 :::
 ```
 
@@ -125,13 +139,17 @@ After
 
 ```md
 ::: info
+
 Outer
 
 ::: tip
+
 Inner
+
 :::
 
 Outer
+
 :::
 ```
 
