@@ -1,4 +1,4 @@
-import type { PositionOptions } from '@/types'
+import type { PositionOptions } from '@/types/text'
 
 export const OPENING_PAIRED_PUNCTUATION = new Set(['(', '[', '{', '<', '（', '【', '《', '“', '‘'])
 export const CLOSING_PAIRED_PUNCTUATION = new Set([')', ']', '}', '>', '）', '】', '》', '”', '’'])

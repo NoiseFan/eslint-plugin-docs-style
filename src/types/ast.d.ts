@@ -51,3 +51,19 @@ export interface SourceCodeWithAncestors {
 export interface RuleContextWithAncestors {
   sourceCode: SourceCodeWithAncestors
 }
+
+/* ==================== Position ==================== */
+
+/**
+ * Half-open character offset range in the source document.
+ */
+export interface OffsetRange {
+  /**
+   * Start offset
+   */
+  start: number
+  /**
+   * End offset
+   */
+  end: number
+}

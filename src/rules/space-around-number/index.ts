@@ -1,5 +1,5 @@
 import type { Text } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { ValueOf } from '@/types/utils'
 import { fixBoundarySpace, getBoundarySpaceMessageId } from '@/rules/shared/text-boundary-spacing'
 import { createRule } from '@/utils'
 

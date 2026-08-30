@@ -1,5 +1,5 @@
 import type { Root } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { ValueOf } from '@/types/utils'
 import { getNodePosition } from '@/parser/ast'
 import { getCodeNodeRanges, parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'

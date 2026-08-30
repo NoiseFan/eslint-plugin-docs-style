@@ -1,5 +1,6 @@
 import type { MessageIds, Mode } from '.'
-import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange } from '@/types/custom-container'
+import type { OffsetRange } from '@/types/ast'
+import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode } from '@/types/custom-container'
 import { isBlankNode, isCloseNode, isCustomContainerNode, isOpenNode } from '@/parser/custom-container'
 import { MESSAGE_IDS } from '.'
 

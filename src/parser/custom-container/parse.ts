@@ -1,9 +1,9 @@
+import type { OffsetRange } from '@/types/ast'
 import type {
   BlankNode,
   ChildrenNode,
   CustomContainerAST,
   CustomContainerBlockNode,
-  OffsetRange,
   TagNode,
 } from '@/types/custom-container'
 import {

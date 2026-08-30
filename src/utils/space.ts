@@ -1,4 +1,4 @@
-import type { PositionOptions, WhiteSpaceReturn } from '@/types'
+import type { PositionOptions, WhiteSpaceReturn } from '@/types/text'
 
 /**
  * Gets the count and range of consecutive whitespace at the start or end of a string.

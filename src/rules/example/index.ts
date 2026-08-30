@@ -1,5 +1,5 @@
 import type { Text } from 'mdast'
-import type { ValueOf } from '@/types'
+import type { ValueOf } from '@/types/utils'
 import { getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
 

@@ -1,4 +1,4 @@
-import type { ValueOf } from '@/types'
+import type { ValueOf } from '@/types/utils'
 import { getNodeContext, getNodePosition } from '@/parser/ast'
 import { createRule } from '@/utils'
 import { getLikeAnchor } from '@/utils/anchor'

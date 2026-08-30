@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
-import type { ValueOf } from '@/types'
 import type { CustomContainerAST, CustomContainerBlockNode, TagNode } from '@/types/custom-container'
+import type { ValueOf } from '@/types/utils'
 import { getNodePosition } from '@/parser/ast'
 import { isCustomContainerType, parseCustomContainers } from '@/parser/custom-container'
 import { createRule } from '@/utils'

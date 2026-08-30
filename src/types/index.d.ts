@@ -1,8 +1,9 @@
 import type { MarkdownRuleDefinition, MarkdownRuleVisitor } from '@eslint/markdown'
-import type { RuleOptions } from '../typegen'
-import type { OffsetRange } from './custom-container'
+import type { RuleOptions } from './typegen'
 
-/** Type-safe configuration entries for all md-style rules. */
+/**
+ * Type-safe configuration entries for all md-style rules.
+ */
 export type { RuleOptions }
 
 /**
@@ -47,11 +48,3 @@ export type RuleContext<MessageIds extends string, Options extends unknown[]> = 
 >[0]
 
 export type RuleListener = MarkdownRuleVisitor
-
-export type ValueOf<T> = T[keyof T]
-
-export type PositionOptions = 'head' | 'tail'
-
-export interface WhiteSpaceReturn extends OffsetRange {
-  count: number
-}

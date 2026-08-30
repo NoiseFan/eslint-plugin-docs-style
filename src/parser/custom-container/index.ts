@@ -1,4 +1,5 @@
 import type { Nodes, Root } from 'mdast'
+import type { OffsetRange } from '@/types/ast'
 import type { BlankNode, ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
 import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
 
@@ -71,14 +72,12 @@ export const isCloseNode = (node: ChildrenNode | undefined): node is TagNode => 
 
 /* ==================== Utils ==================== */
 
-interface RangeOffset { start: number, end: number }
-
 /**
  * Ignore `Custom-containerNode` in `CodeNode` & `InlineCodeNode`.
  * Collects source offsets for fenced code blocks and inline code nodes.
  */
-export function getCodeNodeRanges(node: Root): Array<RangeOffset> {
-  const ranges: Array<RangeOffset> = []
+export function getCodeNodeRanges(node: Root): Array<OffsetRange> {
+  const ranges: Array<OffsetRange> = []
 
   function visit(current: Nodes): void {
     if (!isObject(current))
