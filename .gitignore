@@ -2,7 +2,6 @@ node_modules
 dist
 coverage
 _fixtures
-src/typegen.d.ts
 src/types/typegen.d.ts
 
 skiils
