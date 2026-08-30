@@ -38,6 +38,10 @@ const valid: ValidTestCase[] = [
     description: 'allows loose inner boundary padding by default',
     code: '::: info\n\ncontent\n\n:::',
   },
+  {
+    description: 'allows explicitly configured loose inner boundary padding',
+    code: 'Before\n\n::: info\n\ncontent\n\n:::\n\nAfter',
+  },
 ]
 
 const invalid: InvalidTestCase[] = [
@@ -82,6 +86,15 @@ const invalid: InvalidTestCase[] = [
     errors: [
       { messageId: MESSAGE_IDS.missing },
       { messageId: MESSAGE_IDS.missing },
+    ],
+  },
+  {
+    description: 'removes extra loose mode inner padding',
+    code: '::: info\n\n\ncontent\n\n\n:::',
+    output: '::: info\n\ncontent\n\n:::',
+    errors: [
+      { messageId: MESSAGE_IDS.unexpected },
+      { messageId: MESSAGE_IDS.unexpected },
     ],
   },
 ]

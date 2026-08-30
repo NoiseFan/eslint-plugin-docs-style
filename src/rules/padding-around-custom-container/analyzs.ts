@@ -64,29 +64,28 @@ export function analyzeInnerBoundary(
 ): void {
   const { openIndex, closeIndex } = containerBoundary
   const first = children[openIndex + 1]
-  checkInnerSide(first, 1, children, opts)
+  checkInnerSide(first, { direction: 1, children, ...opts })
 
   const last = children[closeIndex - 1]
   if (last !== first)
-    checkInnerSide(last, -1, children, opts)
+    checkInnerSide(last, { direction: -1, children, ...opts })
 }
 
 /**
  *  Checks one side of a container's inner boundary for the selected mode.
  */
-function checkInnerSide(
+export function checkInnerSide(
   node: ChildrenNode | undefined,
-  direction: -1 | 1,
-  children: ChildrenNode[],
-  opts: AnalyzeContext,
+  opts: { direction: -1 | 1, children: ChildrenNode[] } & AnalyzeContext,
 ): void {
+  const { direction, children, offset } = opts
   if (isBlankNode(node)) {
     const lineBreak = getLineBreak(node.value)
     const expected = opts.mode === 'loose' ? `${lineBreak}${lineBreak}` : lineBreak
     if (node.value !== expected) {
       opts.issues.push({
-        start: opts.offset + node.position.start,
-        end: opts.offset + node.position.end,
+        start: offset + node.position.start,
+        end: offset + node.position.end,
         replacement: expected,
         messageId: node.value.length < expected.length ? MESSAGE_IDS.missing : MESSAGE_IDS.unexpected,
       })
@@ -96,8 +95,8 @@ function checkInnerSide(
   if (opts.mode === 'loose' && node && !isOpenNode(node) && !isCloseNode(node)) {
     const insertion = direction === 1 ? node.position.start : node.position.end
     opts.issues.push({
-      start: opts.offset + insertion,
-      end: opts.offset + insertion,
+      start: offset + insertion,
+      end: offset + insertion,
       replacement: getLineBreakFromChildren(children) + getLineBreakFromChildren(children),
       messageId: MESSAGE_IDS.missing,
     })

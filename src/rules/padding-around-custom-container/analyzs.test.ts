@@ -1,10 +1,10 @@
 import type { Issues } from './analyzs'
-import type { } from '@/types/custom-container'
 import { describe, expect, it } from 'vitest'
 import { parseCustomContainers } from '@/parser/custom-container'
 import {
   addInnerIssues,
   analyzeInnerBoundary,
+  checkInnerSide,
   checkOuterSide,
   dedupeIssues,
   getContainerBoundary,
@@ -84,6 +84,35 @@ describe('collectIssues', () => {
 })
 
 describe('analyzs helpers', () => {
+  describe('checkInnerSide', () => {
+    it('inserts loose-mode padding on either side of direct content', () => {
+      const node = { type: 'text' as const, value: 'content', position: { start: 2, end: 9 } }
+      const issues: Issues = []
+
+      checkInnerSide(node, { direction: 1, children: [node], offset: 10, issues, mode: 'loose' })
+      checkInnerSide(node, { direction: -1, children: [node], offset: 10, issues, mode: 'loose' })
+
+      expect(issues).toEqual([
+        { start: 12, end: 12, replacement: '\n\n', messageId: 'missing' },
+        { start: 19, end: 19, replacement: '\n\n', messageId: 'missing' },
+      ])
+    })
+
+    it('skips compact-mode content and container boundary nodes', () => {
+      const text = { type: 'text' as const, value: 'content', position: { start: 2, end: 9 } }
+      const open = { type: 'open' as const, markerLength: 3, raw: '::: info', value: { content: 'info', start: 0, end: 8 }, position: { start: 0, end: 8 } }
+      const close = { type: 'close' as const, markerLength: 3, raw: ':::', value: { content: '', start: 10, end: 13 }, position: { start: 10, end: 13 } }
+      const issues: Issues = []
+
+      checkInnerSide(text, { direction: 1, children: [text], offset: 0, issues, mode: 'compact' })
+      checkInnerSide(open, { direction: 1, children: [open, text, close], offset: 0, issues, mode: 'loose' })
+      checkInnerSide(close, { direction: -1, children: [open, text, close], offset: 0, issues, mode: 'loose' })
+      checkInnerSide(undefined, { direction: 1, children: [text], offset: 0, issues, mode: 'loose' })
+
+      expect(issues).toEqual([])
+    })
+  })
+
   it('finds the outermost container tags', () => {
     const container = parseCustomContainers('::: info\ntext\n:::')
       .find(node => node.type === 'custom-container')!
@@ -117,34 +146,52 @@ describe('analyzs helpers', () => {
     ])
   })
 
-  it('identifies external content and line-break styles', () => {
+  describe('identifies external content and line-break styles', () => {
     const nodes = parseCustomContainers('::: info\ncontent\n:::').find(node => node.type === 'custom-container')!.children
-    expect(isExternalContent(nodes[0], { index: 0, length: nodes.length })).toBeFalsy()
-    expect(isExternalContent(nodes[2], { index: 2, length: nodes.length })).toBeTruthy()
-    expect(isExternalContent(nodes.at(-1), { index: nodes.length - 1, length: nodes.length })).toBeFalsy()
-    expect(isExternalContent(undefined, { index: 0, length: 0 })).toBeFalsy()
 
-    expect(getLineBreak('a\r\nb')).toBe('\r\n')
-    expect(getLineBreak('a\nb')).toBe('\n')
-    expect(getLineBreakFromChildren([{ type: 'text', value: 'x', position: { start: 0, end: 1 } }])).toBe('\n')
+    it('isExternalContent', () => {
+      expect(isExternalContent(nodes[0], { index: 0, length: nodes.length })).toBeFalsy()
+      expect(isExternalContent(nodes[2], { index: 2, length: nodes.length })).toBeTruthy()
+      expect(isExternalContent(nodes.at(-1), { index: nodes.length - 1, length: nodes.length })).toBeFalsy()
+      expect(isExternalContent(undefined, { index: 0, length: 0 })).toBeFalsy()
+    })
+
+    it('getLineBreak', () => {
+      expect(getLineBreak('a\r\nb')).toBe('\r\n')
+      expect(getLineBreak('a\nb')).toBe('\n')
+    })
+
+    it('getLineBreakFromChildren', () => {
+      expect(getLineBreakFromChildren([{ type: 'text', value: 'x', position: { start: 0, end: 1 } }])).toBe('\n')
+      expect(getLineBreakFromChildren([
+        { type: 'text', value: 'x', position: { start: 0, end: 1 } },
+        { type: 'blank', value: '\r\n', position: { start: 1, end: 3 } },
+      ])).toBe('\r\n')
+    })
   })
 
-  it('creates outer issues and removes exact duplicates', () => {
+  describe('creates outer issues and removes exact duplicates', () => {
     const container = parseCustomContainers('::: info\ncontent\n:::')
       .find(node => node.type === 'custom-container')!
     const children = container.children
 
-    const issues: Issues = []
-    checkOuterSide(children, { boundaryIndex: 0, direction: -1, offset: 0, issues })
-    expect(issues).toEqual([])
+    it('check parent outer side', () => {
+      const issues: Issues = []
+      checkOuterSide(children, { boundaryIndex: 0, direction: -1, offset: 0, issues })
+      expect(issues).toEqual([])
+    })
 
-    const compactChildren = children.filter(node => node.type !== 'blank')
-    const missing: Issues = []
-    checkOuterSide(compactChildren, { boundaryIndex: 0, direction: 1, offset: 5, issues: missing })
-    checkOuterSide(compactChildren, { boundaryIndex: 2, direction: -1, offset: 5, issues: missing })
-    expect(missing).toHaveLength(2)
+    it('check children outer side', () => {
+      const compactChildren = children.filter(node => node.type !== 'blank')
+      const missing: Issues = []
+      checkOuterSide(compactChildren, { boundaryIndex: 0, direction: 1, offset: 5, issues: missing })
+      checkOuterSide(compactChildren, { boundaryIndex: 2, direction: -1, offset: 5, issues: missing })
+      expect(missing).toHaveLength(2)
+    })
 
-    const duplicate = { start: 1, end: 1, replacement: '\n', messageId: 'missing' as const }
-    expect(dedupeIssues([duplicate, duplicate])).toEqual([duplicate])
+    it('dedupeIssues', () => {
+      const duplicate = { start: 1, end: 1, replacement: '\n', messageId: 'missing' as const }
+      expect(dedupeIssues([duplicate, duplicate])).toEqual([duplicate])
+    })
   })
 })
