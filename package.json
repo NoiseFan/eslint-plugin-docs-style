@@ -31,8 +31,9 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
-    "build": "pnpm run gen && tsdown",
-    "gen": "tsx scripts/typegen.ts",
+    "build": "pnpm run gen:types && tsdown",
+    "gen:types": "tsx scripts/typegen.ts",
+    "gen:rules": "tsx scripts/readme.ts",
     "dev": "tsdown --watch",
     "test": "vitest",
     "test:cov": "vitest --coverage",
@@ -76,6 +77,7 @@
     "yaml": "^2.9.0"
   },
   "simple-git-hooks": {
+    "generate-readme-rules": "pnpm gen:readme",
     "pre-commit": "pnpx lint-staged"
   },
   "lint-staged": {
