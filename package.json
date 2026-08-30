@@ -77,7 +77,7 @@
     "yaml": "^2.9.0"
   },
   "simple-git-hooks": {
-    "generate-readme-rules": "pnpm gen:readme",
+    "generate-readme-rules": "pnpm gen:rules",
     "pre-commit": "pnpx lint-staged"
   },
   "lint-staged": {
