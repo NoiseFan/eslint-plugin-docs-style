@@ -31,7 +31,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "pnpm run lint --fix",
-    "build": "tsdown",
+    "build": "pnpm run gen && tsdown",
+    "gen": "tsx scripts/typegen.ts",
     "dev": "tsdown --watch",
     "test": "vitest",
     "test:cov": "vitest --coverage",
@@ -63,11 +64,13 @@
     "eslint-factory": "^0.1.2",
     "eslint-plugin-format": "^2.0.1",
     "eslint-plugin-md-style": "^0.2.0",
+    "eslint-typegen": "^2.3.1",
     "eslint-vitest-rule-tester": "^3.1.0",
     "lint-staged": "^17.3.0",
     "simple-git-hooks": "^2.13.1",
     "tinyglobby": "^0.2.17",
     "tsdown": "^0.22.14",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "vitest": "^4.1.11",
     "yaml": "^2.9.0"

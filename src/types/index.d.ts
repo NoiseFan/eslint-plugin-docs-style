@@ -1,5 +1,9 @@
 import type { MarkdownRuleDefinition, MarkdownRuleVisitor } from '@eslint/markdown'
+import type { RuleOptions } from '../typegen'
 import type { OffsetRange } from './custom-container'
+
+/** Type-safe configuration entries for all md-style rules. */
+export type { RuleOptions }
 
 /**
  * A Markdown rule definition with its exported name and default options.

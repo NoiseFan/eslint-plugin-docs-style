@@ -2,6 +2,8 @@ import type { ESLint, Linter } from 'eslint'
 import markdown, { MarkdownLanguage } from '@eslint/markdown'
 import { rules } from './rules'
 
+export type { RuleOptions } from './types'
+
 export const plugin: ESLint.Plugin = {
   rules,
   processors: markdown.processors,
