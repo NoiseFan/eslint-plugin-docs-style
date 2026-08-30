@@ -13,6 +13,8 @@ export const plugin: ESLint.Plugin = {
 const recommendedRules: Partial<Linter.RulesRecord> = {
   'md-style/valid-heading-anchor': 'error',
   'md-style/space-around-inline-element': 'error',
+  'md-style/padding-around-custom-container': 'error',
+  'md-style/valid-custom-container-type': 'error',
 }
 const allRules: Partial<Linter.RulesRecord>
   = Object.fromEntries(Object.keys(rules)
