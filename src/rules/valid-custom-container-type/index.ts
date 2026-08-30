@@ -19,6 +19,7 @@ export default createRule<Options, MessageIds>({
     type: 'problem',
     docs: {
       description: 'Require custom containers to use a supported type.',
+      recommended: true,
     },
     messages: {
       invalidType: 'Invalid custom container type "{{type}}". Use info, tip, warning, danger, details, raw, code-group, v-pre, or tabs.',

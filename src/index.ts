@@ -15,12 +15,11 @@ export const plugin: ESLint.Plugin = {
 
 type MdStyleRules = Linter.RulesRecord & RuleOptions
 
-const recommendedRules: Partial<MdStyleRules> = {
-  'md-style/valid-heading-anchor': 'error',
-  'md-style/space-around-inline-element': 'error',
-  'md-style/padding-around-custom-container': 'error',
-  'md-style/valid-custom-container-type': 'error',
-}
+const recommendedRules: Partial<MdStyleRules>
+  = Object.fromEntries(Object.entries(rules)
+    .filter(([, rule]) => rule.meta?.docs?.recommended)
+    .map(([ruleName]) => [`md-style/${ruleName}`, 'error']))
+
 const allRules: Partial<MdStyleRules>
   = Object.fromEntries(Object.keys(rules)
     .map(ruleName => [`md-style/${ruleName}`, 'error']))
