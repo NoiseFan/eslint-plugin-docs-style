@@ -41,8 +41,8 @@ export default createRule<Options, MessageIds>({
         const source = context.sourceCode.text
         const ignoreRanges = getCodeNodeRanges(node)
         const nodes = parseCustomContainers(source.slice(start))
-        const mode = context.options[0] ?? 'loose'
-        const issues = getNodesIssues(nodes, start, ignoreRanges, mode)
+        const [mode] = context.options
+        const issues = getNodesIssues(nodes, { offset: start, ignoreRanges, mode })
 
         for (const { start, end, messageId, replacement } of issues) {
           context.report({

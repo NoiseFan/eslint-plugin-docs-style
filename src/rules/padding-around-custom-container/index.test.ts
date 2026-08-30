@@ -20,10 +20,6 @@ const valid: ValidTestCase[] = [
     options: ['compact'],
   },
   {
-    description: 'allows loose inner boundary padding by default',
-    code: '::: info\n\ncontent\n\n:::',
-  },
-  {
     description: 'ignores fenced code blocks',
     code: '```md\n::: info\n\ncontent\n\n:::\n```',
     options: ['compact'],
@@ -37,6 +33,10 @@ const valid: ValidTestCase[] = [
     description: 'allows content lines ending with a closing-marker suffix',
     code: 'Before\n\n::: info\ntext :::\ncontent\n:::\n\nAfter',
     options: ['compact'],
+  },
+  {
+    description: 'allows loose inner boundary padding by default',
+    code: '::: info\n\ncontent\n\n:::',
   },
 ]
 
@@ -76,7 +76,7 @@ const invalid: InvalidTestCase[] = [
     ],
   },
   {
-    description: 'normalizes loose mode inner padding',
+    description: 'normalizes explicitly configured loose mode inner padding',
     code: '::: info\ncontent\n:::',
     output: '::: info\n\ncontent\n\n:::',
     errors: [

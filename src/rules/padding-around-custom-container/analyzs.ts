@@ -1,4 +1,4 @@
-import type { MessageIds } from '.'
+import type { MessageIds, Mode } from '.'
 import type { ChildrenNode, CustomContainerAST, CustomContainerBlockNode, OffsetRange } from '@/types/custom-container'
 import { isBlankNode, isCloseNode, isCustomContainerNode, isOpenNode } from '@/parser/custom-container'
 import { MESSAGE_IDS } from '.'
@@ -13,7 +13,7 @@ export type Issues = Array<Issue>
 interface AnalyzeContext {
   offset: number
   issues: Issues
-  mode?: 'compact' | 'loose'
+  mode?: Mode
 }
 
 interface ContainerBoundary {
@@ -26,32 +26,32 @@ interface ContainerBoundary {
  */
 export function getNodesIssues(
   nodes: CustomContainerBlockNode[],
-  offset: number,
-  ignoreRanges: OffsetRange[] = [],
-  mode: 'compact' | 'loose' = 'compact',
+  opts?: Partial<{ offset: number, ignoreRanges: OffsetRange[], mode: Mode }>,
 ): Issues {
+  const { offset = 0, ignoreRanges = [], mode = 'compact' } = opts || {}
   const issues: Issues = []
+
+  /**
+   * Recursively analyzes every custom-container level in a parsed document.
+   */
+  function analyzeLevel(nodes: ChildrenNode[], opts: AnalyzeContext): void {
+    for (let index = 0; index < nodes.length; index++) {
+      const container = nodes[index]
+      if (!isCustomContainerNode(container))
+        continue
+
+      const boundary = getContainerBoundary(container)
+      if (!boundary)
+        continue
+
+      analyzeInnerBoundary(container.children, boundary, opts)
+      analyzeOuterBoundary(nodes, index, opts)
+      analyzeLevel(container.children, opts)
+    }
+  }
+
   analyzeLevel(nodes, { offset, issues, mode })
   return dedupeIssues(issues).filter(issue => !ignoreRanges.some(range => issue.start < range.end && issue.end > range.start))
-}
-
-/**
- * Recursively analyzes every custom-container level in a parsed document.
- */
-export function analyzeLevel(nodes: ChildrenNode[], opts: AnalyzeContext): void {
-  for (let index = 0; index < nodes.length; index++) {
-    const container = nodes[index]
-    if (!isCustomContainerNode(container))
-      continue
-
-    const boundary = getContainerBoundary(container)
-    if (!boundary)
-      continue
-
-    analyzeInnerBoundary(container.children, boundary, opts)
-    analyzeOuterBoundary(nodes, index, opts)
-    analyzeLevel(container.children, opts)
-  }
 }
 
 /**
@@ -166,7 +166,7 @@ export function checkOuterSide(
   const contentIndex = isBlankNode(blank) ? blankIndex + direction : blankIndex
   const content = children[contentIndex]
 
-  if (!isExternalContent(content, contentIndex, children.length))
+  if (!isExternalContent(content, { index: contentIndex, length: children.length }))
     return
 
   if (!isBlankNode(blank)) {
@@ -200,11 +200,11 @@ export function checkOuterSide(
  */
 export function isExternalContent(
   node: ChildrenNode | undefined,
-  index: number,
-  length: number,
+  opts: { index: number, length: number },
 ): boolean {
   if (!node || isBlankNode(node))
     return false
+  const { index, length } = opts
   if (index === 0 && isOpenNode(node))
     return false
   if (index === length - 1 && isCloseNode(node))
