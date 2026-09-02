@@ -73,7 +73,7 @@ export function analyzeInnerBoundary(
 }
 
 /**
- *  Checks one side of a container's inner boundary for the selected mode.
+ * Checks one side of a container's inner boundary for the selected mode.
  */
 export function checkInnerSide(
   node: ChildrenNode | undefined,
@@ -116,7 +116,7 @@ export function getContainerBoundary(container: CustomContainerAST): ContainerBo
 }
 
 /**
- *  Adds an edit that normalizes an inner blank line to one line break.
+ * Adds an edit that normalizes an inner blank line to one line break.
  */
 export function addInnerIssues(
   blank: Extract<ChildrenNode, { type: 'blank' }>,
@@ -136,7 +136,7 @@ export function addInnerIssues(
 }
 
 /**
- *  Checks both sides of a container for the required external blank line.
+ * Checks both sides of a container for the required external blank line.
  */
 export function analyzeOuterBoundary(
   children: ChildrenNode[],

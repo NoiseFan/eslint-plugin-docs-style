@@ -2,7 +2,7 @@ import type { Text } from 'mdast'
 import type { Point, Position } from 'unist'
 import type { TextAst, TextToken, TextType } from '@/types/text/tokenizer'
 
-import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '../../utils/punctuation'
+import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '@/utils/punctuation'
 
 export const TEXT_TYPE = {
   'cjk': 'cjk',
