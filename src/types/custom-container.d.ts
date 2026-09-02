@@ -9,7 +9,7 @@ export interface CustomContainerAST {
    */
   type: 'custom-container'
   /**
-   *  Source range covering the complete container
+   * Source range covering the complete container
    */
   position: OffsetRange
   /**

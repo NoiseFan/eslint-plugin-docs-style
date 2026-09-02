@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import { describe, expect, it } from 'vitest'
-import { buildTextNodeAst, getTextType, tokenizeText } from '@/utils/text'
+import { buildTextNodeAst, getTextType, tokenizeText } from '@/parser/text'
 
 describe('getTextType', () => {
   it('classifies core character groups', () => {
@@ -22,19 +22,19 @@ describe('getTextType', () => {
 
 describe('tokenizeText', () => {
   it('groups same-type chars', async () => {
-    await expect(JSON.stringify(tokenizeText('中文 Vitest 4.1，OK'), null, 2)).toMatchFileSnapshot('__snapshots__/text/groups-same-type-chars.json')
+    await expect(JSON.stringify(tokenizeText('中文 Vitest 4.1，OK'), null, 2)).toMatchFileSnapshot('__snapshots__/groups-same-type-chars.json')
   })
 
   it('keeps decimal and percent suffixes in the same number token', async () => {
-    await expect(JSON.stringify(tokenizeText('中文 4.0% 增长'), null, 2)).toMatchFileSnapshot('__snapshots__/text/groups-number-fragments.json')
+    await expect(JSON.stringify(tokenizeText('中文 4.0% 增长'), null, 2)).toMatchFileSnapshot('__snapshots__/groups-number-fragments.json')
   })
 
   it('keeps code unit offsets', async () => {
-    await expect(JSON.stringify(tokenizeText('a🙂中'), null, 2)).toMatchFileSnapshot('__snapshots__/text/keeps-code-unit-offsets.json')
+    await expect(JSON.stringify(tokenizeText('a🙂中'), null, 2)).toMatchFileSnapshot('__snapshots__/keeps-code-unit-offsets.json')
   })
 
   it('tracks positions across lines', async () => {
-    await expect(JSON.stringify(tokenizeText('A\n中'), null, 2)).toMatchFileSnapshot('__snapshots__/text/tracks-positions-across-lines.json')
+    await expect(JSON.stringify(tokenizeText('A\n中'), null, 2)).toMatchFileSnapshot('__snapshots__/tracks-positions-across-lines.json')
   })
 })
 
@@ -49,6 +49,6 @@ describe('buildTextNodeAst', () => {
       },
     } as Text
 
-    await expect(JSON.stringify(buildTextNodeAst(node), null, 2)).toMatchFileSnapshot('__snapshots__/text/buildTextNodeAst-uses-mdast-offsets-for-token-ranges.json')
+    await expect(JSON.stringify(buildTextNodeAst(node), null, 2)).toMatchFileSnapshot('__snapshots__/uses-mdast-offsets.json')
   })
 })

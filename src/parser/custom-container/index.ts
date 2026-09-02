@@ -3,7 +3,7 @@ import type { OffsetRange } from '@/types/ast'
 import type { BlankNode, ChildrenNode, CustomContainerAST, TagNode } from '@/types/custom-container'
 import { hasChildren, isCodeNode, isObject } from '@/parser/ast'
 
-export * from './parse'
+export * from './parser'
 
 export const CUSTOM_CONTAINER_TYPES = [
   'info',
