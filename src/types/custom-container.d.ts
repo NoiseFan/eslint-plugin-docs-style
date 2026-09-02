@@ -9,7 +9,7 @@ export interface CustomContainerAST {
    */
   type: 'custom-container'
   /**
-   *  Source range covering the complete container
+   * Source range covering the complete container
    */
   position: OffsetRange
   /**
@@ -50,7 +50,7 @@ export interface TagNode {
    */
   raw: string
   /**
-   *  Tag content and its source range
+   * Tag content and its source range
    */
   value: { content: string } & OffsetRange
   /**
@@ -68,11 +68,11 @@ export interface TagNode {
 }
 
 /**
- *  AST node representing a blank line inside a custom container.
+ * AST node representing a blank line inside a custom container.
  */
 export interface BlankNode {
   /**
-   *  Node discriminator for blank lines
+   * Node discriminator for blank lines
    */
   type: 'blank'
   /**
@@ -90,7 +90,7 @@ export interface BlankNode {
  */
 export interface TextNode {
   /**
-   *  Node discriminator for text nodes
+   * Node discriminator for text nodes
    */
   type: 'text'
   /**

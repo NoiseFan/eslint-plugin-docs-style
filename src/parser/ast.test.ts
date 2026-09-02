@@ -10,7 +10,7 @@ import {
   isTextNode,
 } from '@/parser/ast'
 import { parseMarkdown } from '@/parser/markdown'
-import { buildTextNodeAst } from '@/utils/text'
+import { buildTextNodeAst } from '@/parser/text'
 
 describe('isParentNode', () => {
   it('returns true for nodes with children', () => {

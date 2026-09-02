@@ -2,7 +2,7 @@ import type { Text } from 'mdast'
 import type { TokenContext } from '@/parser/ast'
 import type { BoundarySpaceResult } from '@/types/text/boundary-space'
 import { getNodeContextByParent } from '@/parser/ast'
-import { buildTextNodeAst, TEXT_TYPE } from '@/utils/text/tokenizer'
+import { buildTextNodeAst, TEXT_TYPE } from '@/parser/text'
 
 export type BoundarySpaceMessageId
   = 'missingSpaceBefore'
