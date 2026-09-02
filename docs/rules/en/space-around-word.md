@@ -25,13 +25,17 @@ One space separates adjacent CJK and Latin text:
 <Box>使用 Babel 进行预插桩</Box>
 ```
 
-Punctuation at the start or end of a sentence does not create a CJK-Latin boundary, so the rule does not require an additional space there. An existing single space is preserved; runs of multiple spaces are still collapsed as described above:
+Punctuation at the start or end of a sentence does not create a CJK-Latin boundary, so the rule does not require an additional space there:
 
 ```md
 （Vitest）已发布。
 Vitest：一个快速的测试工具
+```
+
+An existing single space next to punctuation is not preserved:
+
+```md
 目前，Vitest 还不支持范围：
-我们感谢 Jest 团队和社区创建了一个令人愉悦的测试 API，并引入了许多已成为 Web 生态系统标准的测试模式。
 ```
 
 Text containing no CJK-Latin boundary is also valid:
