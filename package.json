@@ -21,7 +21,8 @@
     "test": "vitest",
     "test:cov": "vitest --coverage",
     "publish:ci": "pnpm --filter eslint-plugin-md-style publish:ci",
-    "release": "pnpm --filter eslint-plugin-md-style",
+    "gen:rules": "pnpm --filter eslint-plugin-md-style gen:rules",
+    "release": "pnpm --filter eslint-plugin-md-style release",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
@@ -38,8 +39,7 @@
     "vitest": "catalog:test"
   },
   "simple-git-hooks": {
-    "generate-readme-rules": "pnpm --filter eslint-plugin-md-style gen:rules",
-    "pre-commit": "pnpx lint-staged"
+    "pre-commit": "pnpm gen:rules && pnpx lint-staged"
   },
   "lint-staged": {
     "*.{js,ts,md,yml,yaml,json}": [

@@ -38,7 +38,7 @@
     "test:cov": "vitest --coverage",
     "typecheck": "tsc --noEmit",
     "release": "bumpp",
-    "prepublishOnly": "gen:readme && pnpm build"
+    "prepublishOnly": "gen:rules && pnpm build"
   },
   "peerDependencies": {
     "@antfu/eslint-config": "^7.5.0",

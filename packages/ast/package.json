@@ -2,8 +2,8 @@
   "name": "@md-style/ast",
   "type": "module",
   "version": "0.0.0",
-  "private": false,
-  "description": "A simple example library built by tsdown",
+  "private": true,
+  "description": "Extends Markdown AST",
   "exports": {
     ".": "./dist/index.mjs",
     "./package.json": "./package.json"
@@ -15,10 +15,5 @@
     "build": "tsdown",
     "dev": "tsdown --watch",
     "typecheck": "tsc --noEmit"
-  },
-  "devDependencies": {
-    "tsdown": "catalog:build",
-    "typescript": "catalog:dev",
-    "vitest": "catalog:test"
   }
 }
