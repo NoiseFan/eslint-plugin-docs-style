@@ -116,17 +116,7 @@ importers:
         specifier: catalog:test
         version: 4.1.11(@types/node@26.2.0)(@vitest/coverage-v8@4.1.11)(vite@8.0.10(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
 
-  packages/ast:
-    devDependencies:
-      tsdown:
-        specifier: catalog:build
-        version: 0.22.14(tsx@4.23.13)(typescript@6.0.3)(unrun@0.2.37(synckit@0.11.13))
-      typescript:
-        specifier: catalog:dev
-        version: 6.0.3
-      vitest:
-        specifier: catalog:test
-        version: 4.1.11(@types/node@26.2.0)(@vitest/coverage-v8@4.1.11)(vite@8.0.10(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+  packages/ast: {}
 
   packages/eslint-plugin-md-style:
     dependencies:
