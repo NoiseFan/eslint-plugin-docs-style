@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises'
 
-import { rules } from '../src/rules'
+import { rules } from '../rules'
 
 const readmePath = 'README.md'
 const readme = await fs.readFile(readmePath, 'utf8')

@@ -39,4 +39,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish package
-        run: pnpm run publish:ci
+        run: pnpm --filter eslint-plugin-md-style publish:ci

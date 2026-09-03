@@ -1,0 +1,24 @@
+{
+  "name": "@md-style/ast",
+  "type": "module",
+  "version": "0.0.0",
+  "private": false,
+  "description": "A simple example library built by tsdown",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "tsdown": "^0.22.5",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.11"
+  }
+}
