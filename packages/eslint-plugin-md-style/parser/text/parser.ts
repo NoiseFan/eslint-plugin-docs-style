@@ -1,6 +1,6 @@
 import type { Text } from 'mdast'
 import type { Point, Position } from 'unist'
-import type { TextAst, TextToken, TextType } from '@/types/text/tokenizer'
+import type { TextAst, TextToken, TextType } from '@/types/text'
 
 import { isDashPunctuation, isFullwidthPunctuation, isHalfwidthPunctuation } from '@/utils/punctuation'
 

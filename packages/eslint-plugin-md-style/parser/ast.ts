@@ -1,7 +1,6 @@
 import type { Code, InlineCode, Link, Nodes, Paragraph, Parents, PhrasingContent, RootContent, TableCell, Text } from 'mdast'
 import type { NodeContextReturnType, NodePositionReturnType, RuleContextWithAncestors } from '@/types/ast'
-import type { PositionOptions } from '@/types/text'
-import type { TextToken } from '@/types/text/tokenizer'
+import type { PositionOptions, TextToken } from '@/types/text'
 
 export function isObject(val: unknown): val is object {
   return !!val && typeof val === 'object'

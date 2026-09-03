@@ -1,5 +1,7 @@
 import type { Text } from 'mdast'
-import type { Position } from '../ast'
+
+import type { Position } from './ast'
+import type { OffsetRange } from '@/types/ast'
 
 export type TextType
   = | 'cjk'
@@ -51,4 +53,16 @@ export interface TextAst {
    * Tokenized children derived from the text content
    */
   children: TextToken[]
+}
+
+/**
+ * Whether to inspect the beginning or end of a text value.
+ */
+export type PositionOptions = 'head' | 'tail'
+
+/**
+ * Count and source range of consecutive whitespace at a text boundary.
+ */
+export interface WhiteSpaceReturn extends OffsetRange {
+  count: number
 }
