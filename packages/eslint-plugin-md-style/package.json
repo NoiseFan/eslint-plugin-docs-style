@@ -51,18 +51,18 @@
     }
   },
   "devDependencies": {
-    "@eslint/markdown": "^8.0.3",
-    "@types/mdast": "^4.0.4",
-    "@types/node": "^26.2.0",
-    "@types/unist": "^3.0.3",
-    "@typescript-eslint/utils": "^8.67.0",
-    "@vitest/coverage-v8": "^4.1.11",
-    "bumpp": "^12.2.1",
-    "eslint-plugin-format": "^2.0.1",
-    "eslint-plugin-md-style": "^0.2.0",
-    "eslint-typegen": "^2.3.1",
-    "eslint-vitest-rule-tester": "^3.1.0",
-    "tinyglobby": "^0.2.17",
-    "yaml": "^2.9.0"
+    "@eslint/markdown": "catalog:lint",
+    "@types/mdast": "catalog:types",
+    "@types/node": "catalog:types",
+    "@types/unist": "catalog:types",
+    "@typescript-eslint/utils": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:test",
+    "bumpp": "catalog:script",
+    "eslint-plugin-format": "catalog:lint",
+    "eslint-plugin-md-style": "catalog:lint",
+    "eslint-typegen": "catalog:lint",
+    "eslint-vitest-rule-tester": "catalog:lint",
+    "tinyglobby": "catalog:dev",
+    "yaml": "catalog:dev"
   }
 }

@@ -25,17 +25,17 @@
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.3.0",
-    "@vitest/coverage-v8": "^4.1.11",
-    "eslint": "10.8.1",
-    "eslint-factory": "^0.1.2",
-    "eslint-plugin-md-style": "^0.2.0",
-    "lint-staged": "^17.3.0",
-    "simple-git-hooks": "^2.13.1",
-    "tsdown": "^0.22.14",
-    "tsx": "^4.23.13",
-    "typescript": "^6.0.3",
-    "vitest": "^4.1.11"
+    "@antfu/eslint-config": "catalog:lint",
+    "@vitest/coverage-v8": "catalog:test",
+    "eslint": "catalog:lint",
+    "eslint-factory": "catalog:lint",
+    "eslint-plugin-md-style": "catalog:lint",
+    "lint-staged": "catalog:script",
+    "simple-git-hooks": "catalog:script",
+    "tsdown": "catalog:build",
+    "tsx": "catalog:script",
+    "typescript": "catalog:dev",
+    "vitest": "catalog:test"
   },
   "simple-git-hooks": {
     "generate-readme-rules": "pnpm --filter eslint-plugin-md-style gen:rules",
