@@ -34,6 +34,7 @@
     "build": "pnpm run gen:types && tsdown",
     "gen:types": "tsx scripts/typegen.ts",
     "gen:rules": "tsx scripts/readme.ts",
+    "publish:ci": "tsx scripts/publish.ts",
     "dev": "tsdown --watch",
     "test": "vitest",
     "test:cov": "vitest --coverage",
