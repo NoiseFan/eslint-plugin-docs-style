@@ -5,7 +5,6 @@ export default defineConfig({
   root: fileURLToPath(new URL('./', import.meta.url)),
   test: {
     globals: true,
-    passWithNoTests: true,
     include: ['**/*.test.ts'],
   },
 })
