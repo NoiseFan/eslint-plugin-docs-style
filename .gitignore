@@ -2,7 +2,6 @@ node_modules
 dist
 coverage
 _fixtures
-src/types/typegen.d.ts
 
 skiils
 .claude
@@ -12,3 +11,4 @@ skiils
 .eslintcache
 .local
 .idea
+

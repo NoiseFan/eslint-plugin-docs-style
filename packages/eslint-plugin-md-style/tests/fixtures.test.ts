@@ -1,10 +1,11 @@
 import type { Linter } from 'eslint'
 import fs from 'node:fs/promises'
 import { join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { ESLint } from 'eslint'
 import { glob } from 'tinyglobby'
 import { describe, it } from 'vitest'
-import plugin from '../src/index'
+import plugin from '../index'
 import { getFixtureRuleOverrides } from './helpers/fixture-rule-overrides'
 
 describe('fixtures', () => {
@@ -13,9 +14,10 @@ describe('fixtures', () => {
 
 function runWithConfig(name: string, configs: Linter.Config) {
   it.concurrent(name, async ({ expect }) => {
-    const from = resolve('tests/fixtures/input')
-    const output = resolve('tests/fixtures/output')
-    const target = resolve('tests/_fixtures')
+    const packageRoot = fileURLToPath(new URL('..', import.meta.url))
+    const from = resolve(packageRoot, 'tests/fixtures/input')
+    const output = resolve(packageRoot, 'tests/fixtures/output')
+    const target = resolve(packageRoot, 'tests/_fixtures')
 
     await fs.rm(target, { recursive: true, force: true })
     await fs.cp(from, target, { recursive: true, filter: src => !src.includes('node_modules') })

@@ -27,11 +27,11 @@ jobs:
           registry-url: https://registry.npmjs.org/
           cache: pnpm
 
-      - name: Update npm
-        run: npm install -g npm@latest
+      - name: Setup
+        run: npm i -g @antfu/ni
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Install
+        run: nci
 
       - name: Create GitHub release
         run: npx genereleaselog
@@ -39,4 +39,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish package
-        run: pnpm run publish:ci
+        run: pnpm --filter eslint-plugin-md-style publish:ci

@@ -57,10 +57,10 @@ jobs:
         run: nci
 
       - name: Typecheck
-        run: nr typecheck
+        run: pnpm --filter eslint-plugin-md-style typecheck
 
       - name: Build
-        run: nr build
+        run: pnpm --filter eslint-plugin-md-style build
 
   test:
     runs-on: ubuntu-latest

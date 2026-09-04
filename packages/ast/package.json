@@ -1,0 +1,19 @@
+{
+  "name": "@md-style/ast",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Extends Markdown AST",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "typecheck": "tsc --noEmit"
+  }
+}

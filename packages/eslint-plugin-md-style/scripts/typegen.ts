@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 
 import { flatConfigsToRulesDTS } from 'eslint-typegen/core'
-import plugin from '../src'
+import plugin from '..'
 
 // Generate option-aware typings for every rule exposed by the `all` config.
 const moduleAugmentation = `declare module 'eslint' {
@@ -13,4 +13,4 @@ const moduleAugmentation = `declare module 'eslint' {
 `
 const dts = (await flatConfigsToRulesDTS([plugin.configs.all])).replace(moduleAugmentation, '')
 
-await fs.writeFile('src/types/typegen.d.ts', dts)
+await fs.writeFile('types/typegen.d.ts', dts)

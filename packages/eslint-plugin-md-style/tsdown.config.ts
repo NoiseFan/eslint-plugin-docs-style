@@ -1,9 +1,12 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
+  entry: ['index.ts'],
   platform: 'node',
   exports: true,
-  external: ['@eslint/markdown'],
+  deps: {
+    neverBundle: ['@eslint/markdown'],
+  },
   dts: true,
   clean: true,
 })

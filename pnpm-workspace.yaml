@@ -1,7 +1,40 @@
+minimumReleaseAgeExcludePrune: true
+trustPolicy: no-downgrade
 shellEmulator: true
 
-trustPolicy: no-downgrade
+packages:
+  - packages/*
 
 onlyBuiltDependencies:
   - esbuild
   - simple-git-hooks
+
+catalogs:
+  build:
+    tsdown: ^0.22.5
+  dev:
+    '@typescript-eslint/utils': ^8.67.0
+    tinyglobby: ^0.2.17
+    typescript: ^6.0.3
+    yaml: ^2.9.0
+  lint:
+    '@antfu/eslint-config': ^9.3.0
+    '@eslint/markdown': ^8.0.3
+    eslint: 10.8.1
+    eslint-factory: ^0.1.2
+    eslint-plugin-format: ^2.0.1
+    eslint-plugin-md-style: ^0.2.0
+    eslint-typegen: ^2.3.1
+    eslint-vitest-rule-tester: ^3.1.0
+  script:
+    bumpp: ^12.2.1
+    lint-staged: ^17.3.0
+    simple-git-hooks: ^2.13.1
+    tsx: ^4.23.13
+  test:
+    '@vitest/coverage-v8': ^4.1.11
+    vitest: ^4.1.11
+  types:
+    '@types/mdast': ^4.0.4
+    '@types/node': ^26.2.0
+    '@types/unist': ^3.0.3

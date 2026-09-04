@@ -1,0 +1,68 @@
+{
+  "name": "eslint-plugin-md-style",
+  "type": "module",
+  "version": "0.3.0",
+  "packageManager": "pnpm@10.21.0",
+  "description": "ESLint plugin for enforcing style rules in Markdown-based documentation",
+  "author": "noisefan <noisefan@163.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/NoiseFan/eslint-plugin-md-style#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+github.com:NoiseFan/eslint-plugin-md-style.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NoiseFan/eslint-plugin-md-style/issues"
+  },
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.mts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "pnpm gen:types && tsdown",
+    "gen:types": "tsx scripts/typegen.ts",
+    "gen:rules": "tsx scripts/readme.ts",
+    "publish:ci": "tsx scripts/publish.ts",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "test:cov": "vitest --coverage",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp",
+    "prepublishOnly": "gen:rules && pnpm build"
+  },
+  "peerDependencies": {
+    "@antfu/eslint-config": "^7.5.0",
+    "@eslint/markdown": "^7.5.1",
+    "eslint": "^9.30.0 || ^10.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@antfu/eslint-config": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/markdown": "catalog:lint",
+    "@types/mdast": "catalog:types",
+    "@types/node": "catalog:types",
+    "@types/unist": "catalog:types",
+    "@typescript-eslint/utils": "catalog:dev",
+    "@vitest/coverage-v8": "catalog:test",
+    "bumpp": "catalog:script",
+    "eslint-plugin-format": "catalog:lint",
+    "eslint-plugin-md-style": "catalog:lint",
+    "eslint-typegen": "catalog:lint",
+    "eslint-vitest-rule-tester": "catalog:lint",
+    "tinyglobby": "catalog:dev",
+    "yaml": "catalog:dev"
+  }
+}

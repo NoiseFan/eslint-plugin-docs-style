@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
 
-import { rules } from '../src/rules'
+import { rules } from '../rules'
 
-const readmePath = 'README.md'
+const readmePath = '../../README.md'
 const readme = await fs.readFile(readmePath, 'utf8')
 const table = [
   '| Rule | Included in `recommended` | Autofix |',
@@ -26,3 +26,4 @@ const updated = readme.replace(
 )
 
 await fs.writeFile(readmePath, updated)
+await fs.writeFile('README.md', updated)
