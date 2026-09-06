@@ -1,6 +1,6 @@
-import type { CustomContainer } from '../../src/index'
+import type { CustomContainer } from '@/'
+import { parseMarkdown } from '@/'
 import { describe, expect, it } from 'vitest'
-import { parseMarkdown } from '../../src/index'
 
 function firstContainer(source: string): CustomContainer {
   const node = parseMarkdown(source).children[0]
@@ -14,33 +14,39 @@ describe('customContainerFromMarkdown', () => {
 
     expect(container).toMatchObject({
       type: 'customContainer',
-      openTag: {
-        type: 'warning',
-        label: 'Be careful',
-        markerLength: 3,
+      tag: {
+        open: {
+          type: { value: 'warning' },
+          label: { value: 'Be careful' },
+          markerLength: 3,
+        },
+        close: { markerLength: 3 },
       },
       children: [{
         type: 'paragraph',
         children: [{ type: 'strong', children: [{ type: 'text', value: 'content' }] }],
       }],
-      closeTag: { markerLength: 3 },
     })
   })
 
   it('keeps opening fields focused and precisely positioned', () => {
     const container = firstContainer(' ::: details Click me {open}\r\nContent\r\n ::::')
-
-    expect(container.openTag).toEqual({
-      type: 'details',
-      typePosition: {
-        start: { line: 1, column: 6, offset: 5 },
-        end: { line: 1, column: 13, offset: 12 },
+    expect(container.tag.open).toEqual({
+      type: {
+        value: 'details',
+        position: {
+          start: { line: 1, column: 6, offset: 5 },
+          end: { line: 1, column: 13, offset: 12 },
+        },
       },
-      label: 'Click me',
-      labelPosition: {
-        start: { line: 1, column: 14, offset: 13 },
-        end: { line: 1, column: 22, offset: 21 },
+      label: {
+        value: 'Click me',
+        position: {
+          start: { line: 1, column: 14, offset: 13 },
+          end: { line: 1, column: 22, offset: 21 },
+        },
       },
+      markerLength: 3,
       attr: {
         value: 'open',
         position: {
@@ -48,13 +54,12 @@ describe('customContainerFromMarkdown', () => {
           end: { line: 1, column: 29, offset: 28 },
         },
       },
-      markerLength: 3,
       position: {
         start: { line: 1, column: 1, offset: 0 },
         end: { line: 1, column: 29, offset: 28 },
       },
     })
-    expect(container.closeTag).toEqual({
+    expect(container.tag.close).toEqual({
       markerLength: 4,
       position: {
         start: { line: 3, column: 1, offset: 39 },
@@ -83,7 +88,7 @@ describe('customContainerFromMarkdown', () => {
       type: 'paragraph',
       children: [{ type: 'text', value: 'text\n:::\nmore' }],
     }])
-    expect(container.closeTag?.markerLength).toBe(4)
+    expect(container.tag.close?.markerLength).toBe(4)
   })
 
   it('omits closeTag on an unclosed container', () => {
@@ -135,8 +140,10 @@ describe('customContainerFromMarkdown', () => {
     expect(quotedContainer).toMatchObject({
       type: 'customContainer',
       position: { start: { column: 3, offset: 2 } },
-      openTag: { position: { start: { column: 3, offset: 2 } } },
-      closeTag: { position: { start: { column: 3, offset: 23 } } },
+      tag: {
+        open: { position: { start: { column: 3, offset: 2 } } },
+        close: { position: { start: { column: 3, offset: 23 } } },
+      },
     })
 
     const list = parseMarkdown('- ::: tip\n  body\n  :::').children[0]
@@ -149,8 +156,8 @@ describe('customContainerFromMarkdown', () => {
   })
 
   it('accepts an equal or longer closing fence and trailing whitespace only', () => {
-    expect(firstContainer('::: info\na\n:::').closeTag?.markerLength).toBe(3)
-    expect(firstContainer('::: info\na\n::::  ').closeTag?.markerLength).toBe(4)
+    expect(firstContainer('::: info\na\n:::').tag.close?.markerLength).toBe(3)
+    expect(firstContainer('::: info\na\n::::  ').tag.close?.markerLength).toBe(4)
     expect(firstContainer('::: info\na\n::: trailing')).not.toHaveProperty('closeTag')
   })
 

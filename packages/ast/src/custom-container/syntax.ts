@@ -24,7 +24,9 @@ declare module 'micromark-util-types' {
   }
 }
 
-/** Create the micromark syntax extension for VitePress-style containers. */
+/**
+ * Create the micromark syntax extension for VitePress-style containers.
+ */
 export function customContainer(_options: CustomContainerOptions = {}): Extension {
   return {
     flow: {
@@ -42,11 +44,12 @@ function tokenizeCustomContainer(
   // Micromark tokenizer callbacks expose parser state through `this`.
   // eslint-disable-next-line ts/no-this-alias
   const self = this
-  const tail = self.events[self.events.length - 1]
+  const tail = self.events.at(-1)
   const initialIndent = tail?.[1].type === 'linePrefix'
     ? tail[2].sliceSerialize(tail[1], true).length
     : 0
-  let openingMarkerLength = 0
+
+  let openMarkerLength = 0
   let contentPrevious: Token | undefined
   const closingFence: Construct = { partial: true, tokenize: tokenizeClosingFence }
   const attr: Construct = { partial: true, tokenize: tokenizeAttr }
@@ -58,30 +61,32 @@ function tokenizeCustomContainer(
   function start(code: Code): State | undefined {
     const container = effects.enter('customContainer') as ContainerToken
     const fence = effects.enter('customContainerFence') as ContainerToken
+
     container._customContainerIndent = initialIndent
     fence._customContainerIndent = initialIndent
     effects.enter('customContainerFenceSequence')
-    return openingSequence(code)
+    return openSequence(code)
   }
 
-  function openingSequence(code: Code): State | undefined {
+  function openSequence(code: Code): State | undefined {
+    // console.log('[]', { COLON, code })
     if (code === COLON) {
-      openingMarkerLength++
+      openMarkerLength++
       effects.consume(code)
-      return openingSequence
+      return openSequence
     }
-    if (openingMarkerLength < 3 || !markdownSpace(code))
+    if (openMarkerLength < 3 || !markdownSpace(code))
       return nok(code)
     effects.exit('customContainerFenceSequence')
     effects.enter('whitespace')
     effects.consume(code)
-    return openingWhitespace
+    return openWhitespace
   }
 
-  function openingWhitespace(code: Code): State | undefined {
+  function openWhitespace(code: Code): State | undefined {
     if (markdownSpace(code)) {
       effects.consume(code)
-      return openingWhitespace
+      return openWhitespace
     }
     effects.exit('whitespace')
     if (!isTypeCharacter(code))
@@ -103,6 +108,17 @@ function tokenizeCustomContainer(
       return suffixWhitespace
     }
     return finishOpening(code)
+  }
+
+  function finishOpening(code: Code): State | undefined {
+    if (code !== null && !markdownLineEnding(code))
+      return nok(code)
+    effects.exit('customContainerFence')
+    if (code === null)
+      return after(code)
+    if (self.interrupt)
+      return ok(code)
+    return effects.attempt(nonLazyLine, contentStart, after)(code)
   }
 
   function suffixWhitespace(code: Code): State | undefined {
@@ -142,17 +158,6 @@ function tokenizeCustomContainer(
   function labelBeforeAttr(code: Code): State | undefined {
     effects.exit('customContainerLabel')
     return effects.attempt(attrSuffix, finishOpening, nok)(code)
-  }
-
-  function finishOpening(code: Code): State | undefined {
-    if (code !== null && !markdownLineEnding(code))
-      return nok(code)
-    effects.exit('customContainerFence')
-    if (code === null)
-      return after(code)
-    if (self.interrupt)
-      return ok(code)
-    return effects.attempt(nonLazyLine, contentStart, after)(code)
   }
 
   function contentStart(code: Code): State | undefined {
@@ -268,7 +273,7 @@ function tokenizeCustomContainer(
         closingEffects.consume(code)
         return closingSequence
       }
-      if (size < openingMarkerLength)
+      if (size < openMarkerLength)
         return closingNok(code)
       closingEffects.exit('customContainerFenceSequence')
       if (markdownSpace(code)) {

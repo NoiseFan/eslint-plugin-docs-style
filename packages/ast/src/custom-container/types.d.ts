@@ -8,17 +8,22 @@ export type CustomContainerOptions = Record<never, never>
 
 export interface CustomContainer extends Parent {
   type: 'customContainer'
-  openTag: CustomContainerOpenTag
-  closeTag?: CustomContainerCloseTag
   children: RootContent[]
+  tag: {
+    open: CustomContainerOpenTag
+    close?: CustomContainerCloseTag
+  }
   position?: Position
 }
 
+type CUSTOM_CONTAINER_TYPES = 'info' | 'tip' | 'warning' | 'danger' | 'details' | 'raw' | 'code-group' | 'v-pre' | 'tabs' | string
+
 export interface CustomContainerOpenTag {
-  type: string
-  typePosition?: Position
-  label?: string
-  labelPosition?: Position
+  type: {
+    value: CUSTOM_CONTAINER_TYPES
+    position?: Position
+  }
+  label?: CustomContainerAttr
   attr?: CustomContainerAttr
   markerLength: number
   position?: Position
@@ -31,7 +36,7 @@ export interface CustomContainerCloseTag {
 
 export interface CustomContainerAttr {
   value: string
-  position?: Position
+  position: Position
 }
 
 declare module 'mdast' {

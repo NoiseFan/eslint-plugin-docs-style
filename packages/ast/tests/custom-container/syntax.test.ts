@@ -1,7 +1,7 @@
 import type { Event } from 'micromark-util-types'
+import { customContainer } from '@/'
 import { parse, postprocess, preprocess } from 'micromark'
 import { describe, expect, it } from 'vitest'
-import { customContainer } from '../../src/index'
 
 function tokenEvents(source: string): Event[] {
   const parser = parse({ extensions: [customContainer()] })

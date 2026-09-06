@@ -1,4 +1,4 @@
-import type { CompileContext, Extension as FromMarkdownExtension } from 'mdast-util-from-markdown'
+import type { CompileContext, Extension } from 'mdast-util-from-markdown'
 import type { Token } from 'micromark-util-types'
 import type { Point, Position } from 'unist'
 import type { CustomContainer, CustomContainerOptions } from './types'
@@ -11,7 +11,7 @@ interface ContainerToken extends Token {
 /**
  * Create the mdast compiler extension matching `customContainer`.
  */
-export function customContainerFromMarkdown(_options: CustomContainerOptions = {}): FromMarkdownExtension {
+export function customContainerFromMarkdown(_options: CustomContainerOptions = {}): Extension {
   return {
     enter: { customContainer: enterContainer },
     exit: {
@@ -27,7 +27,7 @@ export function customContainerFromMarkdown(_options: CustomContainerOptions = {
 function enterContainer(this: CompileContext, token: Token): void {
   this.enter({
     type: 'customContainer',
-    openTag: { type: '', markerLength: 0 },
+    tag: { open: { type: { value: '' }, markerLength: 0 } },
     children: [],
   }, token)
 }
@@ -44,15 +44,15 @@ function exitFence(this: CompileContext, token: ContainerToken): void {
   const position: Position = { start: syntaxStart(token), end: publicPoint(token.end) }
 
   if (token._customContainerClosing)
-    node.closeTag = { markerLength, position }
+    node.tag.close = { markerLength, position }
   else
-    Object.assign(node.openTag, { markerLength, position })
+    Object.assign(node.tag.open, { markerLength, position })
 }
 
 function exitType(this: CompileContext, token: Token): void {
-  const openTag = currentContainer(this).openTag
-  openTag.type = this.sliceSerialize(token)
-  openTag.typePosition = tokenPosition(token)
+  const openTag = currentContainer(this).tag.open
+  openTag.type.value = this.sliceSerialize(token)
+  openTag.type.position = tokenPosition(token)
 }
 
 function exitLabel(this: CompileContext, token: Token): void {
@@ -61,17 +61,19 @@ function exitLabel(this: CompileContext, token: Token): void {
   if (!value)
     return
 
-  const openTag = currentContainer(this).openTag
-  openTag.label = value
-  openTag.labelPosition = {
-    start: publicPoint(token.start),
-    end: shiftPoint(token.start, value.length),
+  const openTag = currentContainer(this).tag.open
+  openTag.label = {
+    value,
+    position: {
+      start: publicPoint(token.start),
+      end: shiftPoint(token.start, value.length),
+    },
   }
 }
 
 function exitAttr(this: CompileContext, token: Token): void {
   const raw = this.sliceSerialize(token)
-  currentContainer(this).openTag.attr = {
+  currentContainer(this).tag.open.attr = {
     value: raw.slice(1, -1),
     position: tokenPosition(token),
   }
